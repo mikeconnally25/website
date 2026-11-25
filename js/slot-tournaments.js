@@ -174,6 +174,9 @@ function findCatalogSlot(nameOrSlot) {
 }
 
 const CLAIM_SLOT_GROUPS = [
+  { slug: "slots", label: "Slots" },
+  { slug: "live-games", label: "Live Games" },
+  { slug: "game-shows", label: "Game Shows" },
   { slug: "new-games", label: "New Games" },
   { slug: "bonus-buys", label: "Bonus Buys" },
 ];
@@ -1779,7 +1782,7 @@ function setPickerOpen(nextOpen) {
   if (label) {
     label.textContent = pickerOpen
       ? "Hide slot list"
-      : "Choose New Games or Bonus Buys…";
+      : "Choose a Roobet game…";
   }
   if (pickerOpen) {
     renderSlotPickerOptions();
@@ -1869,7 +1872,7 @@ function renderSlotPickerOptions() {
     } else if (!visibleCount) {
       empty.textContent = query
         ? "No matching slots."
-        : "No New Games / Bonus Buys slots found.";
+        : "No Roobet games found.";
       empty.classList.remove("is-hidden");
     } else {
       empty.classList.add("is-hidden");
@@ -1885,7 +1888,7 @@ function renderSlotPickerOptions() {
         (total, group) => total + catalogSlotsForGroup(group).length,
         0
       );
-      meta.textContent = `${sectionCount} New Games / Bonus Buys slots`;
+      meta.textContent = `${sectionCount} Roobet games`;
     }
   }
 }
@@ -2598,7 +2601,7 @@ function renderClaimSlotPickerOptions() {
     } else if (!visibleCount) {
       empty.textContent = query
         ? "No matching slots."
-        : "No New Games / Bonus Buys slots found.";
+        : "No Roobet games found.";
       empty.classList.remove("is-hidden");
     } else {
       empty.classList.add("is-hidden");

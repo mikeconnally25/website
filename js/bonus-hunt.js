@@ -1011,7 +1011,15 @@ function formatCatalogCountSummary() {
   let unique;
 
   if (sections?.length) {
-    parts = sections.map((section) => `${section.label}: ${section.count || 0}`);
+    const ranked = [...sections].sort(
+      (a, b) => (b.count || 0) - (a.count || 0)
+    );
+    parts = ranked
+      .slice(0, 6)
+      .map((section) => `${section.label}: ${section.count || 0}`);
+    if (ranked.length > 6) {
+      parts.push(`+${ranked.length - 6} more`);
+    }
     unique =
       Number.isFinite(uniqueFromApi) && uniqueFromApi >= 0
         ? uniqueFromApi
@@ -1022,8 +1030,9 @@ function formatCatalogCountSummary() {
     parts = (slotGroups.length
       ? slotGroups
       : [
-          { slug: "new-games", label: "New Games" },
-          { slug: "bonus-buys", label: "Bonus Buys" },
+          { slug: "slots", label: "Slots" },
+          { slug: "live-games", label: "Live Games" },
+          { slug: "game-shows", label: "Game Shows" },
         ]
     ).map((group) => {
       const total = local.counts[group.slug] || 0;
@@ -1034,8 +1043,8 @@ function formatCatalogCountSummary() {
   let summary = parts.length
     ? `${parts.join(" · ")} (${unique} unique)`
     : unique === 1
-      ? "1 unique Roobet slot"
-      : `${unique} unique Roobet slots`;
+      ? "1 unique Roobet game"
+      : `${unique} unique Roobet games`;
 
   const updatedLabel = formatCatalogUpdatedAt(slotCatalogUpdatedAt);
   if (updatedLabel) {
@@ -4539,7 +4548,7 @@ function initAdminForm() {
   document.getElementById("slot-sync-roobet")?.addEventListener("click", async (event) => {
     const button = event.currentTarget;
     button.disabled = true;
-    setCatalogSyncStatus("Syncing New Games and Bonus Buys from Roobet…", "pending");
+    setCatalogSyncStatus("Syncing all playable Roobet games…", "pending");
     try {
       const response = await fetch("/api/bonus-hunt/slots/sync-roobet", {
         method: "POST",

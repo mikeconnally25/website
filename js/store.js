@@ -895,7 +895,7 @@ function renderRedeemSlotResults() {
   if (!matches.length) {
     results.classList.add("is-hidden");
     empty.classList.remove("is-hidden");
-    empty.textContent = "No matching slots in New Games or Bonus Buys.";
+    empty.textContent = "No matching Roobet games.";
     return;
   }
 
@@ -964,7 +964,7 @@ async function openRedeemModal(item) {
   if (copy) {
     copy.textContent = itemNeedsBonusType(item)
       ? `Redeeming ${item.title}. Pick a synced slot, then Regular, Super, or Epic.`
-      : `Redeeming ${item.title}. Pick a synced Roobet New Games or Bonus Buys slot.`;
+      : `Redeeming ${item.title}. Pick a synced Roobet game.`;
   }
   typeWrap?.classList.toggle("is-hidden", !itemNeedsBonusType(item));
   modal.classList.remove("is-hidden");
@@ -1063,7 +1063,7 @@ function initRedeemModal() {
     const submit = document.getElementById("store-redeem-submit");
 
     if (!selectedRedeemSlot?.name || !selectedRedeemSlot?.slug) {
-      setRedeemModalError("Pick a slot from Roobet New Games or Bonus Buys.");
+      setRedeemModalError("Pick a game from the synced Roobet catalog.");
       search?.focus();
       return;
     }
