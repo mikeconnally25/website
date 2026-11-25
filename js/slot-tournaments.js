@@ -174,8 +174,8 @@ function findCatalogSlot(nameOrSlot) {
 }
 
 const CLAIM_SLOT_GROUPS = [
-  { slug: "new-releases", label: "New Releases" },
-  { slug: "only-on-stake", label: "Only on Stake" },
+  { slug: "new-games", label: "New Games" },
+  { slug: "bonus-buys", label: "Bonus Buys" },
 ];
 
 function slotBelongsToGroup(slot, groupSlug) {
@@ -1779,7 +1779,7 @@ function setPickerOpen(nextOpen) {
   if (label) {
     label.textContent = pickerOpen
       ? "Hide slot list"
-      : "Choose New Releases or Only on Stake…";
+      : "Choose New Games or Bonus Buys…";
   }
   if (pickerOpen) {
     renderSlotPickerOptions();
@@ -1864,12 +1864,12 @@ function renderSlotPickerOptions() {
 
   if (empty) {
     if (!slotCatalog.length) {
-      empty.textContent = "Loading Stake slots…";
+      empty.textContent = "Loading Roobet slots…";
       empty.classList.remove("is-hidden");
     } else if (!visibleCount) {
       empty.textContent = query
         ? "No matching slots."
-        : "No New Releases / Only on Stake slots found.";
+        : "No New Games / Bonus Buys slots found.";
       empty.classList.remove("is-hidden");
     } else {
       empty.classList.add("is-hidden");
@@ -1885,7 +1885,7 @@ function renderSlotPickerOptions() {
         (total, group) => total + catalogSlotsForGroup(group).length,
         0
       );
-      meta.textContent = `${sectionCount} New Releases / Only on Stake slots`;
+      meta.textContent = `${sectionCount} New Games / Bonus Buys slots`;
     }
   }
 }
@@ -2029,7 +2029,7 @@ async function loadSlotCatalog({ force = false } = {}) {
   catalogLoadPromise = (async () => {
     const meta = document.getElementById("st-assign-catalog-meta");
     if (meta && !slotCatalog.length) {
-      meta.textContent = "Loading Stake slots…";
+      meta.textContent = "Loading Roobet slots…";
     }
 
     try {
@@ -2058,16 +2058,16 @@ async function loadSlotCatalog({ force = false } = {}) {
       return slotCatalog;
     } catch (error) {
       if (meta) {
-        meta.textContent = error.message || "Could not load Stake slot catalog.";
+        meta.textContent = error.message || "Could not load Roobet slot catalog.";
       }
       const empty = document.getElementById("st-assign-slot-empty");
       if (empty && pickerOpen) {
-        empty.textContent = error.message || "Could not load Stake slots.";
+        empty.textContent = error.message || "Could not load Roobet slots.";
         empty.classList.remove("is-hidden");
       }
       const claimEmpty = document.getElementById("st-claim-slot-empty");
       if (claimEmpty && claimPickerOpen) {
-        claimEmpty.textContent = error.message || "Could not load Stake slots.";
+        claimEmpty.textContent = error.message || "Could not load Roobet slots.";
         claimEmpty.classList.remove("is-hidden");
       }
       throw error;
@@ -2516,7 +2516,7 @@ function setClaimPickerOpen(open, { entryId = null, username = "" } = {}) {
         if (claimPickerOpen) renderClaimSlotPickerOptions();
       })
       .catch((error) => {
-        setClaimStatus(error.message || "Could not load Stake slots.", "error");
+        setClaimStatus(error.message || "Could not load Roobet slots.", "error");
         renderClaimSlotPickerOptions();
       });
     window.setTimeout(() => {
@@ -2593,12 +2593,12 @@ function renderClaimSlotPickerOptions() {
 
   if (empty) {
     if (!slotCatalog.length) {
-      empty.textContent = "Loading Stake slots…";
+      empty.textContent = "Loading Roobet slots…";
       empty.classList.remove("is-hidden");
     } else if (!visibleCount) {
       empty.textContent = query
         ? "No matching slots."
-        : "No New Releases / Only on Stake slots found.";
+        : "No New Games / Bonus Buys slots found.";
       empty.classList.remove("is-hidden");
     } else {
       empty.classList.add("is-hidden");

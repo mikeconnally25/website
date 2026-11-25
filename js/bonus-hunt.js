@@ -1022,8 +1022,8 @@ function formatCatalogCountSummary() {
     parts = (slotGroups.length
       ? slotGroups
       : [
-          { slug: "new-releases", label: "New Releases" },
-          { slug: "only-on-stake", label: "Only on Stake" },
+          { slug: "new-games", label: "New Games" },
+          { slug: "bonus-buys", label: "Bonus Buys" },
         ]
     ).map((group) => {
       const total = local.counts[group.slug] || 0;
@@ -1034,8 +1034,8 @@ function formatCatalogCountSummary() {
   let summary = parts.length
     ? `${parts.join(" · ")} (${unique} unique)`
     : unique === 1
-      ? "1 unique Stake slot"
-      : `${unique} unique Stake slots`;
+      ? "1 unique Roobet slot"
+      : `${unique} unique Roobet slots`;
 
   const updatedLabel = formatCatalogUpdatedAt(slotCatalogUpdatedAt);
   if (updatedLabel) {
@@ -1049,7 +1049,7 @@ function updateSlotCatalogNote() {
   const note = document.getElementById("slot-catalog-note");
   const summary = slotCatalog.length
     ? formatCatalogCountSummary()
-    : "No slots loaded yet. Use Sync New Releases and Sync Only on Stake above.";
+    : "No slots loaded yet. Use Sync from Roobet above.";
 
   if (note && isHuntAdmin()) {
     note.textContent = summary;
@@ -4536,25 +4536,29 @@ function initAdminForm() {
     );
   }
 
-  document.getElementById("slot-sync-new-releases")?.addEventListener("click", async (event) => {
+  document.getElementById("slot-sync-roobet")?.addEventListener("click", async (event) => {
     const button = event.currentTarget;
     button.disabled = true;
+    setCatalogSyncStatus("Syncing New Games and Bonus Buys from Roobet…", "pending");
     try {
-      await startDirectGroupSync("new-releases");
+      const response = await fetch("/api/bonus-hunt/slots/sync-roobet", {
+        method: "POST",
+        credentials: "include",
+        headers: { Accept: "application/json" },
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || "Could not sync from Roobet.");
+      }
+      await loadSlotCatalog();
+      const logoNote =
+        data.withThumbnails > 0 ? ` · ${data.withThumbnails} with logos` : "";
+      setCatalogSyncStatus(
+        `Roobet synced. ${formatCatalogCountSummary()}${logoNote}`,
+        "success"
+      );
     } catch (error) {
-      setCatalogSyncStatus(error.message || "Could not sync New Releases.", "error");
-    } finally {
-      button.disabled = false;
-    }
-  });
-
-  document.getElementById("slot-sync-only-on-stake")?.addEventListener("click", async (event) => {
-    const button = event.currentTarget;
-    button.disabled = true;
-    try {
-      await startDirectGroupSync("only-on-stake");
-    } catch (error) {
-      setCatalogSyncStatus(error.message || "Could not sync Only on Stake.", "error");
+      setCatalogSyncStatus(error.message || "Could not sync from Roobet.", "error");
     } finally {
       button.disabled = false;
     }

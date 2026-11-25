@@ -149,7 +149,7 @@ async function loadSlotStats() {
     document.getElementById("slot-stats-results")?.classList.add("is-hidden");
     document.getElementById("slot-stats-results")?.replaceChildren();
     if (empty) {
-      empty.textContent = "Type a slot name from New Releases or Only on Stake.";
+      empty.textContent = "Type a slot name from New Games or Bonus Buys.";
       empty.classList.remove("is-hidden");
     }
     renderSlotStatsDetail(null);
@@ -172,7 +172,7 @@ async function loadSlotStats() {
     }
     if (empty) {
       empty.textContent = data.catalogEmpty
-        ? "No slots loaded yet. Sync New Releases and Only on Stake from Bonus Hunt."
+        ? "No slots loaded yet. Sync from Roobet on Bonus Hunt."
         : "No matching slots.";
     }
     renderSlotStatsMatches();

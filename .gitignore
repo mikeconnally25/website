@@ -21,5 +21,8 @@ data/daily-claims.json
 data/average-x.json
 data/points-purchases.json
 data/slot-tournament-predictions.json
+data/chat-promos-state.json
+data/site-chat.json
+data/game-state.json
 .vercel
 .env*
