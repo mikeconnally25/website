@@ -44,9 +44,11 @@ async function main() {
   console.log(`Subscriptions HTTP ${response.status}`);
   console.log(JSON.stringify(data, null, 2));
 
-  const webhookResponse = await fetch(
-    "https://website-vzqie.vercel.app/api/kick/webhook"
-  );
+  const siteUrl = (process.env.SITE_URL || "").replace(/\/$/, "");
+  const webhookUrl = siteUrl
+    ? `${siteUrl}/api/kick/webhook`
+    : "http://localhost:3848/api/kick/webhook";
+  const webhookResponse = await fetch(webhookUrl);
   console.log(`\nWebhook GET HTTP ${webhookResponse.status}`);
   console.log(await webhookResponse.text());
 }

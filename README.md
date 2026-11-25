@@ -51,7 +51,8 @@ Restart `npm run dev`, then open http://localhost:3848 and click **Sign in with 
 Add the same vars in the Vercel project → Settings → Environment Variables, with:
 
 ```env
-KICK_REDIRECT_URI=https://YOUR-VERCEL-DOMAIN/api/auth/callback
+SITE_URL=https://www.vzqie.com
+KICK_REDIRECT_URI=https://www.vzqie.com/api/auth/callback
 ```
 
 Update the Kick app Redirect URL to that same production callback (Kick usually allows one redirect per app — switch it when you go live, or create a second Kick app for local).
