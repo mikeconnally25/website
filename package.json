@@ -4,10 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
+    "dev": "node local-server.js",
+    "start": "node local-server.js",
     "verify:kick": "node scripts/verify-kick-credentials.mjs",
     "diagnose:kick": "node scripts/diagnose-kick-chat.mjs"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "dependencies": {
     "@vercel/speed-insights": "^2.0.0",

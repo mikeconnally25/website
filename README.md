@@ -18,6 +18,8 @@ npm run dev
 
 Default port is **3848**. Open http://localhost:3848
 
+On Vercel, static pages are served from the repo root and APIs from `/api/*`. `local-server.js` is for local development only (do not use Express as the Vercel framework preset — use **Other**).
+
 ## Kick auth / admin features
 
 House games, chat, and admin tools need Kick OAuth credentials in `.env`.

@@ -1,5 +1,9 @@
 {
   "version": 2,
+  "framework": null,
+  "buildCommand": null,
+  "outputDirectory": null,
+  "installCommand": "npm install",
   "functions": {
     "api/**/*.js": {
       "maxDuration": 10
@@ -21,6 +25,12 @@
       "source": "/slots-bonus-buys/",
       "destination": "/slot-tournaments/",
       "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/index.html"
     }
   ]
 }
