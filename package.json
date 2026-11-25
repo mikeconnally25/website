@@ -1,0 +1,19 @@
+{
+  "name": "vzqie-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "verify:kick": "node scripts/verify-kick-credentials.mjs",
+    "diagnose:kick": "node scripts/diagnose-kick-chat.mjs"
+  },
+  "dependencies": {
+    "@vercel/speed-insights": "^2.0.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jose": "^5.10.0",
+    "stripe": "^23.0.0"
+  }
+}

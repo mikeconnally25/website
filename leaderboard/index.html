@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Leaderboard — Stake wagering and UncCoins standings on vzqie." />
+  <title>Leaderboard | vzqie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css?v=lbtabs1" />
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="header" id="top">
+    <nav class="nav container">
+      <a href="/" class="logo">
+        <img src="/images/logo.png" alt="" class="logo-image" width="50" height="50" />
+        <span class="logo-text">vzqie</span>
+      </a>
+
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <ul class="nav-links">
+        <li><a href="/#watch">Watch</a></li>
+        <li class="is-hidden" id="admin-nav-commands">
+        <a href="/commands/">Commands</a>
+      </li>
+        <li><a href="/#menu">Menu</a></li>
+        <li><a href="/#house-games">House Games</a></li>
+        <li><a href="/#links">Links</a></li>
+        <li class="is-hidden" id="admin-nav-accounts">
+          <a href="/accounts/">Accounts</a>
+        </li>
+        <li>
+          <div class="auth-panel" id="auth-panel">
+            <div class="auth-guest" id="auth-guest">
+              <a href="/api/auth/login" class="btn btn-sm btn-kick">Sign in with Kick</a>
+            </div>
+            <div class="auth-member is-hidden" id="auth-member">
+              <div class="auth-user">
+                <img id="auth-avatar" class="auth-avatar is-hidden" alt="" width="32" height="32" />
+                <span id="auth-username" class="auth-username"></span>
+                <span id="auth-admin-badge" class="auth-admin-badge is-hidden">Admin</span>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline" id="auth-logout">Sign out</button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="auth-toast is-hidden" id="auth-toast" role="status" aria-live="polite"></div>
+
+    <section class="section page-section leaderboard-page">
+      <div class="section-atmosphere" aria-hidden="true"></div>
+      <div class="container leaderboard-shell">
+        <a href="/#menu" class="back-link">← Back to menu</a>
+
+        <header class="lb-top">
+          <div>
+            <p class="section-eyebrow">vzqie</p>
+            <h1 class="lb-title">Leaderboard</h1>
+            <div class="lb-tabs" role="tablist" aria-label="Leaderboard type">
+              <button type="button" class="lb-tab is-active" role="tab" id="lb-tab-stake" data-lb-tab="stake" aria-selected="true" aria-controls="lb-panel-stake">Stake wagered</button>
+              <button type="button" class="lb-tab" role="tab" id="lb-tab-unc" data-lb-tab="unc" aria-selected="false" aria-controls="lb-panel-unc">UncCoins</button>
+            </div>
+            <p class="lb-lede" id="lb-lede">Top 10 wagered on code <strong>vzqie</strong>.</p>
+            <button type="button" class="btn btn-sm btn-outline lb-rules-toggle" id="leaderboard-rules-toggle" aria-expanded="false" aria-controls="leaderboard-rules">
+              Competition rules
+            </button>
+          </div>
+          <div class="lb-meta" id="lb-meta-stake">
+            <div class="lb-stat">
+              <span>Monthly pool</span>
+              <strong>$5,000</strong>
+            </div>
+            <div class="lb-stat">
+              <span>Period</span>
+              <strong id="leaderboard-period">—</strong>
+            </div>
+            <div class="lb-stat">
+              <span>Updated</span>
+              <strong id="leaderboard-updated">—</strong>
+            </div>
+          </div>
+          <div class="lb-meta is-hidden" id="lb-meta-unc">
+            <div class="lb-stat">
+              <span>Pool</span>
+              <strong>$175</strong>
+            </div>
+            <div class="lb-stat">
+              <span id="unc-ends-label">Ends in</span>
+              <strong id="unc-ends">—</strong>
+            </div>
+            <div class="lb-stat">
+              <span>Players</span>
+              <strong id="unc-players">—</strong>
+            </div>
+          </div>
+        </header>
+
+        <div class="lb-rules is-hidden" id="leaderboard-rules">
+          <article class="lb-rule">
+            <div class="lb-rule-head">
+              <span class="lb-rule-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 3h10v2a5 5 0 0 1-4 4.9V12h3v2H8v-2h3v-2.1A5 5 0 0 1 7 5V3Zm2 2v.2a3 3 0 0 0 2 2.8 3 3 0 0 0 2-2.8V5H9Zm-4 14h14v2H5v-2Z"/></svg>
+              </span>
+              <h2>How to Participate</h2>
+            </div>
+            <p>Play on <a href="https://stake.com" target="_blank" rel="noopener noreferrer">Stake.com</a> using the affiliate code <strong>vzqie</strong>. All wagers automatically count towards your leaderboard position.</p>
+          </article>
+          <article class="lb-rule">
+            <div class="lb-rule-head">
+              <span class="lb-rule-icon is-ok" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1.2 14.2-4-4 1.4-1.4 2.6 2.6 5-5 1.4 1.4-6.4 6.4Z"/></svg>
+              </span>
+              <h2>Eligible Games</h2>
+            </div>
+            <p>All game types count: Casino slots, Live games, Sports betting, and Stake Originals.</p>
+          </article>
+          <article class="lb-rule">
+            <div class="lb-rule-head">
+              <span class="lb-rule-icon is-warn" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 3.2 1.8 21h20.4L12 3.2ZM11 10h2v5h-2v-5Zm0 6.5h2V19h-2v-2.5Z"/></svg>
+              </span>
+              <h2>New Wager Counting Rules</h2>
+            </div>
+            <ul>
+              <li>Games with RTP ≤98%: <strong class="is-full">100% of wagered amount counts</strong></li>
+              <li>Games with RTP &gt;98%: <strong class="is-half">50% of wagered amount counts</strong></li>
+              <li>Games with RTP ≥99%: <strong class="is-low">10% of wagered amount counts</strong></li>
+            </ul>
+            <p>This adjustment discourages high RTP game abuse and ensures fairer competition.</p>
+          </article>
+        </div>
+
+        <p class="guess-status is-hidden" id="leaderboard-status" role="status" aria-live="polite"></p>
+
+        <div class="lb-panel is-active" id="lb-panel-stake" data-lb-panel="stake" role="tabpanel" aria-labelledby="lb-tab-stake">
+          <div class="lb-podium is-hidden" id="leaderboard-podium-panel">
+            <div class="lb-podium-stage" id="leaderboard-podium-stage" aria-label="Top 3 wagered players"></div>
+          </div>
+
+          <section class="lb-board bj21-panel" aria-labelledby="leaderboard-standings-title">
+            <span class="bj21-panel-glow" aria-hidden="true"></span>
+            <div class="lb-board-head">
+              <h2 class="lb-board-title" id="leaderboard-standings-title">Standings</h2>
+              <label class="lb-search">
+                <input id="leaderboard-filter" type="search" placeholder="Find a player" aria-label="Find a player" autocomplete="off" enterkeyhint="search" />
+              </label>
+            </div>
+
+            <div class="lb-cols is-hidden" id="leaderboard-table-head">
+              <span>Rank</span>
+              <span>Player</span>
+              <span>Wagered</span>
+              <span>Prize</span>
+            </div>
+
+            <p class="lb-empty" id="leaderboard-empty">No leaderboard entries yet.</p>
+            <p class="lb-empty is-hidden" id="leaderboard-filter-empty">No player matches that search.</p>
+
+            <ol class="lb-list is-hidden" id="leaderboard-list"></ol>
+          </section>
+        </div>
+
+        <div class="lb-panel is-hidden" id="lb-panel-unc" data-lb-panel="unc" role="tabpanel" aria-labelledby="lb-tab-unc" hidden>
+          <div class="lb-podium is-hidden" id="unc-podium-panel">
+            <div class="lb-podium-stage" id="unc-podium-stage" aria-label="Top 3 UncCoin holders"></div>
+          </div>
+
+          <section class="lb-board bj21-panel" aria-labelledby="unc-standings-title">
+            <span class="bj21-panel-glow" aria-hidden="true"></span>
+            <div class="lb-board-head">
+              <h2 class="lb-board-title" id="unc-standings-title">Standings</h2>
+              <label class="lb-search">
+                <input id="unc-filter" type="search" placeholder="Find a player" aria-label="Find a player" autocomplete="off" enterkeyhint="search" />
+              </label>
+            </div>
+
+            <div class="lb-cols is-hidden" id="unc-table-head">
+              <span>Rank</span>
+              <span>Player</span>
+              <span>UncCoins</span>
+              <span>Prize</span>
+            </div>
+
+            <p class="lb-empty" id="unc-empty">No UncCoins yet.</p>
+            <p class="lb-empty is-hidden" id="unc-filter-empty">No player matches that search.</p>
+
+            <ol class="lb-list is-hidden" id="unc-list"></ol>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-text">vzqie</span>
+        <p>Gambling entertainment stream. 18+ only.</p>
+      </div>
+      <p class="disclaimer">
+        Gambling can be addictive. Please play responsibly. This channel is for entertainment purposes only.
+        If you or someone you know has a gambling problem, call <strong>1-800-GAMBLER</strong> or visit
+        <a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">BeGambleAware.org</a>.
+      </p>
+      <p class="copyright">&copy; <span id="year"></span> vzqie. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/main.js?v=avgx1"></script>
+  <script src="/js/auth.js?v=claim24h"></script>
+  <script src="/js/leaderboard.js?v=lbtabs1"></script>
+</body>
+</html>

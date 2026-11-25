@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "functions": {
+    "api/**/*.js": {
+      "maxDuration": 10
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/chat-promos",
+      "schedule": "*/10 * * * *"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/slots-bonus-buys",
+      "destination": "/slot-tournaments/",
+      "permanent": true
+    },
+    {
+      "source": "/slots-bonus-buys/",
+      "destination": "/slot-tournaments/",
+      "permanent": true
+    }
+  ]
+}

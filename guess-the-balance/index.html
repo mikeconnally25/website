@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Guess the Balance — vzqie stream game on Kick." />
+  <title>Guess the Balance | vzqie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css?v=menuside1" />
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="header" id="top">
+    <nav class="nav container">
+      <a href="/" class="logo">
+        <img src="/images/logo.png" alt="" class="logo-image" width="50" height="50" />
+        <span class="logo-text">vzqie</span>
+      </a>
+
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <ul class="nav-links">
+        <li><a href="/#watch">Watch</a></li>
+        <li class="is-hidden" id="admin-nav-commands">
+        <a href="/commands/">Commands</a>
+      </li>
+        <li><a href="/#menu">Menu</a></li>
+        <li><a href="/#house-games">House Games</a></li>
+        <li><a href="/#links">Links</a></li>
+        <li class="is-hidden" id="admin-nav-accounts">
+          <a href="/accounts/">Accounts</a>
+        </li>
+        <li>
+          <div class="auth-panel" id="auth-panel">
+            <div class="auth-guest" id="auth-guest">
+              <a href="/api/auth/login" class="btn btn-sm btn-kick">Sign in with Kick</a>
+            </div>
+            <div class="auth-member is-hidden" id="auth-member">
+              <div class="auth-user">
+                <img id="auth-avatar" class="auth-avatar is-hidden" alt="" width="32" height="32" />
+                <span id="auth-username" class="auth-username"></span>
+                <span id="auth-admin-badge" class="auth-admin-badge is-hidden">Admin</span>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline" id="auth-logout">Sign out</button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="auth-toast is-hidden" id="auth-toast" role="status" aria-live="polite"></div>
+
+    <section class="section page-section guess-balance-page">
+      <div class="section-atmosphere" aria-hidden="true"></div>
+      <div class="container page-content">
+        <a href="/#menu" class="back-link">← Back to menu</a>
+
+        <div class="section-header left guess-balance-hero">
+          <p class="section-eyebrow">vzqie</p>
+          <h2>Guess the Balance</h2>
+          <p>How much is in the balance? Drop your guess and see how close you get.</p>
+        </div>
+
+        <div class="round-timer bj21-panel-inset is-hidden" id="round-timer" role="timer" aria-live="polite">
+          <span class="round-timer-label">Time left to guess</span>
+          <span class="round-timer-value" id="round-timer-value">5:00</span>
+        </div>
+
+        <div class="admin-panel bj21-panel is-hidden" id="game-admin-panel">
+          <span class="bj21-panel-glow" aria-hidden="true"></span>
+          <div class="admin-panel-section admin-duration-section">
+            <p class="section-eyebrow">Streamer controls</p>
+            <h3 class="guess-panel-title">Round tools</h3>
+            <label class="guess-label" for="round-minutes">Round length</label>
+            <p class="admin-panel-text">Set how long viewers have to submit guesses when you start a round.</p>
+            <div class="digital-clock-picker" id="round-minutes-picker">
+              <button
+                type="button"
+                class="digital-clock-step"
+                id="round-minutes-down"
+                aria-label="Decrease round length by one minute"
+              >
+                −
+              </button>
+              <div class="digital-clock-screen">
+                <input
+                  class="digital-clock-minutes"
+                  id="round-minutes"
+                  name="roundMinutes"
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="3"
+                  value="05"
+                  aria-label="Round length in minutes"
+                />
+                <span class="digital-clock-colon" aria-hidden="true">:</span>
+                <span class="digital-clock-seconds" aria-hidden="true">00</span>
+              </div>
+              <button
+                type="button"
+                class="digital-clock-step"
+                id="round-minutes-up"
+                aria-label="Increase round length by one minute"
+              >
+                +
+              </button>
+            </div>
+          </div>
+
+          <div class="guess-admin-toggles">
+            <div class="admin-panel-row">
+              <div>
+                <p class="admin-panel-label">Admin controls</p>
+                <p class="admin-panel-text" id="game-toggle-status">Guessing is off</p>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="game-toggle" aria-labelledby="game-toggle-status" />
+                <span class="toggle-slider" aria-hidden="true"></span>
+              </label>
+            </div>
+
+            <div class="admin-panel-row">
+              <div>
+                <p class="admin-panel-label">AFF only</p>
+                <p class="admin-panel-text" id="game-aff-toggle-status">
+                  Affiliate restriction off
+                </p>
+              </div>
+              <label class="toggle">
+                <input
+                  type="checkbox"
+                  id="game-aff-toggle"
+                  aria-labelledby="game-aff-toggle-status"
+                />
+                <span class="toggle-slider" aria-hidden="true"></span>
+              </label>
+            </div>
+
+            <div class="admin-panel-row">
+              <div>
+                <p class="admin-panel-label">SUB only</p>
+                <p class="admin-panel-text" id="game-sub-toggle-status">
+                  Subscriber restriction off
+                </p>
+              </div>
+              <label class="toggle">
+                <input
+                  type="checkbox"
+                  id="game-sub-toggle"
+                  aria-labelledby="game-sub-toggle-status"
+                />
+                <span class="toggle-slider" aria-hidden="true"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="admin-panel-section">
+            <label class="guess-label" for="ending-balance">Ending balance</label>
+            <p class="admin-panel-text">Enter the actual balance after the round ends.</p>
+            <div class="admin-balance-row">
+              <div class="guess-input-row admin-balance-input">
+                <span class="guess-prefix" aria-hidden="true">$</span>
+                <input
+                  class="guess-input"
+                  id="ending-balance"
+                  name="endingBalance"
+                  type="number"
+                  inputmode="decimal"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                />
+              </div>
+              <button type="button" class="btn btn-sm btn-primary" id="ending-balance-save">
+                Save
+              </button>
+            </div>
+            <p class="guess-status is-hidden" id="ending-balance-status" role="status" aria-live="polite"></p>
+          </div>
+        </div>
+
+        <div class="game-panel bj21-panel is-hidden" id="game-panel-closed">
+          <span class="bj21-panel-glow" aria-hidden="true"></span>
+          <p class="section-eyebrow">Status</p>
+          <h3 class="guess-panel-title">Guessing closed</h3>
+          <p class="game-panel-text">
+            Guessing is currently closed. Check back when the round goes live on stream.
+          </p>
+        </div>
+
+        <div class="game-panel bj21-panel" id="game-panel-guest">
+          <span class="bj21-panel-glow" aria-hidden="true"></span>
+          <p class="section-eyebrow">Join in</p>
+          <h3 class="guess-panel-title">Sign in to play</h3>
+          <p class="game-panel-text">
+            Sign in with Kick to submit your guess when the round is live on stream.
+          </p>
+          <a href="/api/auth/login" class="btn btn-primary" id="game-sign-in">Sign in with Kick</a>
+        </div>
+
+        <div class="game-panel bj21-panel is-hidden" id="game-panel-member">
+          <span class="bj21-panel-glow" aria-hidden="true"></span>
+          <p class="section-eyebrow">Your entry</p>
+          <h3 class="guess-panel-title">Submit a guess</h3>
+          <p class="game-panel-text">
+            You're signed in as <strong id="game-username"></strong>. Enter your balance guess below.
+          </p>
+          <p class="giveaways-aff-note is-hidden" id="game-access-note"></p>
+
+          <p class="game-panel-note is-hidden" id="game-panel-waiting">
+            Guessing is closed right now. It will unlock when the round goes live on stream.
+          </p>
+
+          <form class="guess-form" id="guess-form">
+            <label class="guess-label" for="guess-amount">Your guess</label>
+            <div class="guess-input-row">
+              <span class="guess-prefix" aria-hidden="true">$</span>
+              <input
+                class="guess-input"
+                id="guess-amount"
+                name="amount"
+                type="number"
+                inputmode="decimal"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-primary" id="guess-submit">Submit guess</button>
+            <p class="guess-status is-hidden" id="guess-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div class="game-panel podium-panel bj21-panel is-hidden" id="podium-panel">
+          <span class="bj21-panel-glow" aria-hidden="true"></span>
+          <div class="podium-header">
+            <div>
+              <p class="section-eyebrow">Results</p>
+              <h3 class="guesses-heading">Podium</h3>
+            </div>
+            <p class="podium-balance">
+              Ending balance: <strong id="podium-ending-balance"></strong>
+            </p>
+          </div>
+          <div class="podium-stage" id="podium-stage" aria-label="Top three closest guesses"></div>
+        </div>
+
+        <div class="game-panel guesses-panel bj21-panel" id="guesses-panel">
+          <span class="bj21-panel-glow" aria-hidden="true"></span>
+          <div class="guesses-panel-header">
+            <div>
+              <p class="section-eyebrow">Live board</p>
+              <h3 class="guesses-heading">All guesses</h3>
+            </div>
+            <p class="guesses-count" id="guesses-count">0 guesses</p>
+          </div>
+          <p class="guesses-empty" id="guesses-empty">No guesses yet. Be the first to submit one.</p>
+          <ul class="guesses-list is-hidden" id="guesses-list"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-text">vzqie</span>
+        <p>Gambling entertainment stream. 18+ only.</p>
+      </div>
+      <p class="disclaimer">
+        Gambling can be addictive. Please play responsibly. This channel is for entertainment purposes only.
+        If you or someone you know has a gambling problem, call <strong>1-800-GAMBLER</strong> or visit
+        <a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">BeGambleAware.org</a>.
+      </p>
+      <p class="copyright">&copy; <span id="year"></span> vzqie. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/main.js?v=avgx1"></script>
+  <script src="/js/auth.js?v=claim24h"></script>
+  <script src="/js/guess-the-balance.js?v=stakecopy1"></script>
+</body>
+</html>

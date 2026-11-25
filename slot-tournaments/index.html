@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Slot Tournaments — live board, signups, and results on vzqie." />
+  <title>Slot Tournaments | vzqie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css?v=menuside1" />
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="header" id="top">
+    <nav class="nav container">
+      <a href="/" class="logo">
+        <img src="/images/logo.png" alt="" class="logo-image" width="50" height="50" />
+        <span class="logo-text">vzqie</span>
+      </a>
+
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <ul class="nav-links">
+        <li><a href="/#watch">Watch</a></li>
+        <li class="is-hidden" id="admin-nav-commands">
+        <a href="/commands/">Commands</a>
+      </li>
+        <li><a href="/#menu">Menu</a></li>
+        <li><a href="/#house-games">House Games</a></li>
+        <li><a href="/#links">Links</a></li>
+        <li class="is-hidden" id="admin-nav-accounts">
+          <a href="/accounts/">Accounts</a>
+        </li>
+        <li>
+          <div class="auth-panel" id="auth-panel">
+            <div class="auth-guest" id="auth-guest">
+              <a href="/api/auth/login" class="btn btn-sm btn-kick">Sign in with Kick</a>
+            </div>
+            <div class="auth-member is-hidden" id="auth-member">
+              <div class="auth-user">
+                <img id="auth-avatar" class="auth-avatar is-hidden" alt="" width="32" height="32" />
+                <span id="auth-username" class="auth-username"></span>
+                <span id="auth-admin-badge" class="auth-admin-badge is-hidden">Admin</span>
+                <button type="button" id="auth-stake-badge" class="auth-stake-badge is-hidden"></button>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline" id="auth-logout">Sign out</button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="auth-toast is-hidden" id="auth-toast" role="status" aria-live="polite"></div>
+
+    <section class="section page-section slot-tournaments-page">
+      <div class="section-atmosphere" aria-hidden="true"></div>
+      <div class="container page-content slot-tournaments-shell">
+        <a href="/#house-games" class="back-link">← Back</a>
+
+        <header class="slot-tournaments-top">
+          <div class="slot-tournaments-hero">
+            <p class="section-eyebrow">vzqie</p>
+            <h1 class="slot-tournaments-heading">Slot Tournaments</h1>
+            <p class="slot-tournaments-lede" id="st-lede">
+              Sign in, claim a spot when signups open, then chase the board and check results here.
+            </p>
+          </div>
+          <div class="slot-tournaments-status-card bj21-panel theme-surface" id="st-status-card" data-phase="closed">
+            <span class="bj21-panel-glow" aria-hidden="true"></span>
+            <div class="slot-tournaments-status-head">
+              <p class="slot-tournaments-panel-label">Status</p>
+              <label class="toggle slot-tournaments-status-toggle is-hidden" id="st-status-toggle-wrap" title="Open or close signups">
+                <input type="checkbox" id="st-status-toggle" aria-label="Open or close tournament signups" />
+                <span class="toggle-slider" aria-hidden="true"></span>
+              </label>
+            </div>
+            <p class="slot-tournaments-status-value" id="st-status-value">Closed</p>
+            <p class="slot-tournaments-status-meta" id="st-status-meta">No active tournament.</p>
+          </div>
+        </header>
+
+        <p class="slot-tournaments-banner is-hidden" id="st-banner" role="status"></p>
+
+        <section class="slot-tournaments-panel bj21-panel theme-surface" aria-labelledby="st-info-title">
+          <span class="bj21-panel-glow" aria-hidden="true"></span>
+          <p class="slot-tournaments-panel-label">Live board</p>
+          <h2 class="slot-tournaments-panel-title" id="st-info-title">Tournament</h2>
+          <dl class="slot-tournaments-meta" id="st-meta">
+            <div>
+              <dt>Title</dt>
+              <dd id="st-title">—</dd>
+            </div>
+            <div>
+              <dt>Slot</dt>
+              <dd id="st-slot">—</dd>
+            </div>
+            <div>
+              <dt>Buy-in</dt>
+              <dd id="st-buyin">—</dd>
+            </div>
+            <div>
+              <dt>Spots</dt>
+              <dd id="st-entry-count">0</dd>
+            </div>
+          </dl>
+          <p class="slot-tournaments-panel-text" id="st-join-hint">
+            When signups open, sign in with Kick and claim a spot on this page.
+          </p>
+          <div class="slot-tournaments-actions">
+            <button type="button" class="btn btn-primary is-hidden" id="st-join-btn">Claim spot</button>
+            <a href="/api/auth/login" class="btn btn-outline is-hidden" id="st-signin-btn">Sign in to claim</a>
+          </div>
+        </section>
+
+        <div
+          class="st-predict-modal st-claim-modal is-hidden"
+          id="st-claim-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="st-claim-modal-title"
+          hidden
+        >
+          <div class="st-predict-modal-backdrop" data-st-claim-close="true"></div>
+          <div class="st-predict-modal-dialog">
+            <div class="st-predict-modal-head">
+              <div>
+                <p class="section-eyebrow">Signups</p>
+                <h2 class="st-predict-modal-title" id="st-claim-modal-title">Pick a slot</h2>
+                <p class="slot-tournaments-panel-text" id="st-claim-modal-hint">
+                  Pick a slot to claim your spot.
+                </p>
+              </div>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline"
+                id="st-claim-close"
+                data-st-claim-close="true"
+              >
+                Close
+              </button>
+            </div>
+            <div class="st-predict-modal-body">
+              <div class="st-slot-picker" id="st-claim-slot-picker">
+                <input
+                  class="guess-input st-slot-picker-search"
+                  id="st-claim-slot-search"
+                  type="search"
+                  placeholder="Search New Releases / Only on Stake…"
+                  autocomplete="off"
+                />
+                <div
+                  class="st-slot-picker-groups st-claim-slot-groups"
+                  id="st-claim-slot-groups"
+                  role="listbox"
+                  aria-label="Available slots"
+                ></div>
+                <p class="st-slot-picker-empty is-hidden" id="st-claim-slot-empty">
+                  Loading Stake slots…
+                </p>
+              </div>
+            </div>
+            <div class="st-predict-modal-foot">
+              <p class="slot-tournaments-panel-text" id="st-claim-modal-status"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="slot-tournaments-split">
+          <section class="slot-tournaments-panel bj21-panel theme-surface" aria-labelledby="st-signups-title">
+            <span class="bj21-panel-glow" aria-hidden="true"></span>
+            <div class="slot-tournaments-section-head">
+              <div>
+                <h2 class="slot-tournaments-panel-title" id="st-signups-title">Signups</h2>
+                <p class="slot-tournaments-panel-text" id="st-spots-display"></p>
+                <p class="slot-tournaments-panel-text" id="st-predictions-status">
+                  Predictions closed
+                </p>
+              </div>
+              <div class="slot-tournaments-actions st-signups-actions">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary is-hidden"
+                  id="st-predictions-toggle"
+                >
+                  Enable predictions
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary is-hidden"
+                  id="st-predict-open"
+                >
+                  Predict
+                </button>
+                <a
+                  href="/api/auth/login"
+                  class="btn btn-sm btn-outline is-hidden"
+                  id="st-predictions-guest"
+                >
+                  Sign in to predict
+                </a>
+                <a
+                  href="/slot-tournaments/bracket/"
+                  class="btn btn-sm btn-outline is-hidden"
+                  id="st-view-bracket"
+                >
+                  View bracket
+                </a>
+              </div>
+            </div>
+
+            <div
+              class="round-timer bj21-panel-inset is-hidden"
+              id="st-predictions-timer"
+              role="timer"
+              aria-live="polite"
+            >
+              <span class="round-timer-label">Time left to predict</span>
+              <span class="round-timer-value" id="st-predictions-timer-value">5:00</span>
+            </div>
+
+            <div class="st-predictions-timer-admin is-hidden" id="st-predictions-timer-admin">
+              <label class="guess-label" for="st-predictions-minutes">Prediction timer</label>
+              <p class="slot-tournaments-panel-text">
+                How long viewers have to submit picks when you enable predictions.
+              </p>
+              <div class="digital-clock-picker" id="st-predictions-minutes-picker">
+                <button
+                  type="button"
+                  class="digital-clock-step"
+                  id="st-predictions-minutes-down"
+                  aria-label="Decrease prediction timer by one minute"
+                >
+                  −
+                </button>
+                <div class="digital-clock-screen">
+                  <input
+                    class="digital-clock-minutes"
+                    id="st-predictions-minutes"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="3"
+                    value="05"
+                    aria-label="Prediction timer length in minutes"
+                  />
+                  <span class="digital-clock-colon" aria-hidden="true">:</span>
+                  <span class="digital-clock-seconds" aria-hidden="true">00</span>
+                </div>
+                <button
+                  type="button"
+                  class="digital-clock-step"
+                  id="st-predictions-minutes-up"
+                  aria-label="Increase prediction timer by one minute"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <p class="slot-tournaments-banner is-hidden" id="st-predictions-banner" role="status"></p>
+            <p class="slot-tournaments-empty" id="st-entries-empty">No signups yet.</p>
+            <div class="slot-tournaments-scroll">
+              <ol class="slot-tournaments-entries is-hidden" id="st-entries"></ol>
+            </div>
+            <div class="slot-tournaments-manual is-hidden" id="st-manual-add">
+              <p class="slot-tournaments-panel-label">Add user</p>
+              <div class="slot-tournaments-manual-row">
+                <div class="slot-tournaments-manual-search">
+                  <label class="guess-label" for="st-manual-username">Username</label>
+                  <input
+                    class="guess-input"
+                    id="st-manual-username"
+                    type="search"
+                    maxlength="40"
+                    autocomplete="off"
+                    placeholder="Search Kick username…"
+                    aria-autocomplete="list"
+                    aria-controls="st-manual-suggestions"
+                    aria-expanded="false"
+                  />
+                  <div
+                    class="slot-tournaments-manual-suggestions is-hidden"
+                    id="st-manual-suggestions"
+                    role="listbox"
+                    aria-label="Matching usernames"
+                    hidden
+                  ></div>
+                </div>
+                <button type="button" class="btn btn-sm btn-primary" id="st-manual-add-btn">
+                  Add
+                </button>
+              </div>
+            </div>
+            <div class="slot-tournaments-bots is-hidden" id="st-bots">
+              <p class="slot-tournaments-panel-label">Fill with bots</p>
+              <div class="slot-tournaments-bots-row">
+                <label class="guess-label" for="st-bots-count">Count</label>
+                <input
+                  class="guess-input"
+                  id="st-bots-count"
+                  type="number"
+                  min="1"
+                  max="100"
+                  step="1"
+                  value="1"
+                />
+                <button type="button" class="btn btn-sm btn-primary" id="st-bots-add">
+                  Add bots
+                </button>
+                <button type="button" class="btn btn-sm btn-outline is-hidden" id="st-bots-fill">
+                  Fill remaining
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="slot-tournaments-panel bj21-panel theme-surface"
+            aria-labelledby="st-prediction-board-title"
+          >
+            <span class="bj21-panel-glow" aria-hidden="true"></span>
+            <div class="slot-tournaments-section-head">
+              <div>
+                <h2 class="slot-tournaments-panel-title" id="st-prediction-board-title">
+                  Predictions leaderboard
+                </h2>
+                <p class="slot-tournaments-panel-text" id="st-prediction-board-meta">
+                  R1 = 1 pt · R2 = 2 pts · R3 = 3 pts · scores update as winners are set
+                </p>
+              </div>
+            </div>
+            <p class="slot-tournaments-empty" id="st-prediction-board-empty">
+              No prediction sheets yet.
+            </p>
+            <div class="st-prediction-board-scroll" id="st-prediction-board-scroll">
+              <div class="st-prediction-podium is-hidden" id="st-prediction-podium">
+                <div
+                  class="podium-stage st-prediction-podium-stage"
+                  id="st-prediction-podium-stage"
+                  aria-label="Top 3 prediction scores"
+                ></div>
+              </div>
+              <ol class="st-prediction-board is-hidden" id="st-prediction-board"></ol>
+            </div>
+          </section>
+        </div>
+
+        <div
+          class="st-predict-modal is-hidden"
+          id="st-predict-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="st-predict-modal-title"
+          hidden
+        >
+          <div class="st-predict-modal-backdrop" data-st-predict-close="true"></div>
+          <div class="st-predict-modal-dialog">
+            <div class="st-predict-modal-head">
+              <div>
+                <p class="section-eyebrow">Predictions</p>
+                <h2 class="st-predict-modal-title" id="st-predict-modal-title">Pick the bracket</h2>
+                <p class="slot-tournaments-panel-text" id="st-predict-modal-hint">
+                  Tap a player in each matchup to choose a winner.
+                </p>
+              </div>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline"
+                id="st-predict-close"
+                data-st-predict-close="true"
+              >
+                Close
+              </button>
+            </div>
+            <div class="st-predict-modal-body">
+              <p class="slot-tournaments-empty is-hidden" id="st-predict-empty">
+                Generate a bracket before predictions.
+              </p>
+              <div class="st-bracket-board is-hidden" id="st-predict-bracket"></div>
+            </div>
+            <div class="st-predict-modal-foot">
+              <p class="slot-tournaments-panel-text" id="st-predict-modal-status"></p>
+              <div class="slot-tournaments-actions">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary is-hidden"
+                  id="st-predictions-save"
+                >
+                  Save picks
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline"
+                  data-st-predict-close="true"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <section
+          class="slot-tournaments-panel bj21-panel theme-surface"
+          aria-labelledby="st-predictors-title"
+        >
+          <span class="bj21-panel-glow" aria-hidden="true"></span>
+          <div class="slot-tournaments-section-head">
+            <div>
+              <h2 class="slot-tournaments-panel-title" id="st-predictors-title">
+                Predictors
+              </h2>
+              <p class="slot-tournaments-panel-text" id="st-predictors-meta">
+                Accounts that submitted a bracket prediction
+              </p>
+            </div>
+          </div>
+          <p class="slot-tournaments-empty" id="st-predictors-empty">
+            No predictions submitted yet.
+          </p>
+          <ul class="st-predictors-list is-hidden" id="st-predictors-list"></ul>
+        </section>
+
+        <section class="slot-tournaments-assign is-hidden" id="st-assign" aria-labelledby="st-assign-title">
+          <div class="slot-tournaments-section-head">
+            <h2 class="slot-tournaments-panel-title" id="st-assign-title">Slot assignments</h2>
+            <p class="slot-tournaments-panel-text">
+              Add slots for the race, then assign each one to an entrant.
+            </p>
+          </div>
+          <p class="slot-tournaments-banner is-hidden" id="st-assign-status" role="status"></p>
+
+          <div class="slot-tournaments-panel bj21-panel theme-surface">
+            <span class="bj21-panel-glow" aria-hidden="true"></span>
+            <p class="slot-tournaments-panel-label">Slots</p>
+            <div class="slot-tournaments-assign-add" id="st-assign-add">
+              <label class="guess-label" for="st-assign-slot-search">Choose a slot</label>
+              <div class="st-slot-picker" id="st-slot-picker">
+                <button
+                  type="button"
+                  class="st-slot-picker-trigger"
+                  id="st-assign-slot-trigger"
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-controls="st-assign-slot-menu"
+                >
+                  <span class="st-slot-picker-trigger-copy" id="st-assign-slot-trigger-label">
+                    Choose from New Releases or Only on Stake…
+                  </span>
+                </button>
+                <div class="st-slot-picker-menu is-hidden" id="st-assign-slot-menu" hidden>
+                  <input
+                    class="guess-input st-slot-picker-search"
+                    id="st-assign-slot-search"
+                    type="search"
+                    placeholder="Search slots…"
+                    autocomplete="off"
+                  />
+                  <div class="st-slot-picker-groups" id="st-assign-slot-groups" role="listbox"></div>
+                  <p class="st-slot-picker-empty is-hidden" id="st-assign-slot-empty">
+                    No matching slots.
+                  </p>
+                </div>
+              </div>
+              <p class="slot-tournaments-panel-text" id="st-assign-catalog-meta"></p>
+            </div>
+            <p class="slot-tournaments-empty" id="st-assign-empty">No slots yet. Pick slots above.</p>
+            <div class="slot-tournaments-scroll slot-tournaments-assign-scroll">
+              <ul class="slot-tournaments-assign-list is-hidden" id="st-assign-list"></ul>
+            </div>
+            <div class="slot-tournaments-actions">
+              <button type="button" class="btn btn-sm btn-outline" id="st-assign-random">
+                Assign randomly
+              </button>
+              <button type="button" class="btn btn-sm btn-outline" id="st-assign-clear">
+                Clear assignments
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="slot-tournaments-admin is-hidden" id="st-admin" aria-labelledby="st-admin-title">
+          <div class="slot-tournaments-section-head">
+            <h2 class="slot-tournaments-panel-title" id="st-admin-title">Admin</h2>
+            <p class="slot-tournaments-panel-text">Set capacity, open signups, then run the race.</p>
+          </div>
+          <p class="slot-tournaments-banner is-hidden" id="st-admin-status" role="status"></p>
+
+          <form class="slot-tournaments-panel bj21-panel theme-surface" id="st-settings-form">
+            <span class="bj21-panel-glow" aria-hidden="true"></span>
+            <p class="slot-tournaments-panel-label">Setup</p>
+            <div class="slot-tournaments-admin-grid">
+              <label class="guess-label" for="st-admin-title-input">Title</label>
+              <input class="guess-input" id="st-admin-title-input" maxlength="80" />
+              <label class="guess-label" for="st-admin-slot">Slot</label>
+              <input class="guess-input" id="st-admin-slot" maxlength="80" />
+              <label class="guess-label" for="st-admin-buyin">Buy-in</label>
+              <input class="guess-input" id="st-admin-buyin" maxlength="40" placeholder="$1" />
+              <label class="guess-label" for="st-admin-capacity">Signup capacity</label>
+              <input class="guess-input" id="st-admin-capacity" type="number" min="1" max="500" step="1" placeholder="16" />
+            </div>
+            <div class="slot-tournaments-actions">
+              <button type="submit" class="btn btn-sm btn-primary">Save setup</button>
+            </div>
+          </form>
+
+          <div class="slot-tournaments-panel bj21-panel theme-surface">
+            <span class="bj21-panel-glow" aria-hidden="true"></span>
+            <p class="slot-tournaments-panel-label">Controls</p>
+            <div class="slot-tournaments-actions">
+              <button type="button" class="btn btn-sm btn-primary" id="st-toggle-open">Open signups</button>
+              <button type="button" class="btn btn-sm btn-outline" id="st-phase-live">Start live</button>
+              <button type="button" class="btn btn-sm btn-outline" id="st-phase-closed">Close board</button>
+              <button type="button" class="btn btn-sm btn-outline" id="st-clear-entries">Clear signups</button>
+            </div>
+            <div class="slot-tournaments-actions">
+              <label class="slot-tournaments-check">
+                <input type="checkbox" id="st-aff-only" />
+                AFF only
+              </label>
+              <label class="slot-tournaments-check">
+                <input type="checkbox" id="st-sub-only" />
+                SUB only
+              </label>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-text">vzqie</span>
+        <p>Gambling entertainment stream. 18+ only.</p>
+      </div>
+      <p class="disclaimer">
+        Gambling can be addictive. Please play responsibly. This channel is for entertainment purposes only.
+        If you or someone you know has a gambling problem, call <strong>1-800-GAMBLER</strong> or visit
+        <a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">BeGambleAware.org</a>.
+      </p>
+      <p class="copyright">&copy; <span id="year"></span> vzqie. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/main.js?v=avgx1"></script>
+  <script src="/js/auth.js?v=claim24h"></script>
+  <script src="/js/slot-tournaments.js?v=bhslots1"></script>
+</body>
+</html>

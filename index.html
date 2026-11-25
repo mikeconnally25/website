@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="vzqie — Live gambling streams on Kick. Slots, blackjack, bonus hunts, and big wins." />
+  <title>vzqie | Kick Gambling Streams</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css?v=bjsplit1" />
+</head>
+<body class="home-page">
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <div class="home-shell">
+    <div class="home-main">
+      <header class="header" id="top">
+        <nav class="nav container">
+          <a href="#top" class="logo">
+            <img src="images/logo.png" alt="" class="logo-image" width="50" height="50" />
+            <span class="logo-text">vzqie</span>
+          </a>
+
+          <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+          <ul class="nav-links">
+            <li><a href="#house-games">House Games</a></li>
+            <li class="is-hidden" id="admin-nav-commands">
+        <a href="/commands/">Commands</a>
+      </li>
+            <li><a href="#watch">Watch</a></li>
+            <li><a href="#links">Links</a></li>
+            <li class="is-hidden" id="admin-nav-accounts">
+              <a href="/accounts/">Accounts</a>
+            </li>
+            <li>
+              <div class="auth-panel" id="auth-panel">
+                <div class="auth-guest" id="auth-guest">
+                  <a href="/api/auth/login" class="btn btn-sm btn-kick">Sign in with Kick</a>
+                </div>
+                <div class="auth-member is-hidden" id="auth-member">
+                  <div class="auth-user">
+                    <img id="auth-avatar" class="auth-avatar is-hidden" alt="" width="32" height="32" />
+                    <span id="auth-username" class="auth-username"></span>
+                    <span id="auth-admin-badge" class="auth-admin-badge is-hidden">Admin</span>
+                  </div>
+                  <button type="button" class="btn btn-sm btn-outline" id="auth-logout">Sign out</button>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </nav>
+      </header>
+
+      <main>
+        <div class="auth-toast is-hidden" id="auth-toast" role="status" aria-live="polite"></div>
+
+        <section class="house-games section" id="house-games">
+          <div class="section-atmosphere" aria-hidden="true"></div>
+          <div class="container">
+            <div class="house-games-card theme-surface bj21-panel">
+            <div class="house-games-card-top">
+            <div class="section-header left house-games-header">
+              <p class="section-eyebrow">vzqie</p>
+              <h2>House Games</h2>
+              <p>Gamble UncCoins on blackjack, roulette, and keno. Wins go straight back to your balance.</p>
+            </div>
+
+            <div class="house-games-tabs" role="tablist" aria-label="House games">
+              <button type="button" class="house-games-tab is-active" data-hg-game="blackjack" role="tab" aria-selected="true">Blackjack</button>
+              <button type="button" class="house-games-tab" data-hg-game="roulette" role="tab" aria-selected="false">Roulette</button>
+              <button type="button" class="house-games-tab" data-hg-game="keno" role="tab" aria-selected="false">Keno</button>
+            </div>
+            </div>
+
+            <div class="house-games-toolbar">
+              <div class="house-games-balance bj21-panel-inset">
+                <span class="house-games-balance-label">Your UncCoins</span>
+                <span class="house-games-balance-value" id="hg-balance">—</span>
+              </div>
+              <div class="house-games-self-credit is-hidden" id="hg-self-credit">
+                <label class="guess-label" for="hg-self-credit-amount">Add UncCoins</label>
+                <input class="guess-input hg-bet-input" id="hg-self-credit-amount" type="number" min="1" step="1" value="1000" title="No amount limit" />
+                <button type="button" class="btn btn-sm btn-primary" id="hg-self-credit-btn">Add</button>
+              </div>
+            </div>
+
+            <p class="house-games-status is-hidden" id="hg-status" role="status" aria-live="polite"></p>
+
+            <div class="house-games-guest" id="hg-guest">
+              <div class="hg-bj-table hg-guest-preview" aria-hidden="true">
+                <div class="hg-bj-felt">
+                  <p class="hg-bj-banner">vzqie</p>
+                  <p class="hg-bj-rules">Blackjack pays 3 to 2 · Dealer stands on 17</p>
+                  <div class="hg-hand hg-hand-dealer">
+                    <p class="hg-hand-label">Dealer</p>
+                    <div class="hg-cards">
+                      <span class="hg-card is-hidden-card"></span>
+                      <span class="hg-card is-hidden-card"></span>
+                    </div>
+                  </div>
+                  <div class="hg-bj-insurance" aria-hidden="true">Insurance pays 2 to 1</div>
+                  <div class="hg-hand hg-hand-player">
+                    <div class="hg-cards">
+                      <span class="hg-card"><span class="hg-card-corner"><span class="hg-card-rank">A</span><span class="hg-card-suit">♠</span></span><span class="hg-card-pip">♠</span><span class="hg-card-corner is-br"><span class="hg-card-rank">A</span><span class="hg-card-suit">♠</span></span></span>
+                      <span class="hg-card"><span class="hg-card-corner"><span class="hg-card-rank">K</span><span class="hg-card-suit">♠</span></span><span class="hg-card-pip">♠</span><span class="hg-card-corner is-br"><span class="hg-card-rank">K</span><span class="hg-card-suit">♠</span></span></span>
+                    </div>
+                    <p class="hg-hand-label">You</p>
+                  </div>
+                </div>
+              </div>
+              <p class="house-games-guest-note"><a href="/api/auth/login">Sign in with Kick</a> to wager UncCoins.</p>
+            </div>
+
+            <div class="house-games-stage is-hidden" id="hg-stage">
+              <div class="house-game-panel is-active" data-hg-panel="blackjack" id="hg-blackjack">
+                <div class="hg-bj-shell">
+                  <div class="hg-bj-table" aria-label="Blackjack table">
+                    <div class="hg-bj-felt">
+                      <div class="hg-bj-shoe" aria-hidden="true">
+                        <span class="hg-bj-shoe-deck"></span>
+                        <span class="hg-bj-shoe-deck"></span>
+                        <span class="hg-bj-shoe-deck"></span>
+                      </div>
+                      <p class="hg-bj-banner" aria-hidden="true">vzqie</p>
+                      <p class="hg-bj-rules" aria-hidden="true">Blackjack pays 3 to 2 · Dealer stands on 17</p>
+                      <div class="hg-hand hg-hand-dealer" id="hg-bj-dealer">
+                        <p class="hg-hand-label">Dealer <span id="hg-bj-dealer-total"></span></p>
+                        <div class="hg-cards" id="hg-bj-dealer-cards"></div>
+                      </div>
+                      <div class="hg-bj-insurance" aria-hidden="true">Insurance pays 2 to 1</div>
+                      <p class="hg-result hg-bj-result" id="hg-bj-result"></p>
+                      <div class="hg-bj-player-row" id="hg-bj-player-row">
+                        <div class="hg-hand hg-hand-player" data-hand-index="0" id="hg-bj-player">
+                          <div class="hg-cards" id="hg-bj-player-cards"></div>
+                          <p class="hg-hand-label">You <span id="hg-bj-player-total"></span></p>
+                          <div class="hg-bj-spot">
+                            <div class="hg-bj-chip" aria-hidden="true">
+                              <span class="hg-bj-chip-inner" id="hg-bj-chip-value">10</span>
+                            </div>
+                            <span class="hg-bj-spot-label">Bet</span>
+                            <p class="hg-bj-side-note" data-hg-side></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                      <div class="hg-bj-rail" role="group" aria-label="Blackjack controls">
+                        <div class="hg-bet-row hg-bj-bet-controls">
+                          <label class="hg-bj-rail-label" for="hg-bj-bet">Bet</label>
+                          <input class="guess-input hg-bet-input hg-bj-bet-input" id="hg-bj-bet" type="number" min="1" max="5000" step="1" value="10" />
+                          <div class="hg-bj-hands" role="group" aria-label="Hands">
+                            <span class="hg-bj-rail-label">Hands</span>
+                            <button type="button" class="hg-bj-hand-btn is-active" data-hands="1" aria-pressed="true">1</button>
+                            <button type="button" class="hg-bj-hand-btn" data-hands="2" aria-pressed="false">2</button>
+                            <button type="button" class="hg-bj-hand-btn" data-hands="3" aria-pressed="false">3</button>
+                          </div>
+                          <button type="button" class="btn btn-primary hg-bj-btn" id="hg-bj-deal">Deal</button>
+                        </div>
+                        <div class="hg-bj-sidebets">
+                          <label class="hg-bj-side-field" for="hg-bj-pair">
+                            <span class="hg-bj-rail-label">Pairs</span>
+                            <input class="guess-input hg-bet-input hg-bj-bet-input" id="hg-bj-pair" type="number" min="0" max="5000" step="1" value="0" title="Optional per hand. Perfect pair 25 to 1, colored pair 12 to 1, mixed pair 6 to 1." />
+                          </label>
+                          <label class="hg-bj-side-field" for="hg-bj-plus3">
+                            <span class="hg-bj-rail-label">21+3</span>
+                            <input class="guess-input hg-bet-input hg-bj-bet-input" id="hg-bj-plus3" type="number" min="0" max="5000" step="1" value="0" title="Optional per hand, using your first two cards and the dealer upcard. Suited trips 100 to 1, straight flush 40 to 1, three of a kind 30 to 1, straight 10 to 1, flush 5 to 1." />
+                          </label>
+                        </div>
+                        <div class="house-games-actions hg-bj-actions">
+                          <button type="button" class="btn btn-sm btn-primary hg-bj-btn" id="hg-bj-hit" disabled>Hit</button>
+                          <button type="button" class="btn btn-sm btn-outline hg-bj-btn" id="hg-bj-stand" disabled>Stand</button>
+                          <button type="button" class="btn btn-sm btn-outline hg-bj-btn" id="hg-bj-double" disabled>Double</button>
+                          <button type="button" class="btn btn-sm btn-outline hg-bj-btn" id="hg-bj-split" disabled>Split</button>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="house-game-panel" data-hg-panel="roulette" id="hg-roulette" hidden>
+                <div class="hg-roulette-stage">
+                  <div class="hg-roulette-wheel-wrap" aria-hidden="true">
+                    <div class="hg-roulette-rim">
+                      <div class="hg-roulette-bowl">
+                        <div class="hg-roulette-wheel" id="hg-roulette-wheel">
+                          <div class="hg-roulette-ball-track" id="hg-roulette-ball-track">
+                            <span class="hg-roulette-ball-orb" id="hg-roulette-ball-orb"></span>
+                          </div>
+                        </div>
+                        <div class="hg-roulette-hub">
+                          <span class="hg-roulette-hub-core" aria-hidden="true"></span>
+                          <span class="hg-roulette-hub-mark" id="hg-roulette-hub-number">21</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="hg-roulette-win-banner is-hidden" id="hg-roulette-win-banner" aria-live="polite"></div>
+                  </div>
+
+                  <div class="hg-roulette-board-wrap">
+                    <div class="hg-bet-row">
+                      <label class="guess-label" for="hg-roulette-bet">Bet / number</label>
+                      <input class="guess-input hg-bet-input" id="hg-roulette-bet" type="number" min="1" max="5000" step="1" value="10" />
+                      <button type="button" class="btn btn-outline" id="hg-roulette-clear">Clear picks</button>
+                      <button type="button" class="btn btn-primary" id="hg-roulette-spin">Spin</button>
+                    </div>
+                    <div class="hg-roulette-board" id="hg-roulette-board" role="group" aria-label="Roulette numbers"></div>
+                    <div class="hg-roulette-choices" id="hg-roulette-choices">
+                      <button type="button" class="btn btn-sm btn-outline hg-roulette-pick" data-choice="red">Red</button>
+                      <button type="button" class="btn btn-sm btn-outline hg-roulette-pick" data-choice="black">Black</button>
+                      <button type="button" class="btn btn-sm btn-outline hg-roulette-pick" data-choice="even">Even</button>
+                      <button type="button" class="btn btn-sm btn-outline hg-roulette-pick" data-choice="odd">Odd</button>
+                      <button type="button" class="btn btn-sm btn-outline hg-roulette-pick" data-choice="low">1–18</button>
+                      <button type="button" class="btn btn-sm btn-outline hg-roulette-pick" data-choice="high">19–36</button>
+                    </div>
+                    <p class="hg-roulette-pick-label" id="hg-roulette-pick-label">Pick up to 12 numbers, or one outside bet</p>
+                    <div class="hg-roulette-result" id="hg-roulette-result" aria-live="polite"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="house-game-panel" data-hg-panel="keno" id="hg-keno" hidden>
+                <div class="hg-keno-layout">
+                  <aside class="hg-keno-controls">
+                    <div class="hg-keno-field">
+                      <label class="guess-label" for="hg-keno-bet">Bet</label>
+                      <input class="guess-input hg-bet-input hg-keno-input" id="hg-keno-bet" type="number" min="1" max="5000" step="1" value="10" />
+                    </div>
+                    <div class="hg-keno-risk" role="group" aria-label="Keno volatility">
+                      <span class="guess-label">Risk</span>
+                      <div class="hg-keno-risk-options">
+                        <button type="button" class="hg-keno-risk-btn is-active" data-keno-risk="classic">Classic</button>
+                        <button type="button" class="hg-keno-risk-btn" data-keno-risk="low">Low</button>
+                        <button type="button" class="hg-keno-risk-btn" data-keno-risk="medium">Medium</button>
+                        <button type="button" class="hg-keno-risk-btn" data-keno-risk="high">High</button>
+                      </div>
+                    </div>
+                    <div class="hg-keno-random" role="group" aria-label="Random keno picks">
+                      <label class="guess-label" for="hg-keno-random-count">Random</label>
+                      <div class="hg-keno-random-row">
+                        <select class="guess-input hg-keno-input hg-keno-random-count" id="hg-keno-random-count" aria-label="How many random numbers">
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4</option>
+                          <option value="5" selected>5</option>
+                          <option value="6">6</option>
+                          <option value="7">7</option>
+                          <option value="8">8</option>
+                          <option value="9">9</option>
+                          <option value="10">10</option>
+                        </select>
+                        <button type="button" class="btn btn-outline hg-keno-btn" id="hg-keno-random">Pick</button>
+                      </div>
+                    </div>
+                    <div class="hg-keno-actions">
+                      <button type="button" class="btn btn-primary hg-keno-btn hg-keno-draw" id="hg-keno-play">Draw</button>
+                      <button type="button" class="btn btn-outline hg-keno-btn" id="hg-keno-clear">Clear</button>
+                    </div>
+                    <p class="hg-keno-hint" id="hg-keno-hint">Pick 1–10 numbers. 10 are drawn.</p>
+                    <div class="hg-keno-result" id="hg-keno-result" aria-live="polite"></div>
+                  </aside>
+                  <div class="hg-keno-board-stage">
+                    <div class="hg-keno-board" id="hg-keno-board"></div>
+                    <div class="hg-keno-win-banner is-hidden" id="hg-keno-win-banner" aria-live="polite"></div>
+                  </div>
+                  <aside class="hg-keno-paytable is-hidden" aria-label="Keno payouts" hidden>
+                    <p class="hg-keno-paytable-title">Payouts</p>
+                    <p class="hg-keno-paytable-sub" id="hg-keno-paytable-sub">Select picks to see hit payoffs</p>
+                    <div class="hg-keno-paytable-body" id="hg-keno-paytable-body"></div>
+                  </aside>
+                </div>
+              </div>
+
+            </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="hero section" id="watch">
+          <div class="section-atmosphere" aria-hidden="true"></div>
+          <div class="container hero-player">
+            <div class="watch-header">
+              <div class="watch-heading">
+                <p class="section-eyebrow">vzqie</p>
+                <h1 id="watch-title">Live Stream</h1>
+                <p class="watch-meta">
+                  <span id="watch-subtitle">Loading latest stream...</span>
+                  <span id="watch-age"></span>
+                </p>
+              </div>
+              <a id="watch-kick" class="btn btn-sm btn-outline" href="https://kick.com/vzqie" target="_blank" rel="noopener noreferrer">Watch on Kick</a>
+            </div>
+
+            <div class="player-wrap theme-surface" id="player-container">
+              <iframe
+                id="kick-player"
+                class="player-frame is-hidden"
+                title="vzqie Kick live stream"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+              <video
+                id="vod-player"
+                class="player-frame is-hidden"
+                controls
+                playsinline
+                preload="metadata"
+              ></video>
+              <div id="player-offline" class="player-offline is-hidden">
+                <p>No stream or VOD available right now.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="links section" id="links">
+          <div class="section-atmosphere" aria-hidden="true"></div>
+          <div class="container">
+            <div class="section-header">
+              <p class="section-eyebrow">Socials</p>
+              <h2>Connect</h2>
+              <p>Follow along everywhere vzqie shows up online.</p>
+            </div>
+
+            <div class="link-grid">
+              <a href="https://kick.com/vzqie" class="link-card kick theme-surface" target="_blank" rel="noopener noreferrer">
+                <span class="menu-label">Platform</span>
+                <span class="link-platform">Kick</span>
+                <span class="link-handle">@vzqie</span>
+                <span class="menu-card-cta">Watch live <span aria-hidden="true">→</span></span>
+              </a>
+              <a href="https://discord.gg/akt6jhgCu" class="link-card discord theme-surface" target="_blank" rel="noopener noreferrer">
+                <span class="menu-label">Community</span>
+                <span class="link-platform">Discord</span>
+                <span class="link-handle">Join the server</span>
+                <span class="menu-card-cta">Hop in <span aria-hidden="true">→</span></span>
+              </a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <div class="container footer-inner">
+          <div class="footer-brand">
+            <span class="logo-text">vzqie</span>
+            <p>Gambling entertainment stream. 18+ only.</p>
+          </div>
+          <p class="disclaimer">
+            Gambling can be addictive. Please play responsibly. This channel is for entertainment purposes only.
+            If you or someone you know has a gambling problem, call <strong>1-800-GAMBLER</strong> or visit
+            <a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">BeGambleAware.org</a>.
+          </p>
+          <p class="copyright">&copy; <span id="year"></span> vzqie. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+
+    <button
+      type="button"
+      class="btn btn-sm btn-primary site-chat-toggle"
+      id="site-chat-toggle"
+      aria-expanded="false"
+      aria-controls="site-chat"
+    >
+      Open chat
+    </button>
+
+    <aside class="site-chat" id="site-chat" aria-label="Community chat">
+      <div class="site-chat-panel">
+        <div class="site-chat-header">
+          <div>
+            <p class="site-chat-eyebrow">Community</p>
+            <div class="site-chat-title-row">
+              <span class="site-chat-live" aria-hidden="true"></span>
+              <h2 class="site-chat-title">Chat</h2>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline site-chat-close"
+            id="site-chat-close"
+            aria-label="Close chat"
+          >
+            Close
+          </button>
+        </div>
+
+        <div class="site-chat-body" id="site-chat-body">
+          <div class="site-chat-messages" id="site-chat-messages" role="log" aria-live="polite"></div>
+          <p class="site-chat-empty" id="site-chat-empty">No messages yet. Say hi.</p>
+
+          <form class="site-chat-composer is-hidden" id="site-chat-form">
+            <label class="sr-only" for="site-chat-input">Message</label>
+            <input
+              class="site-chat-input"
+              id="site-chat-input"
+              type="text"
+              maxlength="280"
+              autocomplete="off"
+              placeholder="Say something..."
+            />
+            <button type="submit" class="btn btn-sm btn-primary" id="site-chat-send">
+              Send
+            </button>
+          </form>
+
+          <div class="site-chat-signin" id="site-chat-signin">
+            <p class="site-chat-signin-note"><a href="/api/auth/login">Sign in with Kick</a> to chat.</p>
+          </div>
+
+          <p class="site-chat-status is-hidden" id="site-chat-status" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js"></script>
+  <script src="js/main.js?v=avgx1"></script>
+  <script src="js/auth.js?v=claim24h"></script>
+  <script src="js/house-games.js?v=bjsplit1"></script>
+  <script src="js/site-chat.js"></script>
+</body>
+</html>

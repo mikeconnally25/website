@@ -1,0 +1,1450 @@
+let currentUser = null;
+let catalog = [];
+let myRedemptions = [];
+let pendingQueue = [];
+let pointsBalance = 0;
+let canRedeem = true;
+let buyPackages = [];
+let buyConfig = {
+  configured: false,
+  stripeConfigured: false,
+  cryptoConfigured: false,
+  enabled: true,
+  rate: 100,
+  minUsd: 1,
+  maxUsd: 100,
+  minPoints: 100,
+  maxPoints: 10000,
+  stepPoints: 100,
+};
+let selectedBuyPackageId = null;
+let redeemSlotCatalog = [];
+let redeemSlotCatalogLoadedAt = 0;
+let selectedRedeemSlot = null;
+
+function isBuyPointsOpen() {
+  return (
+    (Boolean(buyConfig.stripeConfigured) ||
+      Boolean(buyConfig.cryptoConfigured) ||
+      Boolean(buyConfig.configured)) &&
+    buyConfig.enabled !== false
+  );
+}
+
+function buyPayMethods() {
+  const methods = [];
+  if (buyConfig.stripeConfigured) methods.push("stripe");
+  if (buyConfig.cryptoConfigured) methods.push("crypto");
+  return methods;
+}
+
+function buyMethodLabel() {
+  const methods = buyPayMethods();
+  if (methods.length === 2) return "card or crypto";
+  if (methods[0] === "stripe") return "card";
+  if (methods[0] === "crypto") return "crypto";
+  return "card or crypto";
+}
+
+function setStoreStatus(message, tone = "") {
+  const status = document.getElementById("store-status");
+  if (!status) return;
+
+  status.textContent = message;
+  status.classList.toggle("is-hidden", !message);
+  status.classList.toggle("is-error", tone === "error");
+}
+
+function formatPoints(value) {
+  return `${Number(value) || 0} UncCoins`;
+}
+
+function renderBalance() {
+  const value = document.getElementById("store-balance-value");
+  const copy = document.getElementById("store-balance-copy");
+  if (!value || !copy) return;
+
+  if (!currentUser) {
+    value.textContent = "—";
+    copy.textContent =
+      "Sign in with Kick to see your balance and redeem rewards.";
+    return;
+  }
+
+  value.textContent = String(pointsBalance);
+  if (!canRedeem) {
+    copy.textContent = `Signed in as ${currentUser.username}. Store redemptions are disabled for uncapped accounts.`;
+  } else {
+    copy.textContent = `Signed in as ${currentUser.username}.`;
+  }
+}
+
+function formatUsd(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "$0";
+  return `$${n % 1 === 0 ? String(n) : n.toFixed(2)}`;
+}
+
+function renderBuyMethods() {
+  const methodsEl = document.getElementById("store-buy-methods");
+  const cardBtn = document.getElementById("store-buy-pay-card");
+  const cryptoBtn = document.getElementById("store-buy-pay-crypto");
+  if (!methodsEl) return;
+
+  const canBuy = Boolean(currentUser) && isBuyPointsOpen();
+  const showChooser = canBuy && Boolean(selectedBuyPackageId);
+
+  methodsEl.classList.toggle("is-hidden", !showChooser);
+
+  // Always offer both options; disable any method that is not configured yet.
+  if (cardBtn) {
+    cardBtn.classList.remove("is-hidden");
+    cardBtn.disabled = !showChooser || !buyConfig.stripeConfigured;
+    cardBtn.title = buyConfig.stripeConfigured
+      ? "Pay with card via Stripe"
+      : "Card checkout needs STRIPE_SECRET_KEY on the server";
+    cardBtn.textContent = buyConfig.stripeConfigured
+      ? "Pay with card"
+      : "Pay with card (unavailable)";
+  }
+  if (cryptoBtn) {
+    cryptoBtn.classList.remove("is-hidden");
+    cryptoBtn.disabled = !showChooser || !buyConfig.cryptoConfigured;
+    cryptoBtn.title = buyConfig.cryptoConfigured
+      ? "Pay with crypto via NOWPayments"
+      : "Crypto checkout is not configured";
+    cryptoBtn.textContent = buyConfig.cryptoConfigured
+      ? "Pay with crypto"
+      : "Pay with crypto (unavailable)";
+  }
+}
+
+function renderBuyForm() {
+  const packagesEl = document.getElementById("store-buy-packages");
+  const note = document.getElementById("store-buy-note");
+  const copy = document.getElementById("store-buy-copy");
+  if (!note) return;
+
+  const methodLabel = buyMethodLabel();
+  const pkg = buyPackages[0];
+  if (copy) {
+    if (buyPackages.length > 1) {
+      copy.textContent = `Choose a package · ${methodLabel}`;
+    } else if (pkg) {
+      copy.textContent = `${Number(pkg.points).toLocaleString()} UncCoins for ${formatUsd(pkg.usd)} · ${methodLabel}`;
+    } else {
+      copy.textContent = `Choose a package · ${methodLabel}`;
+    }
+  }
+
+  const canBuy = Boolean(currentUser) && isBuyPointsOpen();
+  packagesEl?.classList.toggle("is-disabled", !canBuy);
+
+  if (!isBuyPointsOpen() && buyConfig.enabled !== false) {
+    note.textContent =
+      "Purchases are not configured yet. Add STRIPE_SECRET_KEY (card) and/or NOWPAYMENTS_API_KEY + NOWPAYMENTS_IPN_SECRET (crypto) on Vercel, then redeploy.";
+    renderBuyMethods();
+    return;
+  }
+  if (buyConfig.enabled === false) {
+    note.textContent = "Buying UncCoins is paused right now. Check back later.";
+    renderBuyMethods();
+    return;
+  }
+  if (!currentUser) {
+    note.textContent = "Sign in with Kick to buy UncCoins.";
+    renderBuyMethods();
+    return;
+  }
+  if (selectedBuyPackageId) {
+    note.textContent = "Choose Pay with card or Pay with crypto.";
+  } else {
+    note.textContent = "Tap a package, then choose card or crypto.";
+  }
+  renderBuyMethods();
+}
+
+function renderBuyPackages() {
+  const packagesEl = document.getElementById("store-buy-packages");
+  if (!packagesEl) return;
+
+  packagesEl.replaceChildren();
+  buyPackages.forEach((pkg) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "store-buy-package-btn";
+    btn.dataset.packageId = pkg.id;
+
+    const pts = document.createElement("span");
+    pts.className = "store-buy-package-pts";
+    pts.textContent = `${Number(pkg.points).toLocaleString()} UncCoins`;
+
+    const sep = document.createElement("span");
+    sep.className = "store-buy-package-sep";
+    sep.setAttribute("aria-hidden", "true");
+
+    const usd = document.createElement("span");
+    usd.className = "store-buy-package-usd";
+    usd.textContent = formatUsd(pkg.usd);
+
+    btn.append(pts, sep, usd);
+
+    if (selectedBuyPackageId === pkg.id) {
+      btn.classList.add("is-selected");
+    }
+    btn.addEventListener("click", () => {
+      if (!currentUser || !isBuyPointsOpen()) {
+        setStoreStatus(
+          !isBuyPointsOpen() && buyConfig.enabled !== false
+            ? "Purchases are not configured yet."
+            : buyConfig.enabled === false
+              ? "Buying UncCoins is paused right now."
+              : "Sign in with Kick to buy UncCoins.",
+          "error"
+        );
+        return;
+      }
+      selectedBuyPackageId = pkg.id;
+      document
+        .querySelectorAll(".store-buy-package-btn")
+        .forEach((el) =>
+          el.classList.toggle("is-selected", el.dataset.packageId === pkg.id)
+        );
+      // Always show card vs crypto — never auto-start a single method.
+      renderBuyForm();
+    });
+    packagesEl.append(btn);
+  });
+  renderBuyMethods();
+}
+
+async function startBuyPurchase(payload) {
+  const packageButtons = document.querySelectorAll(".store-buy-package-btn");
+  const methodButtons = document.querySelectorAll(".store-buy-method-btn");
+  packageButtons.forEach((btn) => {
+    btn.disabled = true;
+  });
+  methodButtons.forEach((btn) => {
+    btn.disabled = true;
+  });
+  const method = payload.method || "stripe";
+  setStoreStatus(
+    method === "crypto"
+      ? "Opening crypto checkout..."
+      : "Opening card checkout..."
+  );
+  try {
+    const response = await fetch("/api/points/buy", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || "Could not start purchase.");
+    }
+    const checkoutUrl = data.checkoutUrl || data.invoiceUrl;
+    if (!checkoutUrl) {
+      throw new Error("Checkout URL missing.");
+    }
+    window.location.href = checkoutUrl;
+  } catch (error) {
+    setStoreStatus(error.message || "Could not start purchase.", "error");
+    renderBuyForm();
+    packageButtons.forEach((btn) => {
+      btn.disabled = false;
+    });
+  }
+}
+
+function statusLabel(status) {
+  if (status === "fulfilled") return "Fulfilled";
+  if (status === "cancelled") return "Cancelled";
+  return "Pending";
+}
+
+function itemNeedsBonusType(item) {
+  const text = `${item?.title || ""} ${item?.description || ""}`.toLowerCase();
+  return /bonus/.test(text);
+}
+
+function formatBonusType(value) {
+  const type = String(value || "").trim().toLowerCase();
+  if (type === "regular") return "Regular";
+  if (type === "super") return "Super";
+  if (type === "epic") return "Epic";
+  return "";
+}
+
+function redemptionDetailParts(entry) {
+  return [
+    entry?.slotName || "",
+    formatBonusType(entry?.bonusType),
+  ].filter(Boolean);
+}
+
+function createRowMeta(parts) {
+  const meta = document.createElement("div");
+  meta.className = "store-row-meta";
+  parts.filter(Boolean).forEach((part, index) => {
+    if (index > 0) {
+      const sep = document.createElement("span");
+      sep.className = "store-row-sep";
+      sep.setAttribute("aria-hidden", "true");
+      sep.textContent = "·";
+      meta.append(sep);
+    }
+    const bit = document.createElement("span");
+    bit.textContent = part;
+    meta.append(bit);
+  });
+  return meta;
+}
+
+function createStatusPill(status) {
+  const pill = document.createElement("span");
+  pill.className = `store-status-pill is-${status || "pending"}`;
+  pill.textContent = statusLabel(status);
+  return pill;
+}
+
+function renderCatalog() {
+  const list = document.getElementById("store-catalog-list");
+  const empty = document.getElementById("store-catalog-empty");
+  if (!list || !empty) return;
+
+  const activeItems = catalog.filter((item) => item.active !== false);
+  list.replaceChildren();
+
+  if (!activeItems.length) {
+    empty.classList.remove("is-hidden");
+    list.classList.add("is-hidden");
+    document.getElementById("store-catalog-note")?.classList.add("is-hidden");
+    return;
+  }
+
+  empty.classList.add("is-hidden");
+  list.classList.remove("is-hidden");
+
+  const descriptions = activeItems.map((item) => String(item.description || "").trim());
+  const sharedDescription =
+    descriptions[0] && descriptions.every((text) => text === descriptions[0])
+      ? descriptions[0]
+      : "";
+  const note = document.getElementById("store-catalog-note");
+  if (note) {
+    note.textContent = sharedDescription;
+    note.classList.toggle("is-hidden", !sharedDescription);
+  }
+
+  activeItems.forEach((item, index) => {
+    const row = document.createElement("li");
+    row.className = "store-reward-card";
+    row.style.setProperty("--reward-delay", `${Math.min(index, 8) * 45}ms`);
+
+    const glow = document.createElement("span");
+    glow.className = "store-reward-card-glow";
+    glow.setAttribute("aria-hidden", "true");
+
+    const body = document.createElement("div");
+    body.className = "store-reward-card-body";
+
+    const title = document.createElement("h3");
+    title.className = "store-reward-card-title";
+    title.textContent = item.title;
+
+    const cost = document.createElement("p");
+    cost.className = "store-reward-card-cost";
+    cost.innerHTML = `<strong>${Number(item.cost) || 0}</strong> <span>UncCoins</span>`;
+
+    body.append(title, cost);
+
+    const ownDescription = String(item.description || "").trim();
+    if (ownDescription && ownDescription !== sharedDescription) {
+      const description = document.createElement("p");
+      description.className = "store-reward-card-description";
+      description.textContent = ownDescription;
+      body.append(description);
+    }
+
+    const redeem = document.createElement("button");
+    redeem.type = "button";
+    redeem.className = "btn btn-primary store-reward-card-cta";
+    redeem.textContent = "Redeem";
+    redeem.disabled =
+      !currentUser || !canRedeem || pointsBalance < item.cost;
+    if (!currentUser) {
+      redeem.title = "Sign in with Kick to redeem";
+    } else if (!canRedeem) {
+      redeem.title = "Redemptions disabled for this account";
+      row.classList.add("is-locked");
+    } else if (pointsBalance < item.cost) {
+      redeem.title = "Not enough UncCoins";
+      row.classList.add("is-locked");
+    }
+    redeem.addEventListener("click", () => {
+      void redeemItem(item.id, redeem);
+    });
+
+    row.append(glow, body, redeem);
+    list.append(row);
+  });
+}
+
+function formatWhen(value) {
+  const at = Date.parse(value || "");
+  if (!Number.isFinite(at)) return "";
+  return new Date(at).toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function renderMyRedemptions() {
+  const list = document.getElementById("store-redemptions-list");
+  const empty = document.getElementById("store-redemptions-empty");
+  if (!list || !empty) return;
+
+  list.replaceChildren();
+
+  if (!currentUser || !myRedemptions.length) {
+    empty.classList.remove("is-hidden");
+    list.classList.add("is-hidden");
+    empty.textContent = currentUser
+      ? "No redemptions yet."
+      : "Sign in to see your redemptions.";
+    return;
+  }
+
+  empty.classList.add("is-hidden");
+  list.classList.remove("is-hidden");
+
+  myRedemptions.forEach((entry) => {
+    const row = document.createElement("li");
+    row.className = `store-row store-redemption-item is-${entry.status || "pending"}`;
+
+    const copy = document.createElement("div");
+    copy.className = "store-row-copy";
+
+    const title = document.createElement("p");
+    title.className = "store-row-title";
+    title.textContent = entry.itemTitle;
+
+    copy.append(
+      title,
+      createRowMeta([
+        ...redemptionDetailParts(entry),
+        formatPoints(entry.cost),
+        formatWhen(entry.updatedAt || entry.createdAt),
+      ])
+    );
+    row.append(copy, createStatusPill(entry.status));
+    list.append(row);
+  });
+}
+
+function renderAdminCatalog() {
+  const list = document.getElementById("store-admin-catalog");
+  const empty = document.getElementById("store-admin-catalog-empty");
+  if (!list) return;
+  list.replaceChildren();
+
+  if (!catalog.length) {
+    empty?.classList.remove("is-hidden");
+    list.classList.add("is-hidden");
+    return;
+  }
+
+  empty?.classList.add("is-hidden");
+  list.classList.remove("is-hidden");
+
+  catalog.forEach((item) => {
+    const row = document.createElement("li");
+    row.className = `store-row store-admin-item${item.active ? "" : " is-inactive"}`;
+
+    const copy = document.createElement("div");
+    copy.className = "store-row-copy";
+
+    const title = document.createElement("p");
+    title.className = "store-row-title";
+    title.textContent = item.title;
+
+    copy.append(
+      title,
+      createRowMeta([
+        formatPoints(item.cost),
+        item.active ? "Active" : "Inactive",
+        item.description || "",
+      ])
+    );
+
+    const actions = document.createElement("div");
+    actions.className = "store-queue-actions";
+
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "btn btn-sm btn-primary";
+    edit.textContent = "Edit";
+    edit.addEventListener("click", () => {
+      beginCatalogEdit(item);
+    });
+
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "btn btn-sm btn-outline";
+    toggle.textContent = item.active ? "Disable" : "Enable";
+    toggle.addEventListener("click", () => {
+      void toggleCatalogItem(item.id, !item.active, toggle);
+    });
+
+    actions.append(edit, toggle);
+    row.append(copy, actions);
+    list.append(row);
+  });
+}
+
+function renderQueue() {
+  const list = document.getElementById("store-queue-list");
+  const empty = document.getElementById("store-queue-empty");
+  if (!list || !empty) return;
+
+  const pending = pendingQueue.filter((entry) => entry.status === "pending");
+  list.replaceChildren();
+
+  if (!pending.length) {
+    empty.classList.remove("is-hidden");
+    list.classList.add("is-hidden");
+    return;
+  }
+
+  empty.classList.add("is-hidden");
+  list.classList.remove("is-hidden");
+
+  pending.forEach((entry) => {
+    const row = document.createElement("li");
+    row.className = "store-row store-queue-item";
+
+    const copy = document.createElement("div");
+    copy.className = "store-row-copy";
+
+    const title = document.createElement("p");
+    title.className = "store-row-title";
+    title.textContent = entry.itemTitle;
+
+    copy.append(
+      title,
+      createRowMeta([
+        entry.username,
+        ...redemptionDetailParts(entry),
+        formatPoints(entry.cost),
+      ])
+    );
+
+    const actions = document.createElement("div");
+    actions.className = "store-queue-actions";
+
+    const fulfill = document.createElement("button");
+    fulfill.type = "button";
+    fulfill.className = "btn btn-sm btn-primary";
+    fulfill.textContent = "Fulfill";
+    fulfill.addEventListener("click", () => {
+      void fulfillRedemption(entry.id, fulfill);
+    });
+
+    const cancel = document.createElement("button");
+    cancel.type = "button";
+    cancel.className = "btn btn-sm btn-outline";
+    cancel.textContent = "Cancel";
+    cancel.addEventListener("click", () => {
+      void cancelRedemption(entry.id, cancel);
+    });
+
+    actions.append(fulfill, cancel);
+    row.append(copy, actions);
+    list.append(row);
+  });
+}
+
+function renderHistory() {
+  const list = document.getElementById("store-history-list");
+  const empty = document.getElementById("store-history-empty");
+  if (!list || !empty) return;
+
+  const history = pendingQueue
+    .filter((entry) => entry.status === "fulfilled" || entry.status === "cancelled")
+    .sort(
+      (a, b) =>
+        Date.parse(b.updatedAt || b.createdAt) -
+        Date.parse(a.updatedAt || a.createdAt)
+    );
+
+  list.replaceChildren();
+
+  if (!history.length) {
+    empty.classList.remove("is-hidden");
+    list.classList.add("is-hidden");
+    return;
+  }
+
+  empty.classList.add("is-hidden");
+  list.classList.remove("is-hidden");
+
+  history.forEach((entry) => {
+    const row = document.createElement("li");
+    row.className = `store-row store-queue-item store-history-item is-${entry.status}`;
+
+    const copy = document.createElement("div");
+    copy.className = "store-row-copy";
+
+    const title = document.createElement("p");
+    title.className = "store-row-title";
+    title.textContent = entry.itemTitle;
+
+    copy.append(
+      title,
+      createRowMeta([
+        entry.username,
+        ...redemptionDetailParts(entry),
+        formatPoints(entry.cost),
+        formatWhen(entry.updatedAt || entry.createdAt),
+      ])
+    );
+
+    const actions = document.createElement("div");
+    actions.className = "store-queue-actions";
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "btn btn-sm btn-outline";
+    remove.textContent = "Delete";
+    remove.addEventListener("click", () => {
+      void deletePastRedemption(entry.id, remove);
+    });
+
+    actions.append(createStatusPill(entry.status), remove);
+    row.append(copy, actions);
+    list.append(row);
+  });
+}
+
+function renderAdmin() {
+  const panel = document.getElementById("store-admin");
+  const queuePanel = document.getElementById("store-queue-panel");
+  const redemptionsPanel = document.getElementById("store-redemptions-panel");
+  const browseSide = document.getElementById("store-browse-side");
+  const adminSidebar = document.getElementById("store-admin-sidebar");
+  const isAdmin = Boolean(currentUser?.isAdmin);
+
+  panel?.classList.toggle("is-hidden", !isAdmin);
+  queuePanel?.classList.toggle("is-hidden", !isAdmin);
+
+  if (redemptionsPanel && browseSide && adminSidebar) {
+    if (isAdmin) {
+      adminSidebar.insertBefore(redemptionsPanel, adminSidebar.firstChild);
+    } else if (redemptionsPanel.parentElement !== browseSide) {
+      browseSide.appendChild(redemptionsPanel);
+    }
+  }
+
+  if (!isAdmin) return;
+  renderAdminCatalog();
+  renderQueue();
+  renderHistory();
+  renderBuyToggle();
+}
+
+function renderBuyToggle() {
+  const toggle = document.getElementById("store-buy-toggle");
+  const status = document.getElementById("store-buy-toggle-status");
+  if (!toggle || !status) return;
+
+  toggle.checked = buyConfig.enabled !== false;
+  status.textContent =
+    buyConfig.enabled !== false
+      ? "Buy UncCoins is open"
+      : "Buy UncCoins is paused";
+}
+
+function renderAll() {
+  renderBalance();
+  renderBuyPackages();
+  renderBuyForm();
+  renderCatalog();
+  renderMyRedemptions();
+  renderAdmin();
+}
+
+async function loadCatalog() {
+  const response = await fetch("/api/points/catalog", {
+    credentials: "same-origin",
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    throw new Error("Could not load catalog.");
+  }
+  const data = await response.json();
+  catalog = Array.isArray(data.catalog) ? data.catalog : [];
+}
+
+async function loadMe() {
+  if (!currentUser) {
+    pointsBalance = 0;
+    myRedemptions = [];
+    canRedeem = true;
+    return;
+  }
+
+  const response = await fetch("/api/points/me", {
+    credentials: "same-origin",
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    throw new Error("Could not load UncCoins balance.");
+  }
+  const data = await response.json();
+  pointsBalance = Number(data.balance?.points) || 0;
+  myRedemptions = Array.isArray(data.redemptions) ? data.redemptions : [];
+  canRedeem = data.canRedeem !== false;
+}
+
+async function loadQueue() {
+  if (!currentUser?.isAdmin) {
+    pendingQueue = [];
+    return;
+  }
+
+  const response = await fetch("/api/points/redemptions", {
+    credentials: "same-origin",
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    throw new Error("Could not load redemptions.");
+  }
+  const data = await response.json();
+  pendingQueue = Array.isArray(data.redemptions) ? data.redemptions : [];
+}
+
+async function loadBuyPackages() {
+  const response = await fetch("/api/points/buy/packages", {
+    credentials: "same-origin",
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    buyPackages = [];
+    buyConfig.configured = false;
+    buyConfig.stripeConfigured = false;
+    buyConfig.cryptoConfigured = false;
+    buyConfig.enabled = true;
+    return;
+  }
+  const data = await response.json().catch(() => ({}));
+  buyPackages = Array.isArray(data.packages) ? data.packages : [];
+  const stripeConfigured = Boolean(data.stripeConfigured);
+  const cryptoConfigured = Boolean(data.cryptoConfigured);
+  buyConfig = {
+    configured: Boolean(data.configured) || stripeConfigured || cryptoConfigured,
+    stripeConfigured,
+    cryptoConfigured,
+    enabled: data.enabled !== false,
+    rate: Number(data.rate) || 100,
+    minUsd: Number(data.minUsd) || 1,
+    maxUsd: Number(data.maxUsd) || 100,
+    minPoints: Number(data.minPoints) || 100,
+    maxPoints: Number(data.maxPoints) || 10000,
+    stepPoints: Number(data.stepPoints) || 100,
+  };
+}
+
+async function refreshStore() {
+  try {
+    await Promise.all([
+      loadCatalog(),
+      loadMe(),
+      loadQueue(),
+      loadBuyPackages(),
+    ]);
+    renderAll();
+  } catch (error) {
+    setStoreStatus(error.message || "Could not load store.", "error");
+  }
+}
+
+function setRedeemModalError(message) {
+  const error = document.getElementById("store-redeem-error");
+  if (!error) return;
+  error.textContent = message || "";
+  error.classList.toggle("is-hidden", !message);
+}
+
+async function loadRedeemSlotCatalog({ force = false } = {}) {
+  if (
+    !force &&
+    redeemSlotCatalog.length &&
+    Date.now() - redeemSlotCatalogLoadedAt < 60000
+  ) {
+    return redeemSlotCatalog;
+  }
+  const response = await fetch("/api/bonus-hunt/slots", {
+    credentials: "same-origin",
+    cache: "no-store",
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.error || "Could not load slots.");
+  }
+  redeemSlotCatalog = Array.isArray(data.slots) ? data.slots : [];
+  redeemSlotCatalogLoadedAt = Date.now();
+  return redeemSlotCatalog;
+}
+
+function matchRedeemSlots(query) {
+  const tokens = String(query || "")
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!tokens.length || !redeemSlotCatalog.length) return [];
+  const seen = new Set();
+  const matches = [];
+  for (const slot of redeemSlotCatalog) {
+    const slug = String(slot.slug || "").toLowerCase();
+    if (slug && seen.has(slug)) continue;
+    const haystack = [slot.name, slot.slug, slot.provider, slot.groupLabel]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+    if (!tokens.every((token) => haystack.includes(token))) continue;
+    if (slug) seen.add(slug);
+    matches.push(slot);
+  }
+  matches.sort((a, b) => {
+    const aName = String(a.name || "").toLowerCase();
+    const bName = String(b.name || "").toLowerCase();
+    const aStarts = tokens.some((token) => aName.startsWith(token)) ? 0 : 1;
+    const bStarts = tokens.some((token) => bName.startsWith(token)) ? 0 : 1;
+    if (aStarts !== bStarts) return aStarts - bStarts;
+    return aName.localeCompare(bName, undefined, { sensitivity: "base" });
+  });
+  return matches.slice(0, 12);
+}
+
+function paintSelectedRedeemSlot() {
+  const selected = document.getElementById("store-redeem-slot-selected");
+  const name = document.getElementById("store-redeem-slot-selected-name");
+  const meta = document.getElementById("store-redeem-slot-selected-meta");
+  const search = document.getElementById("store-redeem-slot-search");
+  const results = document.getElementById("store-redeem-slot-results");
+  const empty = document.getElementById("store-redeem-slot-empty");
+  if (!selected) return;
+
+  if (!selectedRedeemSlot) {
+    selected.classList.add("is-hidden");
+    if (name) name.textContent = "";
+    if (meta) meta.textContent = "";
+    search?.classList.remove("is-hidden");
+    return;
+  }
+
+  selected.classList.remove("is-hidden");
+  if (name) name.textContent = selectedRedeemSlot.name || "Slot";
+  if (meta) {
+    meta.textContent = [selectedRedeemSlot.groupLabel, selectedRedeemSlot.provider]
+      .filter(Boolean)
+      .join(" · ");
+  }
+  if (search) {
+    search.value = "";
+    search.classList.add("is-hidden");
+  }
+  results?.classList.add("is-hidden");
+  empty?.classList.add("is-hidden");
+}
+
+function clearSelectedRedeemSlot() {
+  selectedRedeemSlot = null;
+  paintSelectedRedeemSlot();
+  document.getElementById("store-redeem-slot-search")?.focus();
+}
+
+function renderRedeemSlotResults() {
+  const results = document.getElementById("store-redeem-slot-results");
+  const empty = document.getElementById("store-redeem-slot-empty");
+  const search = document.getElementById("store-redeem-slot-search");
+  if (!results || !empty || !search || selectedRedeemSlot) return;
+
+  const query = search.value.trim();
+  results.replaceChildren();
+  if (!query) {
+    results.classList.add("is-hidden");
+    empty.classList.add("is-hidden");
+    return;
+  }
+
+  if (!redeemSlotCatalog.length) {
+    results.classList.add("is-hidden");
+    empty.classList.remove("is-hidden");
+    empty.textContent =
+      "No synced slots yet. Sync New Releases and Only on Stake on Bonus Hunt first.";
+    return;
+  }
+
+  const matches = matchRedeemSlots(query);
+  if (!matches.length) {
+    results.classList.add("is-hidden");
+    empty.classList.remove("is-hidden");
+    empty.textContent = "No matching slots in New Releases or Only on Stake.";
+    return;
+  }
+
+  empty.classList.add("is-hidden");
+  results.classList.remove("is-hidden");
+  matches.forEach((slot) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "hunt-add-slot-option";
+    button.setAttribute("role", "option");
+
+    const copy = document.createElement("span");
+    copy.className = "hunt-add-slot-option-copy";
+    const label = document.createElement("span");
+    label.className = "hunt-add-slot-option-name";
+    label.textContent = slot.name;
+    const note = document.createElement("span");
+    note.className = "hunt-add-slot-option-provider";
+    note.textContent = [slot.groupLabel, slot.provider].filter(Boolean).join(" · ");
+    copy.append(label, note);
+    button.append(copy);
+    button.addEventListener("click", () => {
+      selectedRedeemSlot = {
+        name: slot.name,
+        slug: slot.slug,
+        provider: slot.provider || "",
+        groupLabel: slot.groupLabel || "",
+      };
+      setRedeemModalError("");
+      paintSelectedRedeemSlot();
+    });
+    results.append(button);
+  });
+}
+
+function closeRedeemModal() {
+  const modal = document.getElementById("store-redeem-modal");
+  const form = document.getElementById("store-redeem-form");
+  modal?.classList.add("is-hidden");
+  setRedeemModalError("");
+  selectedRedeemSlot = null;
+  if (form) {
+    form.dataset.itemId = "";
+    form.reset();
+  }
+  document.getElementById("store-redeem-type")?.classList.add("is-hidden");
+  document.getElementById("store-redeem-slot-results")?.classList.add("is-hidden");
+  document.getElementById("store-redeem-slot-empty")?.classList.add("is-hidden");
+  paintSelectedRedeemSlot();
+}
+
+async function openRedeemModal(item) {
+  const modal = document.getElementById("store-redeem-modal");
+  const form = document.getElementById("store-redeem-form");
+  const copy = document.getElementById("store-redeem-copy");
+  const typeWrap = document.getElementById("store-redeem-type");
+  const search = document.getElementById("store-redeem-slot-search");
+  if (!modal || !form || !item) return;
+
+  form.dataset.itemId = item.id;
+  form.dataset.needsBonusType = itemNeedsBonusType(item) ? "1" : "0";
+  form.reset();
+  selectedRedeemSlot = null;
+  setRedeemModalError("");
+  paintSelectedRedeemSlot();
+  if (copy) {
+    copy.textContent = itemNeedsBonusType(item)
+      ? `Redeeming ${item.title}. Pick a synced slot, then Regular, Super, or Epic.`
+      : `Redeeming ${item.title}. Pick a synced New Releases or Only on Stake slot.`;
+  }
+  typeWrap?.classList.toggle("is-hidden", !itemNeedsBonusType(item));
+  modal.classList.remove("is-hidden");
+  search?.focus();
+
+  try {
+    await loadRedeemSlotCatalog();
+    renderRedeemSlotResults();
+  } catch (error) {
+    setRedeemModalError(error.message || "Could not load slots.");
+  }
+}
+
+async function submitRedeemDetails({ itemId, slotName, slotSlug, bonusType }) {
+  const response = await fetch("/api/points/redeem", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ itemId, slotName, slotSlug, bonusType }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error || "Could not redeem item.");
+  }
+
+  pointsBalance = Number(data.balance?.points) || 0;
+  myRedemptions = Array.isArray(data.redemptions) ? data.redemptions : [];
+  if (currentUser?.isAdmin) {
+    await loadQueue();
+  }
+  renderAll();
+  setStoreStatus("Redeemed. Waiting for admin fulfill.", "success");
+}
+
+async function redeemItem(itemId, button) {
+  if (!currentUser) {
+    setStoreStatus("Sign in with Kick to redeem.", "error");
+    return;
+  }
+  if (!canRedeem) {
+    setStoreStatus("This account cannot redeem store rewards.", "error");
+    return;
+  }
+
+  const item = catalog.find((entry) => entry.id === itemId);
+  if (!item) {
+    setStoreStatus("That reward is not available.", "error");
+    return;
+  }
+
+  if (button) button.disabled = true;
+  try {
+    await openRedeemModal(item);
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+function initRedeemModal() {
+  const modal = document.getElementById("store-redeem-modal");
+  const form = document.getElementById("store-redeem-form");
+  const search = document.getElementById("store-redeem-slot-search");
+  if (!modal || !form) return;
+
+  document.getElementById("store-redeem-cancel")?.addEventListener("click", () => {
+    closeRedeemModal();
+  });
+  document.getElementById("store-redeem-backdrop")?.addEventListener("click", () => {
+    closeRedeemModal();
+  });
+  document.getElementById("store-redeem-slot-clear")?.addEventListener("click", () => {
+    clearSelectedRedeemSlot();
+  });
+  search?.addEventListener("input", () => {
+    renderRedeemSlotResults();
+  });
+  search?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const first = document.querySelector("#store-redeem-slot-results .hunt-add-slot-option");
+      first?.click();
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !modal.classList.contains("is-hidden")) {
+      closeRedeemModal();
+    }
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const itemId = form.dataset.itemId || "";
+    const needsBonusType = form.dataset.needsBonusType === "1";
+    const bonusType =
+      form.querySelector('input[name="bonusType"]:checked')?.value || "";
+    const submit = document.getElementById("store-redeem-submit");
+
+    if (!selectedRedeemSlot?.name || !selectedRedeemSlot?.slug) {
+      setRedeemModalError("Pick a slot from New Releases or Only on Stake.");
+      search?.focus();
+      return;
+    }
+    if (needsBonusType && !bonusType) {
+      setRedeemModalError("Pick Regular, Super, or Epic.");
+      return;
+    }
+
+    if (submit) submit.disabled = true;
+    setRedeemModalError("");
+    setStoreStatus("Redeeming...");
+    try {
+      await submitRedeemDetails({
+        itemId,
+        slotName: selectedRedeemSlot.name,
+        slotSlug: selectedRedeemSlot.slug,
+        bonusType,
+      });
+      closeRedeemModal();
+    } catch (error) {
+      setRedeemModalError(error.message || "Could not redeem item.");
+      setStoreStatus(error.message || "Could not redeem item.", "error");
+    } finally {
+      if (submit) submit.disabled = false;
+    }
+  });
+}
+
+async function toggleCatalogItem(id, active, button) {
+  if (button) button.disabled = true;
+  try {
+    const response = await fetch("/api/points/catalog", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, active }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || "Could not update item.");
+    }
+    catalog = Array.isArray(data.catalog) ? data.catalog : catalog;
+    renderAll();
+    setStoreStatus(active ? "Item enabled." : "Item disabled.", "success");
+  } catch (error) {
+    setStoreStatus(error.message || "Could not update item.", "error");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+async function fulfillRedemption(id, button) {
+  if (button) button.disabled = true;
+  try {
+    const response = await fetch("/api/points/fulfill-redemption", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || "Could not fulfill redemption.");
+    }
+    pendingQueue = Array.isArray(data.redemptions) ? data.redemptions : [];
+    await loadMe();
+    renderAll();
+    setStoreStatus("Redemption fulfilled.", "success");
+    document
+      .getElementById("store-history-panel")
+      ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  } catch (error) {
+    setStoreStatus(error.message || "Could not fulfill redemption.", "error");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+async function cancelRedemption(id, button) {
+  if (button) button.disabled = true;
+  try {
+    const response = await fetch("/api/points/cancel-redemption", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || "Could not cancel redemption.");
+    }
+    pendingQueue = Array.isArray(data.redemptions) ? data.redemptions : [];
+    await loadMe();
+    renderAll();
+    setStoreStatus("Redemption cancelled and UncCoins refunded.", "success");
+    document
+      .getElementById("store-history-panel")
+      ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  } catch (error) {
+    setStoreStatus(error.message || "Could not cancel redemption.", "error");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+async function deletePastRedemption(id, button) {
+  if (button) button.disabled = true;
+  try {
+    const response = await fetch("/api/points/delete-redemption", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || "Could not delete redemption.");
+    }
+    pendingQueue = Array.isArray(data.redemptions) ? data.redemptions : [];
+    await loadMe();
+    renderAll();
+    setStoreStatus("Past redemption deleted.", "success");
+  } catch (error) {
+    setStoreStatus(error.message || "Could not delete redemption.", "error");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+function setCatalogFormMode({ editing = false } = {}) {
+  const label = document.getElementById("store-catalog-form-label");
+  const submit = document.getElementById("store-catalog-submit");
+  const cancel = document.getElementById("store-catalog-cancel-edit");
+  if (label) label.textContent = editing ? "Edit reward" : "Add reward";
+  if (submit) submit.textContent = editing ? "Save changes" : "Add to catalog";
+  cancel?.classList.toggle("is-hidden", !editing);
+}
+
+function clearCatalogForm() {
+  const form = document.getElementById("store-catalog-form");
+  const idInput = document.getElementById("store-item-id");
+  form?.reset();
+  if (idInput) idInput.value = "";
+  setCatalogFormMode({ editing: false });
+}
+
+function beginCatalogEdit(item) {
+  const idInput = document.getElementById("store-item-id");
+  const title = document.getElementById("store-item-title");
+  const cost = document.getElementById("store-item-cost");
+  const description = document.getElementById("store-item-description");
+  if (!idInput || !title || !cost || !description) return;
+
+  idInput.value = item.id || "";
+  title.value = item.title || "";
+  cost.value = String(item.cost ?? "");
+  description.value = item.description || "";
+  setCatalogFormMode({ editing: true });
+
+  document
+    .getElementById("store-catalog-form")
+    ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  title.focus();
+}
+
+function initCatalogForm() {
+  const form = document.getElementById("store-catalog-form");
+  if (!form) return;
+
+  document
+    .getElementById("store-catalog-cancel-edit")
+    ?.addEventListener("click", () => {
+      clearCatalogForm();
+      setStoreStatus("");
+    });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const id = document.getElementById("store-item-id")?.value || "";
+    const title = document.getElementById("store-item-title")?.value || "";
+    const cost = document.getElementById("store-item-cost")?.value || "";
+    const description =
+      document.getElementById("store-item-description")?.value || "";
+    const existing = id ? catalog.find((entry) => entry.id === id) : null;
+    const editing = Boolean(id);
+
+    setStoreStatus(editing ? "Saving changes..." : "Saving catalog item...");
+    try {
+      const response = await fetch("/api/points/catalog", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: id || undefined,
+          title,
+          cost: Number(cost),
+          description,
+          active: existing ? existing.active !== false : true,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Could not save item.");
+      }
+      catalog = Array.isArray(data.catalog) ? data.catalog : catalog;
+      clearCatalogForm();
+      renderAll();
+      setStoreStatus(
+        editing ? "Catalog item updated." : "Catalog item added.",
+        "success"
+      );
+    } catch (error) {
+      setStoreStatus(error.message || "Could not save item.", "error");
+    }
+  });
+}
+
+function setAwardChatStatus(message, tone = "") {
+  const status = document.getElementById("store-award-chat-status");
+  if (!status) {
+    setStoreStatus(message, tone);
+    return;
+  }
+
+  status.textContent = message || "";
+  status.classList.toggle("is-hidden", !message);
+  status.classList.toggle("is-error", tone === "error");
+  status.classList.toggle("is-success", tone === "success");
+  if (message) {
+    setStoreStatus(message, tone);
+  }
+}
+
+function initBuyForm() {
+  const form = document.getElementById("store-buy-form");
+  if (form) {
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+    });
+  }
+
+  const cardBtn = document.getElementById("store-buy-pay-card");
+  const cryptoBtn = document.getElementById("store-buy-pay-crypto");
+  cardBtn?.addEventListener("click", () => {
+    if (!selectedBuyPackageId) return;
+    startBuyPurchase({ packageId: selectedBuyPackageId, method: "stripe" });
+  });
+  cryptoBtn?.addEventListener("click", () => {
+    if (!selectedBuyPackageId) return;
+    startBuyPurchase({ packageId: selectedBuyPackageId, method: "crypto" });
+  });
+}
+
+function handlePurchaseReturnQuery() {
+  const params = new URLSearchParams(window.location.search);
+  const purchase = params.get("purchase");
+  if (!purchase) return;
+
+  const provider = String(params.get("provider") || "").toLowerCase();
+  if (purchase === "success") {
+    setStoreStatus(
+      provider === "stripe"
+        ? "Payment received. UncCoins credit shortly — refresh if your balance has not updated yet."
+        : "Payment received. UncCoins credit after the crypto payment confirms — refresh in a moment if your balance has not updated yet.",
+      "success"
+    );
+  } else if (purchase === "cancel") {
+    setStoreStatus("Purchase cancelled. No UncCoins were charged.", "error");
+  }
+
+  params.delete("purchase");
+  params.delete("provider");
+  const next = params.toString();
+  const url = `${window.location.pathname}${next ? `?${next}` : ""}${window.location.hash || ""}`;
+  window.history.replaceState({}, "", url);
+}
+
+function initAwardChatForm() {
+  const form = document.getElementById("store-award-chat-form");
+  if (!form) return;
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const submit = document.getElementById("store-award-chat-submit");
+    const amount = Number(
+      document.getElementById("store-award-chat-amount")?.value || 0
+    );
+    const withinMinutes = Number(
+      document.getElementById("store-award-chat-minutes")?.value || 15
+    );
+
+    if (submit) submit.disabled = true;
+    setAwardChatStatus("Awarding recent Kick chatters...");
+    try {
+      const response = await fetch("/api/points/award-chat", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount, withinMinutes }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || "Could not award chatters.");
+      }
+      await loadMe();
+      renderAll();
+      setAwardChatStatus(
+        `Awarded ${data.amount > 0 ? "+" : ""}${data.amount} UncCoins to ${data.awarded} chatters (last ${data.withinMinutes}m).`,
+        "success"
+      );
+    } catch (error) {
+      setAwardChatStatus(error.message || "Could not award chatters.", "error");
+    } finally {
+      if (submit) submit.disabled = false;
+    }
+  });
+}
+
+function initBuyToggle() {
+  const toggle = document.getElementById("store-buy-toggle");
+  if (!toggle) return;
+
+  toggle.addEventListener("change", async () => {
+    if (!currentUser?.isAdmin) {
+      toggle.checked = buyConfig.enabled !== false;
+      return;
+    }
+
+    const nextEnabled = Boolean(toggle.checked);
+    const previous = buyConfig.enabled !== false;
+    toggle.disabled = true;
+    try {
+      const response = await fetch("/api/points/buy/settings", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: nextEnabled }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || "Could not update buy UncCoins.");
+      }
+      buyConfig.enabled = data.enabled !== false;
+      renderBuyToggle();
+      renderBuyForm();
+      renderBuyPackages();
+      setStoreStatus(
+        buyConfig.enabled
+          ? "Buy UncCoins resumed."
+          : "Buy UncCoins paused.",
+        "success"
+      );
+    } catch (error) {
+      buyConfig.enabled = previous;
+      toggle.checked = previous;
+      renderBuyToggle();
+      setStoreStatus(error.message || "Could not update buy UncCoins.", "error");
+    } finally {
+      toggle.disabled = false;
+    }
+  });
+}
+
+window.addEventListener("auth:change", async (event) => {
+  currentUser = event.detail?.user || null;
+  await refreshStore();
+});
+
+window.addEventListener("points:change", (event) => {
+  if (!currentUser) return;
+  const points = Number(event.detail?.points);
+  if (!Number.isFinite(points)) return;
+  pointsBalance = points;
+  renderBalance();
+  renderCatalog();
+});
+
+initCatalogForm();
+initBuyForm();
+initBuyToggle();
+initAwardChatForm();
+initRedeemModal();
+handlePurchaseReturnQuery();
+refreshStore();

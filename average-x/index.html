@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Bet UncCoins on the average bonus-buy multiplier." />
+  <title>Average X | vzqie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css?v=avgx24" />
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="header" id="top">
+    <nav class="nav container">
+      <a href="/" class="logo">
+        <img src="/images/logo.png" alt="" class="logo-image" width="50" height="50" />
+        <span class="logo-text">vzqie</span>
+      </a>
+
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <ul class="nav-links">
+        <li><a href="/#watch">Watch</a></li>
+        <li class="is-hidden" id="admin-nav-commands">
+          <a href="/commands/">Commands</a>
+        </li>
+        <li><a href="/#menu">Menu</a></li>
+        <li><a href="/#house-games">House Games</a></li>
+        <li><a href="/#links">Links</a></li>
+        <li class="is-hidden" id="admin-nav-accounts">
+          <a href="/accounts/">Accounts</a>
+        </li>
+        <li>
+          <div class="auth-panel" id="auth-panel">
+            <div class="auth-guest" id="auth-guest">
+              <a href="/api/auth/login" class="btn btn-sm btn-kick">Sign in with Kick</a>
+            </div>
+            <div class="auth-member is-hidden" id="auth-member">
+              <div class="auth-user">
+                <img id="auth-avatar" class="auth-avatar is-hidden" alt="" width="32" height="32" />
+                <span id="auth-username" class="auth-username"></span>
+                <span id="auth-admin-badge" class="auth-admin-badge is-hidden">Admin</span>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline" id="auth-logout">Sign out</button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="auth-toast is-hidden" id="auth-toast" role="status" aria-live="polite"></div>
+
+    <section class="section page-section avgx-page">
+      <div class="section-atmosphere" aria-hidden="true"></div>
+      <div class="container page-content">
+        <a href="/#menu" class="back-link">← Menu</a>
+
+        <div class="section-header left avgx-hero">
+          <p class="section-eyebrow">vzqie</p>
+          <h2>Average X</h2>
+        </div>
+
+        <p class="avgx-status" id="avgx-status" role="status"></p>
+
+        <div class="bj21-panel avgx-mode is-hidden" id="avgx-mode">
+          <span class="bj21-panel-glow" aria-hidden="true"></span>
+          <h3 class="avgx-heading">Live section</h3>
+          <div class="avgx-actions">
+            <button class="btn btn-sm btn-outline" type="button" id="avgx-mode-head">Head to head</button>
+            <button class="btn btn-sm btn-outline" type="button" id="avgx-mode-spins">100 spins</button>
+          </div>
+          <p class="avgx-note" id="avgx-mode-note">Head to head is its own section. The slot, averages, and bonus count are on 100 spins.</p>
+        </div>
+
+        <div class="bj21-panel avgx-board avgx-spins" id="avgx-spins-board">
+          <span class="bj21-panel-glow" aria-hidden="true"></span>
+          <h3 class="avgx-heading">100 spins</h3>
+          <div class="avgx-top">
+            <div id="avgx-slot" class="avgx-slot">
+              <p class="avgx-empty">No slot is set yet.</p>
+            </div>
+            <div class="avgx-metrics" id="avgx-metrics"></div>
+          </div>
+          <div class="avgx-table-wrap" id="avgx-bonuses"></div>
+          <p class="avgx-bets-timer" id="avgx-bets-timer">Bets closed</p>
+          <div class="avgx-ranges" id="avgx-ranges"></div>
+          <p class="avgx-note">In chat: !avgx 100 team 1. The winning team splits the pool.</p>
+          <form class="avgx-bet-form" id="avgx-bet-form">
+            <input class="guess-input" id="avgx-amount" type="number" min="1" step="1" value="10" inputmode="numeric" aria-label="UncCoins" />
+            <button class="btn btn-sm btn-primary" id="avgx-place" type="submit">Place bet</button>
+          </form>
+          <p class="avgx-yours" id="avgx-yours"></p>
+          <ul class="avgx-bets" id="avgx-bets"></ul>
+          <div class="avgx-spins-count">
+            <h3 class="avgx-heading">Bonus count</h3>
+            <p class="avgx-bets-timer" id="avgx-spins-timer">Bets closed</p>
+            <p class="avgx-spins-slot" id="avgx-spins-slot"></p>
+            <div class="avgx-ranges" id="avgx-spins-ranges"></div>
+            <p class="avgx-note">Chat: !bonuses 100 0. The winning count splits the pot.</p>
+            <form class="avgx-bet-form is-hidden" id="avgx-spins-form">
+              <input class="guess-input" id="avgx-spins-amount" type="number" min="1" step="1" value="10" inputmode="numeric" aria-label="100 spins UncCoins" />
+              <button class="btn btn-sm btn-primary" type="submit">Place bet</button>
+            </form>
+            <p class="avgx-yours" id="avgx-spins-yours"></p>
+            <ul class="avgx-bets" id="avgx-spins-bets"></ul>
+          </div>
+        </div>
+
+        <div class="bj21-panel avgx-admin avgx-spins-admin is-hidden" id="avgx-spins-admin">
+          <span class="bj21-panel-glow" aria-hidden="true"></span>
+          <div class="avgx-admin-head">
+            <h3 class="avgx-heading">100 spins</h3>
+            <input class="guess-input" id="avgx-search" type="search" placeholder="Search slots" autocomplete="off" aria-label="Slot" />
+          </div>
+          <p class="avgx-note">OBS widget for this slot and its bonuses: <a href="/average-x/round-overlay/">open preview</a>. Width 480, height 560.</p>
+          <div class="avgx-results" id="avgx-results"></div>
+          <p class="avgx-picked" id="avgx-picked">No slot picked.</p>
+          <div class="avgx-editor" id="avgx-editor"></div>
+          <div class="avgx-actions">
+            <button class="btn btn-sm btn-outline" type="button" id="avgx-add">Add bonus</button>
+            <button class="btn btn-sm btn-primary" type="button" id="avgx-save">Save round</button>
+            <select class="one-v-one-bet-seconds" id="avgx-bet-seconds" aria-label="Average bet timer">
+              <option value="30">30s</option>
+              <option value="60" selected>60s</option>
+              <option value="90">90s</option>
+              <option value="120">2 min</option>
+            </select>
+            <button class="btn btn-sm btn-outline" type="button" id="avgx-open">Average bets on</button>
+            <button class="btn btn-sm btn-outline" type="button" id="avgx-close">Average bets off</button>
+            <button class="btn btn-sm btn-outline" type="button" id="avgx-totals">Save totals</button>
+            <button class="btn btn-sm btn-primary" type="button" id="avgx-settle">Settle</button>
+            <button class="btn btn-sm btn-outline" type="button" id="avgx-reset">Reset</button>
+          </div>
+          <div class="avgx-spins-count">
+            <h3 class="avgx-heading">Bonus count</h3>
+            <p class="avgx-note">Uses the slot picked here. Enter the bonus count, then settle.</p>
+            <div class="avgx-actions">
+              <input class="guess-input" id="avgx-spins-count" type="number" min="0" step="1" placeholder="Bonus count" aria-label="Bonuses in 100 spins" />
+              <select class="one-v-one-bet-seconds" id="avgx-spins-seconds" aria-label="Bonus count bet timer">
+                <option value="30">30s</option>
+                <option value="60" selected>60s</option>
+                <option value="90">90s</option>
+                <option value="120">2 min</option>
+              </select>
+              <button class="btn btn-sm btn-outline" type="button" id="avgx-spins-open">Bonus bets on</button>
+              <button class="btn btn-sm btn-outline is-hidden" type="button" id="avgx-spins-close">Bonus bets off</button>
+              <button class="btn btn-sm btn-primary is-hidden" type="button" id="avgx-spins-settle">Settle</button>
+              <button class="btn btn-sm btn-outline is-hidden" type="button" id="avgx-spins-reset">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <section class="bj21-panel avgx-overlay-board" id="avgx-overlay-board" aria-labelledby="avgx-overlay-heading">
+          <span class="bj21-panel-glow" aria-hidden="true"></span>
+          <div class="avgx-overlay-head">
+            <h3 class="avgx-heading" id="avgx-overlay-heading">OBS overlay</h3>
+            <a class="btn btn-sm btn-outline" id="avgx-overlay-preview-link" href="/average-x/round-overlay/">Open full preview</a>
+          </div>
+          <p class="avgx-note" id="avgx-overlay-note">Selecting a slot shows it here with the bonus buys underneath. Width 480, height 560.</p>
+          <div class="avgx-overlay-preview">
+            <iframe id="avgx-overlay-frame" title="Average X overlay preview" src="/average-x/round-overlay/source.html"></iframe>
+          </div>
+          <label class="guess-label" for="avgx-overlay-url">OBS browser source URL</label>
+          <div class="avgx-overlay-url">
+            <input class="guess-input" id="avgx-overlay-url" type="text" readonly />
+            <button class="btn btn-sm btn-primary" type="button" id="avgx-overlay-copy">Copy URL</button>
+          </div>
+          <p class="avgx-note" id="avgx-overlay-copy-status" role="status" aria-live="polite"></p>
+        </section>
+
+        <div class="bj21-panel avgx-board avgx-head-board" id="avgx-head-board">
+          <span class="bj21-panel-glow" aria-hidden="true"></span>
+          <div class="avgx-overlay-head">
+            <h3 class="avgx-heading">Head to head</h3>
+            <a class="btn btn-sm btn-outline" href="/average-x/overlay/">OBS widget</a>
+          </div>
+          <div class="avgx-versus" id="avgx-versus"></div>
+          <p class="avgx-note">Higher average takes the pool. A tie refunds every bet. Chat: !h2h 100 1</p>
+          <form class="avgx-bet-form" id="avgx-head-form">
+            <input class="guess-input" id="avgx-head-amount" type="number" min="1" step="1" value="10" inputmode="numeric" aria-label="Head to head UncCoins" />
+            <button class="btn btn-sm btn-primary" type="submit">Place bet</button>
+          </form>
+          <p class="avgx-yours" id="avgx-head-yours"></p>
+          <div class="avgx-head-betters is-hidden" id="avgx-head-bets" aria-label="Bets by team"></div>
+        </div>
+
+        <div class="bj21-panel avgx-admin is-hidden" id="avgx-head-admin">
+          <span class="bj21-panel-glow" aria-hidden="true"></span>
+          <h3 class="avgx-heading">Run the match</h3>
+          <div class="avgx-duel">
+            <div>
+              <input class="guess-input" id="avgx-head-search-left" type="search" placeholder="Slot 1" autocomplete="off" aria-label="Slot 1" />
+              <div class="avgx-results" id="avgx-head-results-left"></div>
+              <p class="avgx-picked" id="avgx-head-picked-left">No slot picked.</p>
+              <div id="avgx-head-editor-left"></div>
+              <button class="btn btn-sm btn-outline" type="button" id="avgx-head-add-left">Add bonus</button>
+            </div>
+            <div>
+              <input class="guess-input" id="avgx-head-search-right" type="search" placeholder="Slot 2" autocomplete="off" aria-label="Slot 2" />
+              <div class="avgx-results" id="avgx-head-results-right"></div>
+              <p class="avgx-picked" id="avgx-head-picked-right">No slot picked.</p>
+              <div id="avgx-head-editor-right"></div>
+              <button class="btn btn-sm btn-outline" type="button" id="avgx-head-add-right">Add bonus</button>
+            </div>
+          </div>
+          <div class="avgx-actions">
+            <button class="btn btn-sm btn-primary" type="button" id="avgx-head-open">Open bets</button>
+            <button class="btn btn-sm btn-primary is-hidden" type="button" id="avgx-head-settle">Settle</button>
+            <button class="btn btn-sm btn-outline is-hidden" type="button" id="avgx-head-reset">Reset</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-text">vzqie</span>
+        <p>Gambling entertainment stream. 18+ only.</p>
+      </div>
+      <p class="disclaimer">
+        Gambling can be addictive. Please play responsibly. This channel is for entertainment purposes only.
+        If you or someone you know has a gambling problem, call <strong>1-800-GAMBLER</strong> or visit
+        <a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">BeGambleAware.org</a>.
+      </p>
+      <p class="copyright">&copy; <span id="year"></span> vzqie. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/main.js?v=avgx1"></script>
+  <script src="/js/auth.js?v=claim24h"></script>
+  <script src="/js/average-x.js?v=avgx28"></script>
+</body>
+</html>

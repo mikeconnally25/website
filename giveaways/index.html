@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Giveaways — vzqie stream rewards and community prizes." />
+  <title>Giveaways | vzqie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css?v=menuside1" />
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="header" id="top">
+    <nav class="nav container">
+      <a href="/" class="logo">
+        <img src="/images/logo.png" alt="" class="logo-image" width="50" height="50" />
+        <span class="logo-text">vzqie</span>
+      </a>
+
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <ul class="nav-links">
+        <li><a href="/#watch">Watch</a></li>
+        <li class="is-hidden" id="admin-nav-commands">
+        <a href="/commands/">Commands</a>
+      </li>
+        <li><a href="/#menu">Menu</a></li>
+        <li><a href="/#house-games">House Games</a></li>
+        <li><a href="/#links">Links</a></li>
+        <li class="is-hidden" id="admin-nav-accounts">
+          <a href="/accounts/">Accounts</a>
+        </li>
+        <li>
+          <div class="auth-panel" id="auth-panel">
+            <div class="auth-guest" id="auth-guest">
+              <a href="/api/auth/login" class="btn btn-sm btn-kick">Sign in with Kick</a>
+            </div>
+            <div class="auth-member is-hidden" id="auth-member">
+              <div class="auth-user">
+                <img id="auth-avatar" class="auth-avatar is-hidden" alt="" width="32" height="32" />
+                <span id="auth-username" class="auth-username"></span>
+                <span id="auth-admin-badge" class="auth-admin-badge is-hidden">Admin</span>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline" id="auth-logout">Sign out</button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="auth-toast is-hidden" id="auth-toast" role="status" aria-live="polite"></div>
+
+    <section class="section page-section giveaways-page">
+      <div class="container page-content giveaways-shell">
+        <a href="/#menu" class="back-link">← Back to menu</a>
+
+        <div class="giveaways-hero">
+          <div class="giveaways-hero-copy">
+            <p class="giveaways-hero-brand">vzqie</p>
+            <h1 class="giveaways-hero-title">Giveaways</h1>
+            <p class="giveaways-hero-subtitle">
+              Type the live keyword in Kick chat to enter. Watch the case spin when a winner drops.
+            </p>
+          </div>
+        </div>
+
+        <div class="giveaways-spotlight">
+          <div class="giveaways-card">
+            <div class="giveaways-header">
+              <div>
+                <p class="giveaways-eyebrow">Live drop</p>
+                <h2 class="giveaways-title">Active giveaway</h2>
+              </div>
+            </div>
+
+            <p class="giveaways-empty" id="giveaways-empty">
+              No active giveaway right now. Watch live on Kick and check back when the next keyword drops.
+            </p>
+
+            <div class="giveaways-open is-hidden" id="giveaways-open">
+              <p class="giveaways-open-label">Type this in Kick chat</p>
+              <p class="giveaways-keyword-chip" id="giveaways-keyword-display">keyword</p>
+              <p class="giveaways-open-copy" id="giveaways-open-copy">
+                One entry per viewer. Exact match only. Linked Stake required to win.
+              </p>
+              <p class="giveaways-aff-note is-hidden" id="giveaways-access-note"></p>
+            </div>
+
+            <div class="giveaways-keyword-editor is-hidden" id="giveaways-keyword-editor">
+              <label class="guess-label" for="giveaways-keyword">Chat keyword</label>
+              <p class="admin-panel-text">
+                Viewers enter by typing this exact keyword in Kick chat while the giveaway is open.
+              </p>
+              <form class="giveaways-keyword-form" id="giveaways-keyword-form">
+                <div class="guess-input-row">
+                  <input
+                    class="guess-input"
+                    id="giveaways-keyword"
+                    name="keyword"
+                    type="text"
+                    maxlength="64"
+                    autocomplete="off"
+                    spellcheck="false"
+                    placeholder="e.g. vzqie"
+                  />
+                </div>
+                <button type="submit" class="btn btn-sm btn-primary" id="giveaways-keyword-save">
+                  Save keyword
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div class="giveaways-card giveaways-reveal-card">
+            <div class="giveaways-header">
+              <div>
+                <p class="giveaways-eyebrow">Case opening</p>
+                <h2 class="giveaways-title">Reveal winner</h2>
+              </div>
+              <span class="giveaways-count" id="giveaways-reveal-count">Need entrants</span>
+            </div>
+
+            <p class="giveaways-empty" id="giveaways-reveal-empty">
+              Entrants will fill the reel once people join. Spin the case to lock in a winner. Only linked Stake accounts can win.
+            </p>
+
+            <div class="case-reel is-hidden" id="case-reel" aria-live="polite">
+              <div class="case-reel-burst" id="case-reel-burst" aria-hidden="true"></div>
+              <div class="case-reel-fade case-reel-fade-left" aria-hidden="true"></div>
+              <div class="case-reel-fade case-reel-fade-right" aria-hidden="true"></div>
+              <div class="case-reel-marker" aria-hidden="true"></div>
+              <div class="case-reel-window">
+                <div class="case-reel-track" id="case-reel-track"></div>
+              </div>
+            </div>
+
+            <p class="case-reel-result is-hidden" id="case-reel-result"></p>
+
+            <div class="giveaways-reveal-actions is-hidden" id="giveaways-reveal-actions">
+              <button type="button" class="btn btn-primary giveaways-reveal-btn" id="giveaways-reveal-btn">
+                Reveal Winner
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-panel giveaways-admin is-hidden" id="giveaways-admin-panel">
+          <div class="giveaways-admin-top">
+            <div>
+              <p class="admin-panel-label">Admin controls</p>
+              <p class="admin-panel-text" id="giveaways-toggle-status">Giveaways are closed</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="giveaways-toggle" aria-labelledby="giveaways-toggle-status" />
+              <span class="toggle-slider" aria-hidden="true"></span>
+            </label>
+          </div>
+
+          <div class="giveaways-admin-top giveaways-admin-aff">
+            <div>
+              <p class="admin-panel-label">AFF only</p>
+              <p class="admin-panel-text" id="giveaways-aff-toggle-status">
+                Affiliate restriction off
+              </p>
+            </div>
+            <label class="toggle">
+              <input
+                type="checkbox"
+                id="giveaways-aff-toggle"
+                aria-labelledby="giveaways-aff-toggle-status"
+              />
+              <span class="toggle-slider" aria-hidden="true"></span>
+            </label>
+          </div>
+
+          <div class="giveaways-admin-top giveaways-admin-aff">
+            <div>
+              <p class="admin-panel-label">SUB only</p>
+              <p class="admin-panel-text" id="giveaways-sub-toggle-status">
+                Subscriber restriction off
+              </p>
+            </div>
+            <label class="toggle">
+              <input
+                type="checkbox"
+                id="giveaways-sub-toggle"
+                aria-labelledby="giveaways-sub-toggle-status"
+              />
+              <span class="toggle-slider" aria-hidden="true"></span>
+            </label>
+          </div>
+
+          <div class="giveaways-admin-grid">
+            <div class="giveaways-admin-block giveaways-admin-tools">
+              <p class="guess-label">Entrants</p>
+              <p class="admin-panel-text">Reset the pool before the next drop.</p>
+              <button type="button" class="btn btn-sm btn-outline" id="giveaways-clear-entries">
+                Clear entries
+              </button>
+            </div>
+          </div>
+
+          <p class="guess-status is-hidden" id="giveaways-admin-status" role="status" aria-live="polite"></p>
+        </div>
+
+        <div class="giveaways-layout">
+          <div class="giveaways-layout-side">
+            <div class="giveaways-card giveaways-entrants-card">
+              <div class="giveaways-entrants-top">
+                <span class="giveaways-entrants-total" id="giveaways-count">0</span>
+                <div class="giveaways-entrants-heading">
+                  <p class="giveaways-eyebrow">Eligible</p>
+                  <h2 class="giveaways-title">Entrants</h2>
+                </div>
+              </div>
+
+              <p class="giveaways-empty" id="giveaways-entrants-empty">
+                No entrants yet. They will roll in here once viewers type the keyword in Kick chat.
+              </p>
+
+              <div class="giveaways-rolling-viewport is-hidden" id="giveaways-rolling-viewport" aria-label="Eligible giveaway entrants">
+                <div class="giveaways-rolling-fade giveaways-rolling-fade-top" aria-hidden="true"></div>
+                <div class="giveaways-rolling-fade giveaways-rolling-fade-bottom" aria-hidden="true"></div>
+                <ol class="giveaways-rolling-track" id="giveaways-list"></ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-text">vzqie</span>
+        <p>Gambling entertainment stream. 18+ only.</p>
+      </div>
+      <p class="disclaimer">
+        Gambling can be addictive. Please play responsibly. This channel is for entertainment purposes only.
+        If you or someone you know has a gambling problem, call <strong>1-800-GAMBLER</strong> or visit
+        <a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">BeGambleAware.org</a>.
+      </p>
+      <p class="copyright">&copy; <span id="year"></span> vzqie. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/main.js?v=avgx1"></script>
+  <script src="/js/auth.js?v=claim24h"></script>
+  <script src="/js/giveaways.js?v=nowinnerchat1"></script>
+</body>
+</html>

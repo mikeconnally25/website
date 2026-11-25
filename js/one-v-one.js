@@ -1,0 +1,724 @@
+let oneVOneIsAdmin = false;
+
+function formatCoins(amount) {
+  return `${Number(amount) || 0} UncCoin${Number(amount) === 1 ? "" : "s"}`;
+}
+
+function renderBet(element, { number, occupied, pool, myBet, winner, signedIn, betsOpen }, keepValue) {
+  if (!occupied && !pool && winner !== number) return;
+  const block = document.createElement("div");
+  block.className = "one-v-one-bet";
+
+  const pot = document.createElement("p");
+  pot.className = "one-v-one-pot";
+  pot.textContent = `Pool · ${formatCoins(pool)} · winners split the pot`;
+  block.appendChild(pot);
+
+  if (myBet?.side === number) {
+    const mine = document.createElement("p");
+    mine.className = "one-v-one-mine";
+    mine.textContent = `Your bet · ${formatCoins(myBet.amount)}`;
+    block.appendChild(mine);
+  }
+
+  if (winner === number) {
+    const won = document.createElement("p");
+    won.className = "one-v-one-won";
+    won.textContent = "Winner";
+    block.appendChild(won);
+  } else if (!winner && occupied && betsOpen) {
+    if (signedIn) {
+      const form = document.createElement("form");
+      form.className = "one-v-one-bet-form";
+      form.dataset.side = String(number);
+
+      const input = document.createElement("input");
+      input.className = "guess-input one-v-one-bet-amount";
+      input.type = "number";
+      input.min = "1";
+      input.max = "5000";
+      input.step = "1";
+      input.inputMode = "numeric";
+      input.placeholder = "Amount";
+      input.setAttribute("aria-label", `UncCoins to bet on side ${number}`);
+      if (keepValue) input.value = keepValue;
+
+      const button = document.createElement("button");
+      button.type = "submit";
+      button.className = "btn btn-sm btn-primary";
+      button.textContent = `Bet team ${number}`;
+
+      form.append(input, button);
+      block.appendChild(form);
+    } else {
+      const link = document.createElement("a");
+      link.className = "btn btn-sm btn-kick";
+      link.href = "/api/auth/login";
+      link.textContent = "Sign in to bet";
+      block.appendChild(link);
+    }
+  } else if (!winner && occupied) {
+    const closed = document.createElement("p");
+    closed.className = "one-v-one-pot";
+    closed.textContent = "Bets closed";
+    block.appendChild(closed);
+  }
+
+  element.appendChild(block);
+  if (keepValue) element.querySelector(".one-v-one-bet-amount")?.focus();
+}
+
+function renderSide(element, side, seatLabel, bet) {
+  if (!element) return;
+  const previous = element.querySelector(".one-v-one-bet-amount");
+  const keepValue = previous && document.activeElement === previous ? previous.value : "";
+  element.replaceChildren();
+  element.classList.toggle("is-winner", bet?.winner === Number(seatLabel));
+
+  const seat = document.createElement("p");
+  seat.className = "one-v-one-seat";
+  seat.textContent = seatLabel;
+
+  const heading = document.createElement(side?.username ? "button" : "h2");
+  heading.className = "one-v-one-name";
+  heading.textContent = side?.username || "Open seat";
+  if (side?.username) {
+    heading.type = "button";
+    heading.title = "View Stake username";
+    heading.addEventListener("click", () => showSeatProfile(side));
+  }
+
+  const list = document.createElement("ul");
+  list.className = "one-v-one-calls";
+
+  const slot = side?.slot;
+  if (!slot) {
+    const empty = document.createElement("li");
+    empty.className = "one-v-one-empty";
+    empty.textContent = side ? "Request a slot in chat." : "Waiting for a draw.";
+    list.appendChild(empty);
+  } else {
+    const item = document.createElement("li");
+    item.className = "one-v-one-pick";
+
+    const logo = document.createElement("div");
+    logo.className = "one-v-one-logo";
+    const initials = String(slot.slotName || "Slot")
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join("");
+
+    if (slot.thumbnailUrl) {
+      const image = document.createElement("img");
+      image.src = slot.thumbnailUrl;
+      image.alt = "";
+      image.addEventListener("error", () => {
+        image.remove();
+        logo.textContent = initials;
+      });
+      logo.appendChild(image);
+    } else {
+      logo.textContent = initials;
+    }
+
+    const title = document.createElement("p");
+    title.className = "one-v-one-slot";
+    title.textContent = slot.slotName || "Slot";
+
+    item.append(logo, title);
+    if (slot.provider) {
+      const detail = document.createElement("p");
+      detail.className = "one-v-one-meta";
+      detail.textContent = slot.provider;
+      item.appendChild(detail);
+    }
+    list.appendChild(item);
+  }
+
+  element.append(seat, heading, list);
+  renderBet(element, bet, keepValue);
+}
+
+function ensureSeatProfile() {
+  let modal = document.getElementById("one-v-one-profile");
+  if (modal) return modal;
+
+  modal = document.createElement("div");
+  modal.id = "one-v-one-profile";
+  modal.className = "winner-profile-modal is-hidden";
+  modal.setAttribute("role", "dialog");
+  modal.setAttribute("aria-modal", "true");
+  modal.setAttribute("aria-labelledby", "one-v-one-profile-title");
+  modal.innerHTML = `
+    <div class="winner-profile-backdrop" data-one-v-one-profile-close="true"></div>
+    <div class="winner-profile-dialog">
+      <p class="giveaways-eyebrow">1v1 account</p>
+      <h3 class="winner-profile-title" id="one-v-one-profile-title">Account</h3>
+      <dl class="winner-profile-fields">
+        <div class="winner-profile-field">
+          <dt>Kick</dt>
+          <dd id="one-v-one-profile-kick">—</dd>
+        </div>
+        <div class="winner-profile-field">
+          <dt>Stake</dt>
+          <dd id="one-v-one-profile-stake">—</dd>
+        </div>
+      </dl>
+      <button type="button" class="btn btn-sm btn-outline" data-one-v-one-profile-close="true">Close</button>
+    </div>
+  `;
+  document.body.append(modal);
+  modal.addEventListener("click", (event) => {
+    if (event.target?.closest?.("[data-one-v-one-profile-close]")) hideSeatProfile();
+  });
+  return modal;
+}
+
+function hideSeatProfile() {
+  document.getElementById("one-v-one-profile")?.classList.add("is-hidden");
+}
+
+function showSeatProfile(side) {
+  if (!side?.username) return;
+  const modal = ensureSeatProfile();
+  const title = document.getElementById("one-v-one-profile-title");
+  const kick = document.getElementById("one-v-one-profile-kick");
+  const stake = document.getElementById("one-v-one-profile-stake");
+  const username = String(side.username).trim();
+  if (title) title.textContent = username;
+  if (kick) kick.textContent = username;
+  if (stake) {
+    const stakeName = String(side.stakeUsername || "").trim();
+    const copyButton = window.createStakeCopyButton?.(stakeName);
+    stake.replaceChildren();
+    if (copyButton) stake.append(copyButton);
+    else stake.textContent = stakeName || "Not linked";
+  }
+  modal.classList.remove("is-hidden");
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") hideSeatProfile();
+});
+
+let kickChatSignature = "";
+
+function renderKickChat(messages, matchup) {
+  const log = document.getElementById("one-v-one-chat");
+  const empty = document.getElementById("one-v-one-chat-empty");
+  if (!log) return;
+
+  const items = Array.isArray(messages) ? messages : [];
+  const signature = items.map((message) => message.id).join("|");
+  empty?.classList.toggle("is-hidden", items.length > 0);
+  if (signature === kickChatSignature) return;
+
+  const nearBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 48;
+  kickChatSignature = signature;
+  log.replaceChildren();
+
+  const drawn = new Set(
+    [matchup?.left?.username, matchup?.right?.username]
+      .filter(Boolean)
+      .map((name) => name.toLowerCase())
+  );
+
+  for (const message of items) {
+    const row = document.createElement("article");
+    const username = message.username || "viewer";
+    row.className = "one-v-one-chat-row";
+    if (drawn.has(username.toLowerCase())) row.classList.add("is-drawn");
+    if (parseChatBet(message.text)) row.classList.add("is-bet");
+
+    const name = document.createElement("span");
+    name.className = "one-v-one-chat-name";
+    name.textContent = username;
+
+    const text = document.createElement("p");
+    text.className = "one-v-one-chat-text";
+    text.textContent = message.text || "";
+
+    row.append(name, text);
+    log.appendChild(row);
+  }
+
+  if (nearBottom) log.scrollTop = log.scrollHeight;
+}
+
+function renderOneVOne(data, startedAt = 0, authoritative = false) {
+  oneVOneIsAdmin = Boolean(data?.isAdmin);
+  document.getElementById("one-v-one-admin")?.classList.toggle("is-hidden", !oneVOneIsAdmin);
+
+  const poolText = document.getElementById("one-v-one-pool-text");
+  const poolDot = document.getElementById("one-v-one-pool-dot");
+  const entriesToggle = document.getElementById("one-v-one-entries-toggle");
+  const liveStatus = document.getElementById("one-v-one-live-status");
+  const entriesOpen = Boolean(data?.entriesOpen);
+  const affiliatesOnly = Boolean(data?.affiliatesOnly);
+  const subscribersOnly = Boolean(data?.subscribersOnly);
+  if (poolText) {
+    const count = Number(data?.entryCount) || 0;
+    const label = count === 1 ? "entrant" : "entrants";
+    const mode =
+      affiliatesOnly && subscribersOnly
+        ? " · AFF/SUB"
+        : affiliatesOnly
+          ? " · AFF"
+          : subscribersOnly
+            ? " · SUB"
+            : "";
+    poolText.textContent = entriesOpen
+      ? `${count} ${label}${mode} · type 1v1 in chat`
+      : `${count} ${label}${mode} · entries closed`;
+    poolDot?.classList.toggle("is-live", entriesOpen);
+  }
+  const affStatus = document.getElementById("one-v-one-aff-status");
+  const subStatus = document.getElementById("one-v-one-sub-status");
+  const affToggle = document.getElementById("one-v-one-aff-toggle");
+  const subToggle = document.getElementById("one-v-one-sub-toggle");
+  const accessNote = document.getElementById("one-v-one-access-note");
+  if (affStatus) affStatus.textContent = affiliatesOnly ? "Verified affiliates" : "Off";
+  if (subStatus) subStatus.textContent = subscribersOnly ? "Kick subscribers" : "Off";
+  if (affToggle) affToggle.checked = affiliatesOnly;
+  if (subToggle) subToggle.checked = subscribersOnly;
+  if (accessNote) {
+    const note =
+      affiliatesOnly && subscribersOnly
+        ? "AFF/SUB only — verified vzqie affiliates or active Kick subscribers can enter."
+        : affiliatesOnly
+          ? "AFF only — verified vzqie affiliates can enter."
+          : subscribersOnly
+            ? "SUB only — active Kick subscribers can enter."
+            : "";
+    accessNote.textContent = note;
+    accessNote.classList.toggle("is-hidden", !note);
+  }
+  if (entriesToggle) entriesToggle.checked = entriesOpen;
+  if (liveStatus) liveStatus.textContent = entriesOpen ? "On" : "Off";
+
+  const points = data?.balance;
+  const showBalance = Boolean(data?.signedIn) && typeof points === "number" && Number.isFinite(points);
+  const balanceText = showBalance ? points.toLocaleString() : "0";
+  const balanceEl = document.getElementById("one-v-one-balance");
+  if (balanceEl) {
+    balanceEl.classList.toggle("is-hidden", !showBalance);
+    if (showBalance) balanceEl.textContent = `You have ${balanceText} UncCoins`;
+  }
+  const you = document.getElementById("one-v-one-you");
+  const youTotal = document.getElementById("one-v-one-you-total");
+  document.querySelector(".one-v-one-bets-row")?.classList.toggle("has-you", showBalance);
+  you?.classList.toggle("is-hidden", !showBalance);
+  if (youTotal && showBalance) youTotal.textContent = balanceText;
+
+  lastOneVOne = data;
+  syncBetDeadline(data, startedAt, authoritative);
+  const betsOpen = betsCloseAt > Date.now();
+  betsWereOpen = betsOpen;
+  const bet = {
+    pools: data?.pools || { one: 0, two: 0 },
+    myBet: data?.myBet || null,
+    winner: data?.winner || null,
+    signedIn: Boolean(data?.signedIn),
+    betsOpen,
+  };
+  renderSide(document.getElementById("one-v-one-side-left"), data?.matchup?.left, "1", {
+    number: 1,
+    occupied: Boolean(data?.matchup?.left),
+    pool: bet.pools.one,
+    myBet: bet.myBet,
+    winner: bet.winner,
+    signedIn: bet.signedIn,
+    betsOpen,
+  });
+  renderSide(document.getElementById("one-v-one-side-right"), data?.matchup?.right, "2", {
+    number: 2,
+    occupied: Boolean(data?.matchup?.right),
+    pool: bet.pools.two,
+    myBet: bet.myBet,
+    winner: bet.winner,
+    signedIn: bet.signedIn,
+    betsOpen,
+  });
+  const removeLeft = document.getElementById("one-v-one-remove-left");
+  const removeRight = document.getElementById("one-v-one-remove-right");
+  const settled = Boolean(data?.winner);
+  if (removeLeft) removeLeft.disabled = !data?.matchup?.left;
+  if (removeRight) removeRight.disabled = !data?.matchup?.right;
+  const winOne = document.getElementById("one-v-one-win-1");
+  const winTwo = document.getElementById("one-v-one-win-2");
+  if (winOne) winOne.disabled = settled || !data?.matchup?.left;
+  if (winTwo) winTwo.disabled = settled || !data?.matchup?.right;
+  const bothSeated = Boolean(data?.matchup?.left) && Boolean(data?.matchup?.right);
+  const newOpponent = document.getElementById("one-v-one-new-opponent");
+  const openBets = document.getElementById("one-v-one-bets-open");
+  if (newOpponent) newOpponent.disabled = !settled;
+  if (openBets) openBets.disabled = settled || !bothSeated;
+  paintBetsTimer();
+  // Only confirmed UncCoin bets — never merge Kick !bet chat (failed bets still appear in chat).
+  renderBetList(Array.isArray(data?.bets) ? data.bets : []);
+  renderKickChat(data?.chat, data?.matchup);
+}
+
+function parseChatBet(text) {
+  const match = String(text || "")
+    .trim()
+    .match(/^!bet\s+(\d+)\s+team\s*([12])\s*$/i);
+  if (!match) return null;
+  const amount = Number(match[1]);
+  if (!Number.isFinite(amount) || amount < 1) return null;
+  return { amount, side: Number(match[2]) };
+}
+
+function renderBetList(bets) {
+  const rows = Array.isArray(bets) ? bets : [];
+  for (const side of [1, 2]) {
+    const sideBets = rows
+      .filter((bet) => Number(bet.side) === side)
+      .sort(
+        (a, b) =>
+          (Number(b.amount) || 0) - (Number(a.amount) || 0) ||
+          String(a.username || "").localeCompare(String(b.username || ""))
+      );
+    const total = document.getElementById(`one-v-one-bets-${side}-total`);
+    if (total) {
+      const stake = sideBets.reduce((sum, bet) => sum + (Number(bet.amount) || 0), 0);
+      total.textContent = stake.toLocaleString();
+    }
+
+    const list = document.getElementById(`one-v-one-betters-${side}`);
+    const empty = document.getElementById(`one-v-one-betters-${side}-empty`);
+    if (!list) continue;
+    list.replaceChildren();
+    for (const bet of sideBets) {
+      const item = document.createElement("li");
+      item.className = `one-v-one-better${bet.mine ? " is-mine" : ""}`;
+
+      const name = document.createElement("span");
+      name.className = "one-v-one-better-name";
+      name.textContent = bet.username || "viewer";
+
+      const amount = document.createElement("span");
+      amount.className = "one-v-one-better-amount";
+      const stake = (Number(bet.amount) || 0).toLocaleString();
+      amount.textContent =
+        bet.payout == null ? stake : bet.refund ? `${stake} refund` : `${stake} · paid ${Number(bet.payout).toLocaleString()}`;
+
+      item.append(name, amount);
+      list.append(item);
+    }
+    empty?.classList.toggle("is-hidden", sideBets.length > 0);
+  }
+}
+
+function setOneVOneNote(message, isError) {
+  const note = document.getElementById("one-v-one-admin-note");
+  if (!note) return;
+  note.textContent = message || "";
+  note.classList.toggle("is-error", Boolean(isError));
+}
+
+async function loadOneVOne() {
+  const startedAt = Date.now();
+  const response = await fetch("/api/one-v-one/status", { cache: "no-store", credentials: "same-origin" });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Could not load the 1v1.");
+  renderOneVOne(data, startedAt);
+}
+
+async function saveOneVOne(event) {
+  event.preventDefault();
+  setOneVOneNote("");
+  const count = Number(event.submitter?.value) === 1 ? 1 : 2;
+  const heldWinner = count === 1 && Boolean(document.querySelector(".one-v-one-side.is-winner"));
+
+  try {
+    const response = await fetch("/api/one-v-one/set", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ count }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Could not draw the 1v1.");
+    renderOneVOne(data);
+    if (heldWinner) setOneVOneNote(rematchNote(data));
+    else setOneVOneNote(count === 1 ? "Drew 1 viewer." : "Drew 2 viewers.");
+  } catch (error) {
+    setOneVOneNote(error.message, true);
+  }
+}
+
+async function removeOneVOne(side) {
+  setOneVOneNote("");
+  try {
+    const response = await fetch("/api/one-v-one/remove", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ side }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Could not remove that viewer.");
+    renderOneVOne(data);
+    setOneVOneNote(side === "1" ? "Removed side 1." : "Removed side 2.");
+  } catch (error) {
+    setOneVOneNote(error.message, true);
+  }
+}
+
+async function clearOneVOne() {
+  setOneVOneNote("");
+  try {
+    const response = await fetch("/api/one-v-one/clear", {
+      method: "POST",
+      credentials: "same-origin",
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Could not reset the 1v1.");
+    renderOneVOne(data);
+    setOneVOneNote("1v1 reset.");
+  } catch (error) {
+    setOneVOneNote(error.message, true);
+  }
+}
+
+async function toggleOneVOneEntries(event) {
+  setOneVOneNote("");
+  const open = Boolean(event.target.checked);
+  try {
+    const response = await fetch("/api/one-v-one/entries", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ open }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Could not update the 1v1.");
+    renderOneVOne(data);
+    if (!open) setOneVOneNote("1v1 is off.");
+    else if (data.announced) setOneVOneNote("1v1 is on. Kick chat was told to type 1v1.");
+    else setOneVOneNote("1v1 is on, but the chat message did not send.", true);
+  } catch (error) {
+    setOneVOneNote(error.message, true);
+    loadOneVOne().catch(() => {});
+  }
+}
+
+async function clearOneVOneEntries() {
+  setOneVOneNote("");
+  try {
+    const response = await fetch("/api/one-v-one/entries/clear", {
+      method: "POST",
+      credentials: "same-origin",
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Could not clear entrants.");
+    renderOneVOne(data);
+    setOneVOneNote("Entrants cleared.");
+  } catch (error) {
+    setOneVOneNote(error.message, true);
+  }
+}
+
+function setBetNote(message, isError) {
+  const note = document.getElementById("one-v-one-bet-note");
+  if (!note) return;
+  note.textContent = message || "";
+  note.classList.toggle("is-error", Boolean(isError));
+}
+
+async function placeBet(event) {
+  event.preventDefault();
+  const form = event.target;
+  const amount = form.querySelector(".one-v-one-bet-amount")?.value;
+  setBetNote("");
+  try {
+    const response = await fetch("/api/one-v-one/bet", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ side: form.dataset.side, amount }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Could not place that bet.");
+    renderOneVOne(data);
+    setBetNote(`Bet placed on side ${form.dataset.side}.`);
+  } catch (error) {
+    setBetNote(error.message, true);
+  }
+}
+
+async function settleOneVOne(side) {
+  setOneVOneNote("");
+  try {
+    const response = await fetch("/api/one-v-one/settle", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ side }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Could not settle the 1v1.");
+    renderOneVOne(data);
+    const winningBets = (data.bets || []).filter((bet) => Number(bet.side) === Number(side));
+    const refunded = !winningBets.length || winningBets.every((bet) => bet.refund);
+    setOneVOneNote(
+      refunded
+        ? `Team ${side} wins. Nobody bet that side, so every bet was refunded.`
+        : `Team ${side} wins. The pot was split by bet size.`
+    );
+  } catch (error) {
+    setOneVOneNote(error.message, true);
+  }
+}
+
+document.getElementById("one-v-one-admin")?.addEventListener("submit", saveOneVOne);
+async function setOneVOneAccess(patch) {
+  setOneVOneNote("");
+  try {
+    const response = await fetch("/api/one-v-one/access", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Could not update that restriction.");
+    renderOneVOne(data);
+    const affiliatesOnly = Boolean(data.affiliatesOnly);
+    const subscribersOnly = Boolean(data.subscribersOnly);
+    if (affiliatesOnly && subscribersOnly) {
+      setOneVOneNote("AFF/SUB only. Affiliates or subscribers can enter.");
+    } else if (affiliatesOnly) {
+      setOneVOneNote("AFF only. Verified affiliates can enter.");
+    } else if (subscribersOnly) {
+      setOneVOneNote("SUB only. Kick subscribers can enter.");
+    } else {
+      setOneVOneNote("Affiliate and subscriber restrictions are off.");
+    }
+  } catch (error) {
+    setOneVOneNote(error.message, true);
+    loadOneVOne().catch(() => {});
+  }
+}
+
+document.getElementById("one-v-one-entries-toggle")?.addEventListener("change", toggleOneVOneEntries);
+document.getElementById("one-v-one-aff-toggle")?.addEventListener("change", (event) => {
+  setOneVOneAccess({ affiliatesOnly: Boolean(event.target.checked) });
+});
+document.getElementById("one-v-one-sub-toggle")?.addEventListener("change", (event) => {
+  setOneVOneAccess({ subscribersOnly: Boolean(event.target.checked) });
+});
+document.getElementById("one-v-one-entries-clear")?.addEventListener("click", clearOneVOneEntries);
+document.getElementById("one-v-one-remove-left")?.addEventListener("click", () => removeOneVOne("1"));
+document.getElementById("one-v-one-remove-right")?.addEventListener("click", () => removeOneVOne("2"));
+function rematchNote(data) {
+  const both = Boolean(data?.matchup?.left) && Boolean(data?.matchup?.right);
+  return both
+    ? "Winner held. Drew a new opponent."
+    : "Winner held. Need another entrant to draw an opponent.";
+}
+
+async function drawNewOpponent() {
+  setOneVOneNote("");
+  try {
+    const response = await fetch("/api/one-v-one/rematch", {
+      method: "POST",
+      credentials: "same-origin",
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Could not draw a new opponent.");
+    renderOneVOne(data);
+    setOneVOneNote(rematchNote(data));
+  } catch (error) {
+    setOneVOneNote(error.message, true);
+  }
+}
+
+async function setBetTimer(open) {
+  setOneVOneNote("");
+  const seconds = Number(document.getElementById("one-v-one-bet-seconds")?.value) || 60;
+  const startedAt = Date.now();
+  try {
+    const response = await fetch("/api/one-v-one/bets", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ open, seconds }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Could not update the bet timer.");
+    renderOneVOne(data, startedAt, true);
+    setOneVOneNote(open ? `Bets are open for ${seconds} seconds.` : "Bets are closed.");
+  } catch (error) {
+    setOneVOneNote(error.message, true);
+  }
+}
+
+let lastOneVOne = null;
+let betsCloseAt = 0;
+let betsWereOpen = false;
+let betDeadlineKnownAt = 0;
+
+function syncBetDeadline(data, startedAt, authoritative) {
+  const serverNow = Number(data?.serverNow) || 0;
+  const closeAt = Number(data?.betsCloseAt) || 0;
+  const remaining = serverNow && closeAt ? closeAt - serverNow : 0;
+
+  if (remaining > 500) {
+    betsCloseAt = Date.now() + remaining;
+    betDeadlineKnownAt = Date.now();
+    return;
+  }
+
+  if (!authoritative && startedAt && startedAt < betDeadlineKnownAt && betsCloseAt > Date.now()) {
+    return;
+  }
+
+  betsCloseAt = 0;
+}
+
+function formatBetClock(ms) {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  const minutes = Math.floor(total / 60);
+  const seconds = String(total % 60).padStart(2, "0");
+  return `${minutes}:${seconds}`;
+}
+
+function paintBetsTimer() {
+  const el = document.getElementById("one-v-one-bets-timer");
+  const open = betsCloseAt > Date.now();
+  if (el) {
+    el.classList.toggle("is-live", open);
+    el.textContent = open ? `Bets close in ${formatBetClock(betsCloseAt - Date.now())}` : "Bets closed";
+  }
+  const closeBets = document.getElementById("one-v-one-bets-close");
+  if (closeBets) closeBets.disabled = !open;
+}
+
+document.getElementById("one-v-one-win-1")?.addEventListener("click", () => settleOneVOne("1"));
+document.getElementById("one-v-one-win-2")?.addEventListener("click", () => settleOneVOne("2"));
+document.getElementById("one-v-one-clear")?.addEventListener("click", clearOneVOne);
+document.getElementById("one-v-one-new-opponent")?.addEventListener("click", drawNewOpponent);
+document.getElementById("one-v-one-bets-open")?.addEventListener("click", () => setBetTimer(true));
+document.getElementById("one-v-one-bets-close")?.addEventListener("click", () => setBetTimer(false));
+document.getElementById("one-v-one-board")?.addEventListener("submit", (event) => {
+  if (event.target?.classList?.contains("one-v-one-bet-form")) placeBet(event);
+});
+window.addEventListener("auth:change", () => {
+  loadOneVOne().catch((error) => setOneVOneNote(error.message, true));
+});
+
+loadOneVOne().catch((error) => setOneVOneNote(error.message, true));
+window.setInterval(() => {
+  loadOneVOne().catch(() => {});
+}, 5000);
+window.setInterval(() => {
+  const open = betsCloseAt > Date.now();
+  paintBetsTimer();
+  if (betsWereOpen && !open && lastOneVOne) {
+    betsWereOpen = false;
+    renderOneVOne({ ...lastOneVOne, betsCloseAt: 0, serverNow: Date.now() }, Date.now());
+  }
+}, 250);

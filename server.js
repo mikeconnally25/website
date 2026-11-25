@@ -1,0 +1,484 @@
+import { loadProjectEnv } from "./lib/load-dotenv.js";
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+import {
+  handleCallback,
+  handleLogin,
+  handleLogout,
+  handleMe,
+} from "./lib/auth-handlers.js";
+import {
+  handleBonusHuntAdd,
+  handleBonusHuntClear,
+  handleBonusHuntEnd,
+  handleBonusHuntGet,
+  handleBonusHuntHistory,
+  handleBonusHuntHistoryRemove,
+  handleBonusHuntSettings,
+  handleBonusHuntRemove,
+  handleBonusHuntUpdate,
+  handleBonusHuntRequestRemove,
+  handleBonusHuntRequestBet,
+  handleBonusHuntRequestSubmit,
+  handleBonusHuntRequestsClear,
+  handleBonusHuntRequestsList,
+  handleBonusHuntRequestsToggle,
+  handleBonusHuntRequestsAffSubOnly,
+  handleBonusHuntSlots,
+  handleBonusHuntSlotsImport,
+  handleBonusHuntSlotsImportSync,
+  handleBonusHuntSlotsSyncToken,
+  handleBonusHuntSlotsSyncStatus,
+  handleKickChatSubscribe,
+  handleKickChatStatus,
+  handleKickTestSlotCommand,
+} from "./lib/bonus-hunt-handlers.js";
+import { handleKickWebhook } from "./lib/kick-webhook.js";
+import {
+  handleOneVOneAccess,
+  handleOneVOneBet,
+  handleOneVOneBetTimer,
+  handleOneVOneClear,
+  handleOneVOneEntries,
+  handleOneVOneEntriesClear,
+  handleOneVOneRematch,
+  handleOneVOneRemove,
+  handleOneVOneSet,
+  handleOneVOneSettle,
+  handleOneVOneStatus,
+} from "./lib/one-v-one-handlers.js";
+import { handleKickBotLogin, handleKickBotStatus } from "./lib/kick-bot-auth-handlers.js";
+import { handleOpeningUpdate, handleSlotStatsGet, handleSlotStatsLive } from "./lib/slot-stats.js";
+import { handleKickCredentialsCheck } from "./lib/kick-credentials-check.js";
+import { handleKickSetupStatus } from "./lib/kick-setup-status.js";
+import {
+  handleGuessStatus,
+  handleGuessList,
+  handleGuessSetEndingBalance,
+  handleGuessSubmit,
+  handleGuessToggle,
+  handleGuessAffiliatesOnly,
+  handleGuessSubscribersOnly,
+} from "./lib/guess-handlers.js";
+import { handleLeaderboardGet } from "./lib/leaderboard-handlers.js";
+import {
+  handleUsersList,
+  handleStakeLink,
+  handleUserAffGrant,
+  handleUserBan,
+  handleUserRemove,
+  handleUserSetStake,
+} from "./lib/user-handlers.js";
+import {
+  handleGiveawayAffiliatesOnly,
+  handleGiveawaySubscribersOnly,
+  handleGiveawayEntriesClear,
+  handleGiveawayKeyword,
+  handleGiveawayReveal,
+  handleGiveawayStatus,
+  handleGiveawayToggle,
+} from "./lib/giveaway-handlers.js";
+import {
+  handleWeeklyRaffleClearWinner,
+  handleWeeklyRaffleResetWeek,
+  handleWeeklyRaffleReveal,
+  handleWeeklyRaffleStartWeek,
+  handleWeeklyRaffleStatus,
+} from "./lib/weekly-raffle-handlers.js";
+import {
+  handleHouseLossRaffleResetWeek,
+  handleHouseLossRaffleReveal,
+  handleHouseLossRaffleStatus,
+} from "./lib/house-loss-raffle-handlers.js";
+import {
+  handleChatList,
+  handleChatRemove,
+  handleChatSend,
+} from "./lib/chat-handlers.js";
+import {
+  handleBotRepliesGet,
+  handleBotRepliesSave,
+} from "./lib/bot-replies-handlers.js";
+import { startLocalChatPromoScheduler } from "./lib/chat-promos.js";
+import {
+  handlePointsAward,
+  handlePointsAwardChat,
+  handlePointsCatalogGet,
+  handlePointsCatalogUpsert,
+  handlePointsLeaderboard,
+  handlePointsMe,
+  handlePointsRedeem,
+  handlePointsRedemptionCancel,
+  handlePointsRedemptionDelete,
+  handlePointsRedemptionFulfill,
+  handlePointsRedemptionsList,
+  handlePointsTip,
+} from "./lib/points-handlers.js";
+import {
+  handlePointsBuy,
+  handlePointsBuyIpn,
+  handlePointsBuyPackages,
+  handlePointsBuySettings,
+  handlePointsBuyStripeWebhook,
+} from "./lib/points-buy-handlers.js";
+import {
+  handleSlotTournamentAffiliatesOnly,
+  handleSlotTournamentBracketClear,
+  handleSlotTournamentBracketGenerate,
+  handleSlotTournamentBracketScore,
+  handleSlotTournamentChangeEntrySlot,
+  handleSlotTournamentEntriesBots,
+  handleSlotTournamentEntriesClear,
+  handleSlotTournamentEntryAdd,
+  handleSlotTournamentEntryRemove,
+  handleSlotTournamentJoin,
+  handleSlotTournamentPhase,
+  handleSlotTournamentPredictionsSave,
+  handleSlotTournamentPredictionsToggle,
+  handleSlotTournamentResults,
+  handleSlotTournamentSettings,
+  handleSlotTournamentSlots,
+  handleSlotTournamentStatus,
+  handleSlotTournamentSubscribersOnly,
+  handleSlotTournamentToggle,
+} from "./lib/slot-tournament-handlers.js";
+import {
+  handleSlotLeagueEntriesBots,
+  handleSlotLeagueEntriesClear,
+  handleSlotLeagueEntryRemove,
+  handleSlotLeagueGenerateGroups,
+  handleSlotLeagueGenerateKnockout,
+  handleSlotLeagueGenerateSeason,
+  handleSlotLeagueJoin,
+  handleSlotLeagueRandomizeWeek,
+  handleSlotLeagueMatchScore,
+  handleSlotLeaguePhase,
+  handleSlotLeagueReset,
+  handleSlotLeagueRosterReset,
+  handleSlotLeagueSettings,
+  handleSlotLeagueSpotAssign,
+  handleSlotLeagueSpotSlot,
+  handleSlotLeagueStatus,
+  handleSlotLeagueToggle,
+} from "./lib/slot-league-handlers.js";
+import {
+  handleHouseGamesBalance,
+  handleHouseGamesPlay,
+  handleHouseGamesSelfCredit,
+} from "./lib/house-games-handlers.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+loadProjectEnv(__dirname);
+const app = express();
+const PORT = Number(process.env.PORT) || 3848;
+
+app.post(
+  "/api/kick/webhook",
+  express.raw({ type: "application/json" }),
+  (req, res) => handleKickWebhook(req, res)
+);
+app.post(
+  "/api/points/buy/stripe-webhook",
+  express.raw({ type: "application/json" }),
+  (req, res) => handlePointsBuyStripeWebhook(req, res)
+);
+
+app.use(express.json());
+app.use(express.static(__dirname));
+
+app.get("/api/auth/login", (req, res) => handleLogin(req, res));
+app.get("/api/auth/callback", (req, res) => handleCallback(req, res));
+app.get("/api/auth/me", (req, res) => handleMe(req, res));
+app.post("/api/auth/logout", (req, res) => handleLogout(req, res));
+app.post("/api/guess-the-balance/submit", (req, res) => handleGuessSubmit(req, res));
+app.get("/api/guess-the-balance/status", (req, res) => handleGuessStatus(req, res));
+app.post("/api/guess-the-balance/toggle", (req, res) => handleGuessToggle(req, res));
+app.post("/api/guess-the-balance/affiliates-only", (req, res) =>
+  handleGuessAffiliatesOnly(req, res)
+);
+app.post("/api/guess-the-balance/subscribers-only", (req, res) =>
+  handleGuessSubscribersOnly(req, res)
+);
+app.get("/api/guess-the-balance/guesses", (req, res) => handleGuessList(req, res));
+app.post("/api/guess-the-balance/ending-balance", (req, res) =>
+  handleGuessSetEndingBalance(req, res)
+);
+app.get("/api/bonus-hunt", (req, res) => handleBonusHuntGet(req, res));
+app.post("/api/bonus-hunt/settings", (req, res) =>
+  handleBonusHuntSettings(req, res)
+);
+app.post("/api/bonus-hunt/add", (req, res) => handleBonusHuntAdd(req, res));
+app.post("/api/bonus-hunt/update", (req, res) => handleBonusHuntUpdate(req, res));
+app.post("/api/bonus-hunt/remove", (req, res) => handleBonusHuntRemove(req, res));
+app.post("/api/bonus-hunt/clear", (req, res) => handleBonusHuntClear(req, res));
+app.post("/api/bonus-hunt/end", (req, res) => handleBonusHuntEnd(req, res));
+app.get("/api/bonus-hunt/history", (req, res) => handleBonusHuntHistory(req, res));
+app.post("/api/bonus-hunt/history/remove", (req, res) =>
+  handleBonusHuntHistoryRemove(req, res)
+);
+app.get("/api/bonus-hunt/slots", (req, res) => handleBonusHuntSlots(req, res));
+app.post("/api/bonus-hunt/slots/import", (req, res) =>
+  handleBonusHuntSlotsImport(req, res)
+);
+app.post("/api/bonus-hunt/slots/import-sync", (req, res) =>
+  handleBonusHuntSlotsImportSync(req, res)
+);
+app.options("/api/bonus-hunt/slots/import-sync", (req, res) =>
+  handleBonusHuntSlotsImportSync(req, res)
+);
+app.post("/api/bonus-hunt/slots/sync-token", (req, res) =>
+  handleBonusHuntSlotsSyncToken(req, res)
+);
+app.get("/api/bonus-hunt/slots/sync-status", (req, res) =>
+  handleBonusHuntSlotsSyncStatus(req, res)
+);
+app.get("/api/slot-stats", (req, res) => handleSlotStatsGet(req, res));
+app.get("/api/slot-stats-live", (req, res) => handleSlotStatsLive(req, res));
+app.post("/api/slot-stats-opening", (req, res) => handleOpeningUpdate(req, res));
+app.get("/api/bonus-hunt/requests", (req, res) =>
+  handleBonusHuntRequestsList(req, res)
+);
+app.post("/api/bonus-hunt/request", (req, res) =>
+  handleBonusHuntRequestSubmit(req, res)
+);
+app.post("/api/bonus-hunt/requests/remove", (req, res) =>
+  handleBonusHuntRequestRemove(req, res)
+);
+app.post("/api/bonus-hunt/requests/bet", (req, res) =>
+  handleBonusHuntRequestBet(req, res)
+);
+app.post("/api/bonus-hunt/requests/clear", (req, res) =>
+  handleBonusHuntRequestsClear(req, res)
+);
+app.post("/api/bonus-hunt/requests/toggle", (req, res) =>
+  handleBonusHuntRequestsToggle(req, res)
+);
+app.post("/api/bonus-hunt/requests/aff-sub-only", (req, res) =>
+  handleBonusHuntRequestsAffSubOnly(req, res)
+);
+app.post("/api/kick/subscribe", (req, res) => handleKickChatSubscribe(req, res));
+app.get("/api/kick/chat-status", (req, res) => handleKickChatStatus(req, res));
+app.post("/api/kick/test-command", (req, res) => handleKickTestSlotCommand(req, res));
+app.get("/api/kick/bot/login", (req, res) => handleKickBotLogin(req, res));
+app.get("/api/kick/bot/status", (req, res) => handleKickBotStatus(req, res));
+app.get("/api/kick/credentials-check", (req, res) => handleKickCredentialsCheck(req, res));
+app.get("/api/kick/setup-status", (req, res) => handleKickSetupStatus(req, res));
+app.get("/api/leaderboard", (req, res) => handleLeaderboardGet(req, res));
+app.get("/api/users", (req, res) => handleUsersList(req, res));
+app.post("/api/users/link-stake", (req, res) => handleStakeLink(req, res));
+app.post("/api/users/aff-grant", (req, res) => handleUserAffGrant(req, res));
+app.post("/api/users/ban", (req, res) => handleUserBan(req, res));
+app.post("/api/users/remove", (req, res) => handleUserRemove(req, res));
+app.post("/api/users/set-stake", (req, res) => handleUserSetStake(req, res));
+app.get("/api/points/leaderboard", (req, res) =>
+  handlePointsLeaderboard(req, res)
+);
+app.get("/api/points/me", (req, res) => handlePointsMe(req, res));
+app.get("/api/points/catalog", (req, res) => handlePointsCatalogGet(req, res));
+app.post("/api/points/catalog", (req, res) => handlePointsCatalogUpsert(req, res));
+app.post("/api/points/award", (req, res) => handlePointsAward(req, res));
+app.post("/api/points/award-chat", (req, res) => handlePointsAwardChat(req, res));
+app.post("/api/points/redeem", (req, res) => handlePointsRedeem(req, res));
+app.post("/api/points/tip", (req, res) => handlePointsTip(req, res));
+app.get("/api/points/buy/packages", (req, res) =>
+  handlePointsBuyPackages(req, res)
+);
+app.post("/api/points/buy/settings", (req, res) =>
+  handlePointsBuySettings(req, res)
+);
+app.post("/api/points/buy", (req, res) => handlePointsBuy(req, res));
+app.post("/api/points/buy/ipn", (req, res) => handlePointsBuyIpn(req, res));
+app.get("/api/points/redemptions", (req, res) =>
+  handlePointsRedemptionsList(req, res)
+);
+app.post("/api/points/redemptions/fulfill", (req, res) =>
+  handlePointsRedemptionFulfill(req, res)
+);
+app.post("/api/points/fulfill-redemption", (req, res) =>
+  handlePointsRedemptionFulfill(req, res)
+);
+app.post("/api/points/redemptions/cancel", (req, res) =>
+  handlePointsRedemptionCancel(req, res)
+);
+app.post("/api/points/cancel-redemption", (req, res) =>
+  handlePointsRedemptionCancel(req, res)
+);
+app.post("/api/points/delete-redemption", (req, res) =>
+  handlePointsRedemptionDelete(req, res)
+);
+app.get("/api/house-games/balance", (req, res) =>
+  handleHouseGamesBalance(req, res)
+);
+app.post("/api/house-games/self-credit", (req, res) =>
+  handleHouseGamesSelfCredit(req, res)
+);
+app.post("/api/house-games/play", (req, res) => handleHouseGamesPlay(req, res));
+app.get("/api/slot-tournaments/status", (req, res) =>
+  handleSlotTournamentStatus(req, res)
+);
+app.post("/api/slot-tournaments/toggle", (req, res) =>
+  handleSlotTournamentToggle(req, res)
+);
+app.post("/api/slot-tournaments/settings", (req, res) =>
+  handleSlotTournamentSettings(req, res)
+);
+app.post("/api/slot-tournaments/phase", (req, res) =>
+  handleSlotTournamentPhase(req, res)
+);
+app.post("/api/slot-tournaments/affiliates-only", (req, res) =>
+  handleSlotTournamentAffiliatesOnly(req, res)
+);
+app.post("/api/slot-tournaments/subscribers-only", (req, res) =>
+  handleSlotTournamentSubscribersOnly(req, res)
+);
+app.post("/api/slot-tournaments/entries/clear", (req, res) =>
+  handleSlotTournamentEntriesClear(req, res)
+);
+app.post("/api/slot-tournaments/entries/remove", (req, res) =>
+  handleSlotTournamentEntryRemove(req, res)
+);
+app.post("/api/slot-tournaments/entries/add", (req, res) =>
+  handleSlotTournamentEntryAdd(req, res)
+);
+app.post("/api/slot-tournaments/entries/bots", (req, res) =>
+  handleSlotTournamentEntriesBots(req, res)
+);
+app.post("/api/slot-tournaments/slots", (req, res) =>
+  handleSlotTournamentSlots(req, res)
+);
+app.post("/api/slot-tournaments/entries/slot", (req, res) =>
+  handleSlotTournamentChangeEntrySlot(req, res)
+);
+app.post("/api/slot-tournaments/bracket/generate", (req, res) =>
+  handleSlotTournamentBracketGenerate(req, res)
+);
+app.post("/api/slot-tournaments/bracket/score", (req, res) =>
+  handleSlotTournamentBracketScore(req, res)
+);
+app.post("/api/slot-tournaments/bracket/clear", (req, res) =>
+  handleSlotTournamentBracketClear(req, res)
+);
+app.post("/api/slot-tournaments/predictions/toggle", (req, res) =>
+  handleSlotTournamentPredictionsToggle(req, res)
+);
+app.post("/api/slot-tournaments/predictions/save", (req, res) =>
+  handleSlotTournamentPredictionsSave(req, res)
+);
+app.post("/api/slot-tournaments/results", (req, res) =>
+  handleSlotTournamentResults(req, res)
+);
+app.post("/api/slot-tournaments/join", (req, res) =>
+  handleSlotTournamentJoin(req, res)
+);
+app.get("/api/slot-league/status", (req, res) =>
+  handleSlotLeagueStatus(req, res)
+);
+app.post("/api/slot-league/toggle", (req, res) =>
+  handleSlotLeagueToggle(req, res)
+);
+app.post("/api/slot-league/settings", (req, res) =>
+  handleSlotLeagueSettings(req, res)
+);
+app.post("/api/slot-league/phase", (req, res) =>
+  handleSlotLeaguePhase(req, res)
+);
+app.post("/api/slot-league/join", (req, res) =>
+  handleSlotLeagueJoin(req, res)
+);
+app.post("/api/slot-league/reset", (req, res) =>
+  handleSlotLeagueReset(req, res)
+);
+app.post("/api/slot-league/entries/bots", (req, res) =>
+  handleSlotLeagueEntriesBots(req, res)
+);
+app.post("/api/slot-league/entries/remove", (req, res) =>
+  handleSlotLeagueEntryRemove(req, res)
+);
+app.post("/api/slot-league/entries/clear", (req, res) =>
+  handleSlotLeagueEntriesClear(req, res)
+);
+app.post("/api/slot-league/roster/reset", (req, res) =>
+  handleSlotLeagueRosterReset(req, res)
+);
+app.post("/api/slot-league/spots/assign", (req, res) =>
+  handleSlotLeagueSpotAssign(req, res)
+);
+app.post("/api/slot-league/spots/slot", (req, res) =>
+  handleSlotLeagueSpotSlot(req, res)
+);
+app.post("/api/slot-league/groups/generate", (req, res) =>
+  handleSlotLeagueGenerateGroups(req, res)
+);
+app.post("/api/slot-league/season/generate", (req, res) =>
+  handleSlotLeagueGenerateSeason(req, res)
+);
+app.post("/api/slot-league/knockout/generate", (req, res) =>
+  handleSlotLeagueGenerateKnockout(req, res)
+);
+app.post("/api/slot-league/week/randomize", (req, res) =>
+  handleSlotLeagueRandomizeWeek(req, res)
+);
+app.post("/api/slot-league/matches/score", (req, res) =>
+  handleSlotLeagueMatchScore(req, res)
+);
+app.get("/api/giveaways/status", (req, res) => handleGiveawayStatus(req, res));
+app.post("/api/giveaways/toggle", (req, res) => handleGiveawayToggle(req, res));
+app.post("/api/giveaways/affiliates-only", (req, res) =>
+  handleGiveawayAffiliatesOnly(req, res)
+);
+app.post("/api/giveaways/subscribers-only", (req, res) =>
+  handleGiveawaySubscribersOnly(req, res)
+);
+app.post("/api/giveaways/keyword", (req, res) => handleGiveawayKeyword(req, res));
+app.post("/api/giveaways/entries/clear", (req, res) =>
+  handleGiveawayEntriesClear(req, res)
+);
+app.post("/api/giveaways/reveal", (req, res) => handleGiveawayReveal(req, res));
+app.get("/api/weekly-raffles/status", (req, res) =>
+  handleWeeklyRaffleStatus(req, res)
+);
+app.post("/api/weekly-raffles/start-week", (req, res) =>
+  handleWeeklyRaffleStartWeek(req, res)
+);
+app.post("/api/weekly-raffles/reset-week", (req, res) =>
+  handleWeeklyRaffleResetWeek(req, res)
+);
+app.post("/api/weekly-raffles/reveal", (req, res) =>
+  handleWeeklyRaffleReveal(req, res)
+);
+app.post("/api/weekly-raffles/clear-winner", (req, res) =>
+  handleWeeklyRaffleClearWinner(req, res)
+);
+app.get("/api/house-loss-raffle/status", (req, res) =>
+  handleHouseLossRaffleStatus(req, res)
+);
+app.post("/api/house-loss-raffle/reveal", (req, res) =>
+  handleHouseLossRaffleReveal(req, res)
+);
+app.post("/api/house-loss-raffle/reset-week", (req, res) =>
+  handleHouseLossRaffleResetWeek(req, res)
+);
+app.get("/api/chat", (req, res) => handleChatList(req, res));
+app.post("/api/chat", (req, res) => handleChatSend(req, res));
+app.post("/api/chat/remove", (req, res) => handleChatRemove(req, res));
+app.get("/api/commands/replies", (req, res) => handleBotRepliesGet(req, res));
+app.post("/api/commands/replies", (req, res) => handleBotRepliesSave(req, res));
+app.get("/api/one-v-one/status", (req, res) => handleOneVOneStatus(req, res));
+app.post("/api/one-v-one/entries", (req, res) => handleOneVOneEntries(req, res));
+app.post("/api/one-v-one/access", (req, res) => handleOneVOneAccess(req, res));
+app.post("/api/one-v-one/entries/clear", (req, res) => handleOneVOneEntriesClear(req, res));
+app.post("/api/one-v-one/set", (req, res) => handleOneVOneSet(req, res));
+app.post("/api/one-v-one/remove", (req, res) => handleOneVOneRemove(req, res));
+app.post("/api/one-v-one/bet", (req, res) => handleOneVOneBet(req, res));
+app.post("/api/one-v-one/bets", (req, res) => handleOneVOneBetTimer(req, res));
+app.post("/api/one-v-one/rematch", (req, res) => handleOneVOneRematch(req, res));
+app.post("/api/one-v-one/settle", (req, res) => handleOneVOneSettle(req, res));
+app.post("/api/one-v-one/clear", (req, res) => handleOneVOneClear(req, res));
+
+app.listen(PORT, () => {
+  console.log(`vzqie site running at http://localhost:${PORT}`);
+  console.log(`Kick redirect URI: ${process.env.KICK_REDIRECT_URI || `http://localhost:${PORT}/api/auth/callback`}`);
+  startLocalChatPromoScheduler();
+  console.log("Kick chat promo: combined message every 10m");
+});

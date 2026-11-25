@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="1v1 — draw two active viewers and line up their slot calls on vzqie." />
+  <title>1v1 | vzqie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css?v=menuside1" />
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="header" id="top">
+    <nav class="nav container">
+      <a href="/" class="logo">
+        <img src="/images/logo.png" alt="" class="logo-image" width="50" height="50" />
+        <span class="logo-text">vzqie</span>
+      </a>
+
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <ul class="nav-links">
+        <li><a href="/#watch">Watch</a></li>
+        <li class="is-hidden" id="admin-nav-commands">
+          <a href="/commands/">Commands</a>
+        </li>
+        <li><a href="/#menu">Menu</a></li>
+        <li><a href="/#house-games">House Games</a></li>
+        <li><a href="/#links">Links</a></li>
+        <li class="is-hidden" id="admin-nav-accounts">
+          <a href="/accounts/">Accounts</a>
+        </li>
+        <li>
+          <div class="auth-panel" id="auth-panel">
+            <div class="auth-guest" id="auth-guest">
+              <a href="/api/auth/login" class="btn btn-sm btn-kick">Sign in with Kick</a>
+            </div>
+            <div class="auth-member is-hidden" id="auth-member">
+              <div class="auth-user">
+                <img id="auth-avatar" class="auth-avatar is-hidden" alt="" width="32" height="32" />
+                <span id="auth-username" class="auth-username"></span>
+                <span id="auth-admin-badge" class="auth-admin-badge is-hidden">Admin</span>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline" id="auth-logout">Sign out</button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="auth-toast is-hidden" id="auth-toast" role="status" aria-live="polite"></div>
+
+    <section class="section page-section one-v-one-page">
+      <div class="section-atmosphere" aria-hidden="true"></div>
+      <div class="container one-v-one-shell">
+        <a href="/#menu" class="back-link">← Back to menu</a>
+
+        <header class="section-header left">
+          <p class="section-eyebrow">vzqie</p>
+          <h1 class="theme-heading">1v1</h1>
+          <p>Open entries, then site accounts type 1v1 in chat. Draw one or two of them. Each one requests a slot, and it shows here with the logo. Open the bet timer, then chatters bet with !bet 100 team 1 or !bet 100 team 2. The winning team splits the whole pot based on how much each person bet.</p>
+        </header>
+
+        <div class="one-v-one-toolbar">
+          <div class="one-v-one-toolbar-status">
+            <p class="one-v-one-pool btn-pill" id="one-v-one-pool">
+              <span class="btn-pill-dot" id="one-v-one-pool-dot" aria-hidden="true"></span>
+              <span id="one-v-one-pool-text">Checking entrants…</span>
+            </p>
+            <p class="one-v-one-balance btn-pill is-hidden" id="one-v-one-balance">You have 0 UncCoins</p>
+          </div>
+          <a class="btn btn-sm btn-outline" href="/one-v-one/overlay/">OBS widget</a>
+          <p class="one-v-one-note is-hidden" id="one-v-one-access-note"></p>
+
+          <form class="one-v-one-admin is-hidden" id="one-v-one-admin">
+            <div class="one-v-one-admin-actions">
+              <section class="one-v-one-admin-group" aria-labelledby="one-v-one-admin-entries">
+                <p class="one-v-one-admin-label" id="one-v-one-admin-entries">Entries</p>
+                <div class="one-v-one-access">
+                  <label class="one-v-one-access-row">
+                    <span>
+                      <span class="one-v-one-access-label">1v1</span>
+                      <span class="one-v-one-access-status" id="one-v-one-live-status">Off</span>
+                    </span>
+                    <span class="toggle">
+                      <input type="checkbox" id="one-v-one-entries-toggle" />
+                      <span class="toggle-slider" aria-hidden="true"></span>
+                    </span>
+                  </label>
+                  <label class="one-v-one-access-row">
+                    <span>
+                      <span class="one-v-one-access-label">AFF only</span>
+                      <span class="one-v-one-access-status" id="one-v-one-aff-status">Off</span>
+                    </span>
+                    <span class="toggle">
+                      <input type="checkbox" id="one-v-one-aff-toggle" />
+                      <span class="toggle-slider" aria-hidden="true"></span>
+                    </span>
+                  </label>
+                  <label class="one-v-one-access-row">
+                    <span>
+                      <span class="one-v-one-access-label">SUB only</span>
+                      <span class="one-v-one-access-status" id="one-v-one-sub-status">Off</span>
+                    </span>
+                    <span class="toggle">
+                      <input type="checkbox" id="one-v-one-sub-toggle" />
+                      <span class="toggle-slider" aria-hidden="true"></span>
+                    </span>
+                  </label>
+                </div>
+                <div class="one-v-one-admin-buttons">
+                  <button type="button" class="btn btn-outline" id="one-v-one-entries-clear">Clear entrants</button>
+                </div>
+              </section>
+
+              <section class="one-v-one-admin-group" aria-labelledby="one-v-one-admin-draw">
+                <p class="one-v-one-admin-label" id="one-v-one-admin-draw">Draw</p>
+                <div class="one-v-one-admin-buttons">
+                  <button type="submit" class="btn btn-primary" name="count" value="1">Draw 1</button>
+                  <button type="submit" class="btn btn-primary" name="count" value="2">Draw 2</button>
+                  <button type="button" class="btn btn-outline" id="one-v-one-remove-left" disabled>Remove 1</button>
+                  <button type="button" class="btn btn-outline" id="one-v-one-remove-right" disabled>Remove 2</button>
+                </div>
+              </section>
+
+              <section class="one-v-one-admin-group" aria-labelledby="one-v-one-admin-result">
+                <p class="one-v-one-admin-label" id="one-v-one-admin-result">Result</p>
+                <div class="one-v-one-admin-buttons">
+                  <button type="button" class="btn btn-outline" id="one-v-one-win-1">1 wins</button>
+                  <button type="button" class="btn btn-outline" id="one-v-one-win-2">2 wins</button>
+                  <button type="button" class="btn btn-outline" id="one-v-one-new-opponent" disabled>New opponent</button>
+                  <button type="button" class="btn btn-outline" id="one-v-one-clear">Reset</button>
+                </div>
+              </section>
+
+              <section class="one-v-one-admin-group" aria-labelledby="one-v-one-admin-bets">
+                <p class="one-v-one-admin-label" id="one-v-one-admin-bets">Bets</p>
+                <div class="one-v-one-admin-buttons">
+                  <select class="one-v-one-bet-seconds" id="one-v-one-bet-seconds" aria-label="Bet timer length">
+                    <option value="30">30s</option>
+                    <option value="60" selected>60s</option>
+                    <option value="90">90s</option>
+                    <option value="120">2 min</option>
+                  </select>
+                  <button type="button" class="btn btn-outline" id="one-v-one-bets-open">Open bets</button>
+                  <button type="button" class="btn btn-outline" id="one-v-one-bets-close" disabled>Close bets</button>
+                </div>
+              </section>
+            </div>
+            <p class="one-v-one-note" id="one-v-one-admin-note" role="status"></p>
+          </form>
+        </div>
+
+        <div class="one-v-one-board bj21-panel" id="one-v-one-board">
+          <article class="one-v-one-side" id="one-v-one-side-left"></article>
+          <div class="one-v-one-vs" aria-hidden="true"><span>VS</span></div>
+          <article class="one-v-one-side" id="one-v-one-side-right"></article>
+        </div>
+        <p class="one-v-one-note" id="one-v-one-bet-note" role="status"></p>
+
+        <section class="one-v-one-bets bj21-panel" aria-label="Bets">
+          <p class="one-v-one-bets-timer" id="one-v-one-bets-timer">Bets closed</p>
+          <div class="one-v-one-bets-row">
+          <div class="one-v-one-bets-side">
+            <span class="one-v-one-bets-label">1</span>
+            <strong class="one-v-one-bets-total" id="one-v-one-bets-1-total">0</strong>
+            <span class="one-v-one-bets-unit">UncCoins</span>
+          </div>
+          <div class="one-v-one-bets-side">
+            <span class="one-v-one-bets-label">2</span>
+            <strong class="one-v-one-bets-total" id="one-v-one-bets-2-total">0</strong>
+            <span class="one-v-one-bets-unit">UncCoins</span>
+          </div>
+          <div class="one-v-one-bets-side is-hidden" id="one-v-one-you">
+            <span class="one-v-one-bets-label">You</span>
+            <strong class="one-v-one-bets-total" id="one-v-one-you-total">0</strong>
+            <span class="one-v-one-bets-unit">UncCoins</span>
+          </div>
+          </div>
+          <div class="one-v-one-betters">
+            <div class="one-v-one-betters-side">
+              <p class="one-v-one-betters-label">Team 1</p>
+              <ul class="one-v-one-betters-list" id="one-v-one-betters-1"></ul>
+              <p class="one-v-one-betters-empty" id="one-v-one-betters-1-empty">No bets yet</p>
+            </div>
+            <div class="one-v-one-betters-side">
+              <p class="one-v-one-betters-label">Team 2</p>
+              <ul class="one-v-one-betters-list" id="one-v-one-betters-2"></ul>
+              <p class="one-v-one-betters-empty" id="one-v-one-betters-2-empty">No bets yet</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="one-v-one-chat bj21-panel" aria-label="Kick chat">
+          <div class="one-v-one-chat-head">
+            <span class="site-chat-live" aria-hidden="true"></span>
+            <h2>Kick chat</h2>
+          </div>
+          <div class="one-v-one-chat-well">
+            <div class="one-v-one-chat-log" id="one-v-one-chat" role="log" aria-live="polite"></div>
+            <p class="one-v-one-chat-empty" id="one-v-one-chat-empty">No Kick chat in the last 30 minutes.</p>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-text">vzqie</span>
+        <p>Gambling entertainment stream. 18+ only.</p>
+      </div>
+      <p class="disclaimer">
+        Gambling can be addictive. Please play responsibly. This channel is for entertainment purposes only.
+        If you or someone you know has a gambling problem, call <strong>1-800-GAMBLER</strong> or visit
+        <a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">BeGambleAware.org</a>.
+      </p>
+      <p class="copyright">&copy; <span id="year"></span> vzqie. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/main.js?v=avgx1"></script>
+  <script src="/js/auth.js?v=claim24h"></script>
+  <script src="/js/one-v-one.js?v=1v1betfix1"></script>
+</body>
+</html>

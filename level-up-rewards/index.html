@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Level Up Rewards — Stake VIP tiers and vzqie bonus rewards on vzqie." />
+  <title>Level Up Rewards | vzqie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css?v=menuside1" />
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="header" id="top">
+    <nav class="nav container">
+      <a href="/" class="logo">
+        <img src="/images/logo.png" alt="" class="logo-image" width="50" height="50" />
+        <span class="logo-text">vzqie</span>
+      </a>
+
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <ul class="nav-links">
+        <li><a href="/#watch">Watch</a></li>
+        <li class="is-hidden" id="admin-nav-commands">
+        <a href="/commands/">Commands</a>
+      </li>
+        <li><a href="/#menu">Menu</a></li>
+        <li><a href="/#house-games">House Games</a></li>
+        <li><a href="/#links">Links</a></li>
+        <li class="is-hidden" id="admin-nav-accounts">
+          <a href="/accounts/">Accounts</a>
+        </li>
+        <li>
+          <div class="auth-panel" id="auth-panel">
+            <div class="auth-guest" id="auth-guest">
+              <a href="/api/auth/login" class="btn btn-sm btn-kick">Sign in with Kick</a>
+            </div>
+            <div class="auth-member is-hidden" id="auth-member">
+              <div class="auth-user">
+                <img id="auth-avatar" class="auth-avatar is-hidden" alt="" width="32" height="32" />
+                <span id="auth-username" class="auth-username"></span>
+                <span id="auth-admin-badge" class="auth-admin-badge is-hidden">Admin</span>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline" id="auth-logout">Sign out</button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="auth-toast is-hidden" id="auth-toast" role="status" aria-live="polite"></div>
+
+    <section class="section page-section level-up-page">
+      <div class="section-atmosphere" aria-hidden="true"></div>
+      <div class="container level-up-shell">
+        <a href="/#menu" class="back-link">← Back to menu</a>
+
+        <header class="level-up-hero">
+          <p class="section-eyebrow">vzqie</p>
+          <h1 class="level-up-heading">Level Up Rewards</h1>
+          <p class="level-up-lede">
+            Hit each wager tier on Stake and claim the Stake reward plus an extra vzqie bonus on top.
+          </p>
+        </header>
+
+        <!-- Shared VIP icon filters (custom lookalikes, not Stake assets) -->
+        <svg class="level-up-sprite" width="0" height="0" aria-hidden="true" focusable="false">
+          <defs>
+            <filter id="vip-soft-glow" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="2.4" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <filter id="vip-bloom" x="-80%" y="-80%" width="260%" height="260%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="3.6" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+        </svg>
+
+        <div class="level-up-grid" aria-label="Level up reward tiers">
+          <article class="level-up-card" data-tier="bronze">
+            <div class="level-up-card-top">
+              <span class="level-up-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <defs>
+                    <radialGradient id="bz-glow" cx="32" cy="32" r="26" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#c99a5a" stop-opacity=".55"/><stop offset="1" stop-color="#c99a5a" stop-opacity="0"/>
+                    </radialGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="26" fill="url(#bz-glow)"/>
+                  <path d="M32 10l5.4 11.2L50 23l-9.2 9 2.2 12.6L32 38.2 21 44.6l2.2-12.6L14 23l12.6-1.8L32 10z" fill="rgba(201,154,90,.12)" stroke="#c99a5a" stroke-width="2.4" stroke-linejoin="round" filter="url(#vip-soft-glow)"/>
+                  <path d="M32 10l5.4 11.2L50 23l-9.2 9 2.2 12.6L32 38.2 21 44.6l2.2-12.6L14 23l12.6-1.8L32 10z" fill="none" stroke="#e8c08a" stroke-width="1.15" stroke-linejoin="round" opacity=".9"/>
+                </svg>
+              </span>
+              <div class="level-up-card-meta">
+                <span class="level-up-badge">Bronze</span>
+                <p class="level-up-wager">$10,000 Wagered</p>
+              </div>
+            </div>
+            <p class="level-up-copy">
+              <strong>Stake</strong> Gives <strong>$15</strong> + recent gameplay bonus &amp;
+              <strong>vzqie</strong> gives <strong>$15</strong> extra on top.
+            </p>
+          </article>
+
+          <article class="level-up-card" data-tier="silver">
+            <div class="level-up-card-top">
+              <span class="level-up-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <defs>
+                    <radialGradient id="si-glow" cx="32" cy="32" r="26" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#c8d4dc" stop-opacity=".55"/><stop offset="1" stop-color="#c8d4dc" stop-opacity="0"/>
+                    </radialGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="26" fill="url(#si-glow)"/>
+                  <path d="M32 10l5.4 11.2L50 23l-9.2 9 2.2 12.6L32 38.2 21 44.6l2.2-12.6L14 23l12.6-1.8L32 10z" fill="rgba(200,212,220,.1)" stroke="#b8c8d0" stroke-width="2.4" stroke-linejoin="round" filter="url(#vip-soft-glow)"/>
+                  <path d="M32 10l5.4 11.2L50 23l-9.2 9 2.2 12.6L32 38.2 21 44.6l2.2-12.6L14 23l12.6-1.8L32 10z" fill="none" stroke="#eef4f8" stroke-width="1.15" stroke-linejoin="round" opacity=".95"/>
+                </svg>
+              </span>
+              <div class="level-up-card-meta">
+                <span class="level-up-badge">Silver</span>
+                <p class="level-up-wager">$50,000 Wagered</p>
+              </div>
+            </div>
+            <p class="level-up-copy">
+              <strong>Stake</strong> Gives <strong>$50</strong> + recent gameplay bonus &amp;
+              <strong>vzqie</strong> gives <strong>$50</strong> extra on top.
+            </p>
+          </article>
+
+          <article class="level-up-card" data-tier="gold">
+            <div class="level-up-card-top">
+              <span class="level-up-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <defs>
+                    <radialGradient id="go-glow" cx="32" cy="32" r="26" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#f0c020" stop-opacity=".65"/><stop offset="1" stop-color="#f0c020" stop-opacity="0"/>
+                    </radialGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="26" fill="url(#go-glow)"/>
+                  <path d="M32 10l5.4 11.2L50 23l-9.2 9 2.2 12.6L32 38.2 21 44.6l2.2-12.6L14 23l12.6-1.8L32 10z" fill="rgba(240,192,32,.14)" stroke="#e0b010" stroke-width="2.4" stroke-linejoin="round" filter="url(#vip-soft-glow)"/>
+                  <path d="M32 10l5.4 11.2L50 23l-9.2 9 2.2 12.6L32 38.2 21 44.6l2.2-12.6L14 23l12.6-1.8L32 10z" fill="none" stroke="#ffe066" stroke-width="1.15" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <div class="level-up-card-meta">
+                <span class="level-up-badge">Gold</span>
+                <p class="level-up-wager">$100,000 Wagered</p>
+              </div>
+            </div>
+            <p class="level-up-copy">
+              <strong>Stake</strong> Gives <strong>$100</strong> + recent gameplay bonus &amp;
+              <strong>vzqie</strong> gives <strong>$75</strong> extra on top.
+            </p>
+          </article>
+
+          <article class="level-up-card" data-tier="platinum">
+            <div class="level-up-card-top">
+              <span class="level-up-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <defs>
+                    <radialGradient id="p1-glow" cx="32" cy="32" r="28" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#5ad4e8" stop-opacity=".75"/><stop offset=".55" stop-color="#5ad4e8" stop-opacity=".2"/><stop offset="1" stop-color="#5ad4e8" stop-opacity="0"/>
+                    </radialGradient>
+                    <linearGradient id="p1-fill" x1="18" y1="10" x2="46" y2="52" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#dff8ff"/><stop offset=".35" stop-color="#5ad4e8"/><stop offset="1" stop-color="#1a7a9a"/>
+                    </linearGradient>
+                    <linearGradient id="p1-shine" x1="24" y1="12" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="28" fill="url(#p1-glow)"/>
+                  <path d="M32 8l6.4 13.2L54 23.2l-11 10.8 2.6 15.2L32 41.2 18.4 49.2l2.6-15.2-11-10.8 15.6-2L32 8z" fill="url(#p1-fill)" stroke="#9aecf8" stroke-width="1.2" stroke-linejoin="round" filter="url(#vip-bloom)"/>
+                  <path d="M32 12l3.8 7.8 1.8.24-2.7 2.65.2 1.4L32 22V12z" fill="url(#p1-shine)"/>
+                </svg>
+              </span>
+              <div class="level-up-card-meta">
+                <span class="level-up-badge">Platinum 1</span>
+                <p class="level-up-wager">$250,000 Wagered</p>
+              </div>
+            </div>
+            <p class="level-up-copy">
+              <strong>Stake</strong> Gives <strong>$200</strong> + recent gameplay bonus &amp;
+              <strong>vzqie</strong> gives <strong>$100</strong> extra on top.
+            </p>
+          </article>
+
+          <article class="level-up-card" data-tier="platinum">
+            <div class="level-up-card-top">
+              <span class="level-up-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <defs>
+                    <radialGradient id="p2-glow" cx="32" cy="32" r="28" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#5ad4e8" stop-opacity=".75"/><stop offset=".55" stop-color="#5ad4e8" stop-opacity=".2"/><stop offset="1" stop-color="#5ad4e8" stop-opacity="0"/>
+                    </radialGradient>
+                    <linearGradient id="p2-fill" x1="18" y1="10" x2="46" y2="52" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#dff8ff"/><stop offset=".35" stop-color="#5ad4e8"/><stop offset="1" stop-color="#1a7a9a"/>
+                    </linearGradient>
+                    <linearGradient id="p2-num" x1="26" y1="22" x2="38" y2="42" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#ffffff"/><stop offset="1" stop-color="#b8e8f4"/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="28" fill="url(#p2-glow)"/>
+                  <path d="M32 8l6.4 13.2L54 23.2l-11 10.8 2.6 15.2L32 41.2 18.4 49.2l2.6-15.2-11-10.8 15.6-2L32 8z" fill="url(#p2-fill)" stroke="#9aecf8" stroke-width="1.2" stroke-linejoin="round" filter="url(#vip-bloom)"/>
+                  <text x="32" y="37" text-anchor="middle" fill="url(#p2-num)" font-size="18" font-weight="800" font-family="Inter,system-ui,sans-serif" style="paint-order:stroke;stroke:#0a3a4a;stroke-width:2.5px">2</text>
+                </svg>
+              </span>
+              <div class="level-up-card-meta">
+                <span class="level-up-badge">Platinum 2</span>
+                <p class="level-up-wager">$500,000 Wagered</p>
+              </div>
+            </div>
+            <p class="level-up-copy">
+              <strong>Stake</strong> Gives <strong>$400</strong> + recent gameplay bonus &amp;
+              <strong>vzqie</strong> gives <strong>$200</strong> extra on top.
+            </p>
+          </article>
+
+          <article class="level-up-card" data-tier="platinum">
+            <div class="level-up-card-top">
+              <span class="level-up-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <defs>
+                    <radialGradient id="p3-glow" cx="32" cy="32" r="28" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#5ad4e8" stop-opacity=".75"/><stop offset=".55" stop-color="#5ad4e8" stop-opacity=".2"/><stop offset="1" stop-color="#5ad4e8" stop-opacity="0"/>
+                    </radialGradient>
+                    <linearGradient id="p3-fill" x1="18" y1="10" x2="46" y2="52" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#dff8ff"/><stop offset=".35" stop-color="#5ad4e8"/><stop offset="1" stop-color="#1a7a9a"/>
+                    </linearGradient>
+                    <linearGradient id="p3-num" x1="26" y1="22" x2="38" y2="42" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#ffffff"/><stop offset="1" stop-color="#b8e8f4"/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="28" fill="url(#p3-glow)"/>
+                  <path d="M32 8l6.4 13.2L54 23.2l-11 10.8 2.6 15.2L32 41.2 18.4 49.2l2.6-15.2-11-10.8 15.6-2L32 8z" fill="url(#p3-fill)" stroke="#9aecf8" stroke-width="1.2" stroke-linejoin="round" filter="url(#vip-bloom)"/>
+                  <text x="32" y="37" text-anchor="middle" fill="url(#p3-num)" font-size="18" font-weight="800" font-family="Inter,system-ui,sans-serif" style="paint-order:stroke;stroke:#0a3a4a;stroke-width:2.5px">3</text>
+                </svg>
+              </span>
+              <div class="level-up-card-meta">
+                <span class="level-up-badge">Platinum 3</span>
+                <p class="level-up-wager">$1,000,000 Wagered</p>
+              </div>
+            </div>
+            <p class="level-up-copy">
+              <strong>Stake</strong> Gives <strong>$800</strong> + recent gameplay bonus &amp;
+              <strong>vzqie</strong> gives <strong>$400</strong> extra on top.
+            </p>
+          </article>
+
+          <article class="level-up-card" data-tier="platinum">
+            <div class="level-up-card-top">
+              <span class="level-up-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <defs>
+                    <radialGradient id="p4-glow" cx="32" cy="32" r="28" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#5ad4e8" stop-opacity=".75"/><stop offset=".55" stop-color="#5ad4e8" stop-opacity=".2"/><stop offset="1" stop-color="#5ad4e8" stop-opacity="0"/>
+                    </radialGradient>
+                    <linearGradient id="p4-fill" x1="18" y1="10" x2="46" y2="52" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#dff8ff"/><stop offset=".35" stop-color="#5ad4e8"/><stop offset="1" stop-color="#1a7a9a"/>
+                    </linearGradient>
+                    <linearGradient id="p4-num" x1="26" y1="22" x2="38" y2="42" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#ffffff"/><stop offset="1" stop-color="#b8e8f4"/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="28" fill="url(#p4-glow)"/>
+                  <path d="M32 8l6.4 13.2L54 23.2l-11 10.8 2.6 15.2L32 41.2 18.4 49.2l2.6-15.2-11-10.8 15.6-2L32 8z" fill="url(#p4-fill)" stroke="#9aecf8" stroke-width="1.2" stroke-linejoin="round" filter="url(#vip-bloom)"/>
+                  <text x="32" y="37" text-anchor="middle" fill="url(#p4-num)" font-size="18" font-weight="800" font-family="Inter,system-ui,sans-serif" style="paint-order:stroke;stroke:#0a3a4a;stroke-width:2.5px">4</text>
+                </svg>
+              </span>
+              <div class="level-up-card-meta">
+                <span class="level-up-badge">Platinum 4</span>
+                <p class="level-up-wager">$2,500,000 Wagered</p>
+              </div>
+            </div>
+            <p class="level-up-copy">
+              <strong>Stake</strong> Gives <strong>$1,600</strong> + recent gameplay bonus + daily reload bonus &amp;
+              <strong>vzqie</strong> gives <strong>$800</strong> extra on top.
+            </p>
+          </article>
+
+          <article class="level-up-card" data-tier="platinum">
+            <div class="level-up-card-top">
+              <span class="level-up-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <defs>
+                    <radialGradient id="p5-glow" cx="32" cy="32" r="28" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#5ad4e8" stop-opacity=".75"/><stop offset=".55" stop-color="#5ad4e8" stop-opacity=".2"/><stop offset="1" stop-color="#5ad4e8" stop-opacity="0"/>
+                    </radialGradient>
+                    <linearGradient id="p5-fill" x1="18" y1="10" x2="46" y2="52" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#dff8ff"/><stop offset=".35" stop-color="#5ad4e8"/><stop offset="1" stop-color="#1a7a9a"/>
+                    </linearGradient>
+                    <linearGradient id="p5-num" x1="26" y1="22" x2="38" y2="42" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#ffffff"/><stop offset="1" stop-color="#b8e8f4"/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="28" fill="url(#p5-glow)"/>
+                  <path d="M32 8l6.4 13.2L54 23.2l-11 10.8 2.6 15.2L32 41.2 18.4 49.2l2.6-15.2-11-10.8 15.6-2L32 8z" fill="url(#p5-fill)" stroke="#9aecf8" stroke-width="1.2" stroke-linejoin="round" filter="url(#vip-bloom)"/>
+                  <text x="32" y="37" text-anchor="middle" fill="url(#p5-num)" font-size="18" font-weight="800" font-family="Inter,system-ui,sans-serif" style="paint-order:stroke;stroke:#0a3a4a;stroke-width:2.5px">5</text>
+                </svg>
+              </span>
+              <div class="level-up-card-meta">
+                <span class="level-up-badge">Platinum 5</span>
+                <p class="level-up-wager">$5,000,000 Wagered</p>
+              </div>
+            </div>
+            <p class="level-up-copy">
+              <strong>Stake</strong> Gives <strong>$3,200</strong> + recent gameplay bonus + daily reload bonus &amp;
+              <strong>vzqie</strong> gives <strong>$1,600</strong> extra on top.
+            </p>
+          </article>
+
+          <article class="level-up-card" data-tier="platinum">
+            <div class="level-up-card-top">
+              <span class="level-up-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <defs>
+                    <radialGradient id="p6-glow" cx="32" cy="32" r="28" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#5ad4e8" stop-opacity=".75"/><stop offset=".55" stop-color="#5ad4e8" stop-opacity=".2"/><stop offset="1" stop-color="#5ad4e8" stop-opacity="0"/>
+                    </radialGradient>
+                    <linearGradient id="p6-fill" x1="18" y1="10" x2="46" y2="52" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#dff8ff"/><stop offset=".35" stop-color="#5ad4e8"/><stop offset="1" stop-color="#1a7a9a"/>
+                    </linearGradient>
+                    <linearGradient id="p6-num" x1="26" y1="22" x2="38" y2="42" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#ffffff"/><stop offset="1" stop-color="#b8e8f4"/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="28" fill="url(#p6-glow)"/>
+                  <path d="M32 8l6.4 13.2L54 23.2l-11 10.8 2.6 15.2L32 41.2 18.4 49.2l2.6-15.2-11-10.8 15.6-2L32 8z" fill="url(#p6-fill)" stroke="#9aecf8" stroke-width="1.2" stroke-linejoin="round" filter="url(#vip-bloom)"/>
+                  <text x="32" y="37" text-anchor="middle" fill="url(#p6-num)" font-size="18" font-weight="800" font-family="Inter,system-ui,sans-serif" style="paint-order:stroke;stroke:#0a3a4a;stroke-width:2.5px">6</text>
+                </svg>
+              </span>
+              <div class="level-up-card-meta">
+                <span class="level-up-badge">Platinum 6</span>
+                <p class="level-up-wager">$10,000,000 Wagered</p>
+              </div>
+            </div>
+            <p class="level-up-copy">
+              <strong>Stake</strong> Gives <strong>$6,400</strong> + recent gameplay bonus + daily reload bonus &amp;
+              <strong>vzqie</strong> gives <strong>$3,200</strong> extra on top.
+            </p>
+          </article>
+
+          <article class="level-up-card" data-tier="diamond">
+            <div class="level-up-card-top">
+              <span class="level-up-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <defs>
+                    <radialGradient id="d1-glow" cx="32" cy="30" r="26" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#9ecce8" stop-opacity=".45"/><stop offset="1" stop-color="#9ecce8" stop-opacity="0"/>
+                    </radialGradient>
+                    <linearGradient id="d1-fill" x1="32" y1="8" x2="32" y2="56" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#f7fbff"/><stop offset=".4" stop-color="#c5dff0"/><stop offset="1" stop-color="#6fa8c8"/>
+                    </linearGradient>
+                    <linearGradient id="d1-edge" x1="20" y1="14" x2="44" y2="48" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#ffffff" stop-opacity=".55"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="26" fill="url(#d1-glow)"/>
+                  <path d="M18 24L24.5 15.5 28.5 9.5 31 14.5 36.5 13.5 46 24 32 55.5Z" fill="url(#d1-fill)" stroke="#b8d8ec" stroke-width="1" stroke-linejoin="round"/>
+                  <path d="M24.5 15.5 28.5 9.5 31 14.5 36.5 13.5 28.8 24.2Z" fill="url(#d1-edge)"/>
+                  <path d="M28.8 24.2 32 55.5 46 24 36.5 13.5Z" fill="rgba(70,120,150,.12)"/>
+                  <rect x="30.2" y="22" width="3.6" height="15" rx=".5" fill="#0b1520"/>
+                </svg>
+              </span>
+              <div class="level-up-card-meta">
+                <span class="level-up-badge">Diamond 1</span>
+                <p class="level-up-wager">$25,000,000 Wagered</p>
+              </div>
+            </div>
+            <p class="level-up-copy">
+              <strong>Stake</strong> Gives <strong>$12,800</strong> + recent gameplay bonus + daily reload bonus &amp;
+              <strong>vzqie</strong> gives <strong>$6,400</strong> extra on top.
+            </p>
+          </article>
+
+          <article class="level-up-card" data-tier="diamond">
+            <div class="level-up-card-top">
+              <span class="level-up-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <defs>
+                    <radialGradient id="d2-glow" cx="32" cy="30" r="26" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#9ecce8" stop-opacity=".45"/><stop offset="1" stop-color="#9ecce8" stop-opacity="0"/>
+                    </radialGradient>
+                    <linearGradient id="d2-fill" x1="32" y1="8" x2="32" y2="56" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#f7fbff"/><stop offset=".4" stop-color="#c5dff0"/><stop offset="1" stop-color="#6fa8c8"/>
+                    </linearGradient>
+                    <linearGradient id="d2-edge" x1="20" y1="14" x2="44" y2="48" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#ffffff" stop-opacity=".55"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="26" fill="url(#d2-glow)"/>
+                  <path d="M18 24L24.5 15.5 28.5 9.5 31 14.5 36.5 13.5 46 24 32 55.5Z" fill="url(#d2-fill)" stroke="#b8d8ec" stroke-width="1" stroke-linejoin="round"/>
+                  <path d="M24.5 15.5 28.5 9.5 31 14.5 36.5 13.5 28.8 24.2Z" fill="url(#d2-edge)"/>
+                  <path d="M28.8 24.2 32 55.5 46 24 36.5 13.5Z" fill="rgba(70,120,150,.12)"/>
+                  <rect x="26.2" y="22" width="3.6" height="15" rx=".5" fill="#0b1520"/>
+                  <rect x="34.2" y="22" width="3.6" height="15" rx=".5" fill="#0b1520"/>
+                </svg>
+              </span>
+              <div class="level-up-card-meta">
+                <span class="level-up-badge">Diamond 2</span>
+                <p class="level-up-wager">$50,000,000 Wagered</p>
+              </div>
+            </div>
+            <p class="level-up-copy">
+              <strong>Stake</strong> Gives <strong>$25,600</strong> + recent gameplay bonus + daily reload bonus &amp;
+              <strong>vzqie</strong> gives <strong>$12,800</strong> extra on top.
+            </p>
+          </article>
+
+          <article class="level-up-card" data-tier="diamond">
+            <div class="level-up-card-top">
+              <span class="level-up-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <defs>
+                    <radialGradient id="d3-glow" cx="32" cy="30" r="26" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#9ecce8" stop-opacity=".45"/><stop offset="1" stop-color="#9ecce8" stop-opacity="0"/>
+                    </radialGradient>
+                    <linearGradient id="d3-fill" x1="32" y1="8" x2="32" y2="56" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#f7fbff"/><stop offset=".4" stop-color="#c5dff0"/><stop offset="1" stop-color="#6fa8c8"/>
+                    </linearGradient>
+                    <linearGradient id="d3-edge" x1="20" y1="14" x2="44" y2="48" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#ffffff" stop-opacity=".55"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="26" fill="url(#d3-glow)"/>
+                  <path d="M18 24L24.5 15.5 28.5 9.5 31 14.5 36.5 13.5 46 24 32 55.5Z" fill="url(#d3-fill)" stroke="#b8d8ec" stroke-width="1" stroke-linejoin="round"/>
+                  <path d="M24.5 15.5 28.5 9.5 31 14.5 36.5 13.5 28.8 24.2Z" fill="url(#d3-edge)"/>
+                  <path d="M28.8 24.2 32 55.5 46 24 36.5 13.5Z" fill="rgba(70,120,150,.12)"/>
+                  <rect x="22.4" y="22" width="3.6" height="15" rx=".5" fill="#0b1520"/>
+                  <rect x="30.2" y="22" width="3.6" height="15" rx=".5" fill="#0b1520"/>
+                  <rect x="38" y="22" width="3.6" height="15" rx=".5" fill="#0b1520"/>
+                </svg>
+              </span>
+              <div class="level-up-card-meta">
+                <span class="level-up-badge">Diamond 3</span>
+                <p class="level-up-wager">$75,000,000 Wagered</p>
+              </div>
+            </div>
+            <p class="level-up-copy">
+              <strong>Stake</strong> Gives <strong>$51,200</strong> + recent gameplay bonus + daily reload bonus &amp;
+              <strong>vzqie</strong> gives <strong>$20,000</strong> extra on top.
+            </p>
+          </article>
+
+          <article class="level-up-card" data-tier="diamond">
+            <div class="level-up-card-top">
+              <span class="level-up-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <defs>
+                    <radialGradient id="d4-glow" cx="32" cy="30" r="26" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#9ecce8" stop-opacity=".45"/><stop offset="1" stop-color="#9ecce8" stop-opacity="0"/>
+                    </radialGradient>
+                    <linearGradient id="d4-fill" x1="32" y1="8" x2="32" y2="56" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#f7fbff"/><stop offset=".4" stop-color="#c5dff0"/><stop offset="1" stop-color="#6fa8c8"/>
+                    </linearGradient>
+                    <linearGradient id="d4-edge" x1="20" y1="14" x2="44" y2="48" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#ffffff" stop-opacity=".55"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="26" fill="url(#d4-glow)"/>
+                  <path d="M18 24L24.5 15.5 28.5 9.5 31 14.5 36.5 13.5 46 24 32 55.5Z" fill="url(#d4-fill)" stroke="#b8d8ec" stroke-width="1" stroke-linejoin="round"/>
+                  <path d="M24.5 15.5 28.5 9.5 31 14.5 36.5 13.5 28.8 24.2Z" fill="url(#d4-edge)"/>
+                  <path d="M28.8 24.2 32 55.5 46 24 36.5 13.5Z" fill="rgba(70,120,150,.12)"/>
+                  <text x="32" y="35.5" text-anchor="middle" fill="#0b1520" font-size="15" font-weight="800" font-family="Inter,system-ui,sans-serif">IV</text>
+                </svg>
+              </span>
+              <div class="level-up-card-meta">
+                <span class="level-up-badge">Diamond 4</span>
+                <p class="level-up-wager">$100,000,000 Wagered</p>
+              </div>
+            </div>
+            <p class="level-up-copy">
+              <strong>Stake</strong> Gives <strong>$102,400</strong> + recent gameplay bonus + daily reload bonus &amp;
+              <strong>vzqie</strong> gives <strong>$30,000</strong> extra on top.
+            </p>
+          </article>
+
+          <article class="level-up-card" data-tier="diamond">
+            <div class="level-up-card-top">
+              <span class="level-up-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <defs>
+                    <radialGradient id="d5-glow" cx="32" cy="30" r="26" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#9ecce8" stop-opacity=".45"/><stop offset="1" stop-color="#9ecce8" stop-opacity="0"/>
+                    </radialGradient>
+                    <linearGradient id="d5-fill" x1="32" y1="8" x2="32" y2="56" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#f7fbff"/><stop offset=".4" stop-color="#c5dff0"/><stop offset="1" stop-color="#6fa8c8"/>
+                    </linearGradient>
+                    <linearGradient id="d5-edge" x1="20" y1="14" x2="44" y2="48" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#ffffff" stop-opacity=".55"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="26" fill="url(#d5-glow)"/>
+                  <path d="M18 24L24.5 15.5 28.5 9.5 31 14.5 36.5 13.5 46 24 32 55.5Z" fill="url(#d5-fill)" stroke="#b8d8ec" stroke-width="1" stroke-linejoin="round"/>
+                  <path d="M24.5 15.5 28.5 9.5 31 14.5 36.5 13.5 28.8 24.2Z" fill="url(#d5-edge)"/>
+                  <path d="M28.8 24.2 32 55.5 46 24 36.5 13.5Z" fill="rgba(70,120,150,.12)"/>
+                  <text x="32" y="35.5" text-anchor="middle" fill="#0b1520" font-size="16" font-weight="800" font-family="Inter,system-ui,sans-serif">V</text>
+                </svg>
+              </span>
+              <div class="level-up-card-meta">
+                <span class="level-up-badge">Diamond 5</span>
+                <p class="level-up-wager">$125,000,000 Wagered</p>
+              </div>
+            </div>
+            <p class="level-up-copy">
+              <strong>Stake</strong> Gives <strong>$204,800</strong> + recent gameplay bonus + daily reload bonus &amp;
+              <strong>vzqie</strong> gives <strong>$40,000</strong> extra on top.
+            </p>
+          </article>
+
+          <article class="level-up-card" data-tier="obsidian">
+            <div class="level-up-card-top">
+              <span class="level-up-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <defs>
+                    <radialGradient id="ob-glow" cx="32" cy="28" r="28" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#8b6ad4" stop-opacity=".5"/><stop offset=".5" stop-color="#8b6ad4" stop-opacity=".12"/><stop offset="1" stop-color="#8b6ad4" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="ob-fill" cx="26" cy="22" r="22" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#5a6274"/><stop offset=".4" stop-color="#1a1e28"/><stop offset="1" stop-color="#050608"/>
+                    </radialGradient>
+                    <linearGradient id="ob-rim" x1="16" y1="14" x2="48" y2="50" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#a898d8"/><stop offset=".5" stop-color="#6a7080"/><stop offset="1" stop-color="#2a303c"/>
+                    </linearGradient>
+                    <linearGradient id="ob-shine" x1="22" y1="14" x2="38" y2="34" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#e8ecf8" stop-opacity=".55"/><stop offset="1" stop-color="#e8ecf8" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <circle cx="32" cy="32" r="28" fill="url(#ob-glow)"/>
+                  <ellipse cx="32" cy="33" rx="17" ry="18" fill="url(#ob-fill)" stroke="url(#ob-rim)" stroke-width="1.4" filter="url(#vip-soft-glow)"/>
+                  <ellipse cx="27" cy="24" rx="8" ry="5" fill="url(#ob-shine)"/>
+                  <circle cx="24" cy="20" r="1.6" fill="#fff" opacity=".4"/>
+                </svg>
+              </span>
+              <div class="level-up-card-meta">
+                <span class="level-up-badge">Obsidian</span>
+                <p class="level-up-wager">$200,000,000 Wagered</p>
+              </div>
+            </div>
+            <p class="level-up-copy">
+              <strong>Stake</strong> Gives <strong>$409,600</strong> + recent gameplay bonus + daily reload bonus &amp;
+              <strong>vzqie</strong> gives <strong>$80,000</strong> extra on top.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-text">vzqie</span>
+        <p>Gambling entertainment stream. 18+ only.</p>
+      </div>
+      <p class="disclaimer">
+        Gambling can be addictive. Please play responsibly. This channel is for entertainment purposes only.
+        If you or someone you know has a gambling problem, call <strong>1-800-GAMBLER</strong> or visit
+        <a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">BeGambleAware.org</a>.
+      </p>
+      <p class="copyright">&copy; <span id="year"></span> vzqie. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/main.js?v=avgx1"></script>
+  <script src="/js/auth.js?v=claim24h"></script>
+</body>
+</html>

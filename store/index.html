@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="vzqie Store — spend UncCoins on rewards." />
+  <title>Store | vzqie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css?v=buypack1" />
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="header" id="top">
+    <nav class="nav container">
+      <a href="/" class="logo">
+        <img src="/images/logo.png" alt="" class="logo-image" width="50" height="50" />
+        <span class="logo-text">vzqie</span>
+      </a>
+
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <ul class="nav-links">
+        <li><a href="/#watch">Watch</a></li>
+        <li class="is-hidden" id="admin-nav-commands">
+          <a href="/commands/">Commands</a>
+        </li>
+        <li><a href="/#menu">Menu</a></li>
+        <li><a href="/#house-games">House Games</a></li>
+        <li><a href="/#links">Links</a></li>
+        <li class="is-hidden" id="admin-nav-accounts">
+          <a href="/accounts/">Accounts</a>
+        </li>
+        <li>
+          <div class="auth-panel" id="auth-panel">
+            <div class="auth-guest" id="auth-guest">
+              <a href="/api/auth/login" class="btn btn-sm btn-kick">Sign in with Kick</a>
+            </div>
+            <div class="auth-member is-hidden" id="auth-member">
+              <div class="auth-user">
+                <img id="auth-avatar" class="auth-avatar is-hidden" alt="" width="32" height="32" />
+                <span id="auth-username" class="auth-username"></span>
+                <span id="auth-admin-badge" class="auth-admin-badge is-hidden">Admin</span>
+                <button type="button" id="auth-stake-badge" class="auth-stake-badge is-hidden"></button>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline" id="auth-logout">Sign out</button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="auth-toast is-hidden" id="auth-toast" role="status" aria-live="polite"></div>
+
+    <section class="section page-section store-page">
+      <div class="section-atmosphere" aria-hidden="true"></div>
+      <div class="container page-content store-shell">
+        <a href="/#menu" class="back-link">← Back to menu</a>
+
+        <header class="store-top">
+          <div class="store-hero">
+            <p class="section-eyebrow">vzqie</p>
+            <h1 class="store-heading">Store</h1>
+            <p class="store-lede">Redeem UncCoins for rewards. Buy more anytime with card or crypto.</p>
+          </div>
+
+          <aside class="store-balance" id="store-balance-panel" aria-live="polite">
+            <p class="store-balance-label">Balance</p>
+            <p class="store-balance-value" id="store-balance-value">—</p>
+            <p class="store-balance-copy" id="store-balance-copy">Sign in to redeem</p>
+          </aside>
+        </header>
+
+        <p class="store-status is-hidden" id="store-status" role="status"></p>
+
+        <section class="store-buy" aria-labelledby="store-buy-title">
+          <div class="store-buy-copy">
+            <h2 class="store-buy-title" id="store-buy-title">Buy UncCoins</h2>
+            <p class="store-buy-subtitle" id="store-buy-copy">Choose a package · then card or crypto</p>
+          </div>
+          <div class="store-buy-packages" id="store-buy-packages" role="group" aria-label="UncCoins package"></div>
+          <div class="store-buy-methods is-hidden" id="store-buy-methods" role="group" aria-label="Payment method">
+            <button type="button" class="store-buy-method-btn is-card" id="store-buy-pay-card">
+              Pay with card
+            </button>
+            <button type="button" class="store-buy-method-btn is-crypto" id="store-buy-pay-crypto">
+              Pay with crypto
+            </button>
+          </div>
+          <p class="store-buy-note" id="store-buy-note">Sign in with Kick to buy UncCoins.</p>
+          <form class="store-buy-form is-hidden" id="store-buy-form" aria-hidden="true"></form>
+        </section>
+
+        <div class="store-browse-row">
+          <section class="store-rewards" aria-labelledby="store-catalog-title">
+            <div class="store-section-header">
+              <h2 class="store-section-title" id="store-catalog-title">Rewards</h2>
+              <p class="store-section-copy">Tap redeem. Admins fulfill pending rewards.</p>
+            </div>
+            <p class="store-rewards-note is-hidden" id="store-catalog-note"></p>
+            <p class="store-empty is-hidden" id="store-catalog-empty">No rewards listed yet.</p>
+            <ul class="store-reward-grid" id="store-catalog-list"></ul>
+          </section>
+
+          <aside class="store-browse-side" id="store-browse-side">
+            <div class="store-rail is-hidden" id="store-queue-panel">
+              <div class="store-section-header store-admin-queue-header">
+                <h2 class="store-section-title" id="store-queue-title">Pending</h2>
+              </div>
+              <p class="store-empty is-hidden" id="store-queue-empty">No pending redemptions.</p>
+              <div class="store-list-scroll store-queue-scroll">
+                <ul class="store-queue-list" id="store-queue-list"></ul>
+              </div>
+            </div>
+
+            <section class="store-rail" id="store-redemptions-panel" aria-labelledby="store-redemptions-title">
+              <div class="store-section-header">
+                <h2 class="store-section-title" id="store-redemptions-title">Activity</h2>
+              </div>
+              <p class="store-empty" id="store-redemptions-empty">No redemptions yet.</p>
+              <div class="store-list-scroll">
+                <ul class="store-redemptions-list is-hidden" id="store-redemptions-list"></ul>
+              </div>
+            </section>
+          </aside>
+        </div>
+
+        <section class="store-admin is-hidden" id="store-admin" aria-labelledby="store-admin-title">
+          <div class="store-section-header">
+            <h2 class="store-section-title" id="store-admin-title">Admin</h2>
+            <p class="store-section-copy">
+              Award UncCoins, manage rewards, and fulfill the queue.
+              Chat: <code>!points @user 100</code> or <code>!pointsall 100</code>.
+            </p>
+          </div>
+
+          <div class="store-admin-layout">
+            <div class="store-admin-sidebar" id="store-admin-sidebar">
+              <div class="store-rail" id="store-history-panel">
+                <div class="store-section-header store-admin-queue-header" id="store-history-header">
+                  <h3 class="store-section-subtitle">Previous redemptions</h3>
+                </div>
+                <p class="store-empty is-hidden" id="store-history-empty">No previous redemptions yet.</p>
+                <div class="store-list-scroll store-history-scroll">
+                  <ul class="store-queue-list store-history-list" id="store-history-list"></ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="store-admin-main">
+              <div class="store-admin-tools">
+                <div class="store-admin-form" id="store-buy-settings">
+                  <p class="store-panel-label">Buy UncCoins</p>
+                  <div class="store-buy-toggle">
+                    <div>
+                      <p class="admin-panel-label">Purchases</p>
+                      <p class="admin-panel-text" id="store-buy-toggle-status">
+                        Buy UncCoins is open
+                      </p>
+                    </div>
+                    <label class="toggle">
+                      <input
+                        type="checkbox"
+                        id="store-buy-toggle"
+                        checked
+                        aria-labelledby="store-buy-toggle-status"
+                      />
+                      <span class="toggle-slider" aria-hidden="true"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <form class="store-admin-form" id="store-award-chat-form">
+                  <p class="store-panel-label">Award chat</p>
+                  <p class="store-section-copy">UncCoins for Kick chatters active in the last N minutes.</p>
+                  <div class="store-admin-grid store-award-chat-grid">
+                    <div class="store-field">
+                      <label class="guess-label" for="store-award-chat-amount">UncCoins</label>
+                      <input class="guess-input" id="store-award-chat-amount" name="amount" type="number" step="1" required value="100" />
+                    </div>
+                    <div class="store-field">
+                      <label class="guess-label" for="store-award-chat-minutes">Minutes</label>
+                      <input class="guess-input" id="store-award-chat-minutes" name="minutes" type="number" min="1" max="120" step="1" value="15" />
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-sm btn-primary" id="store-award-chat-submit">
+                    Award chatters
+                  </button>
+                  <p class="store-award-chat-status is-hidden" id="store-award-chat-status" role="status"></p>
+                </form>
+
+                <form class="store-admin-form" id="store-catalog-form">
+                  <p class="store-panel-label" id="store-catalog-form-label">Add reward</p>
+                  <input type="hidden" id="store-item-id" name="id" value="" />
+                  <div class="store-admin-grid">
+                    <label class="guess-label" for="store-item-title">Title</label>
+                    <input class="guess-input" id="store-item-title" name="title" required maxlength="80" />
+                    <label class="guess-label" for="store-item-cost">Cost</label>
+                    <input class="guess-input" id="store-item-cost" name="cost" type="number" min="1" step="1" required />
+                    <label class="guess-label" for="store-item-description">Description</label>
+                    <input class="guess-input" id="store-item-description" name="description" maxlength="200" />
+                  </div>
+                  <div class="store-queue-actions">
+                    <button type="submit" class="btn btn-sm btn-primary" id="store-catalog-submit">
+                      Add to catalog
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline is-hidden" id="store-catalog-cancel-edit">
+                      Cancel edit
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <div class="store-rail" id="store-catalog-manage">
+                <p class="store-panel-label">Catalog</p>
+                <p class="store-empty is-hidden" id="store-admin-catalog-empty">No catalog items yet.</p>
+                <ul class="store-admin-catalog" id="store-admin-catalog"></ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div class="store-redeem-modal is-hidden" id="store-redeem-modal" role="dialog" aria-modal="true" aria-labelledby="store-redeem-title">
+    <button type="button" class="store-redeem-backdrop" id="store-redeem-backdrop" aria-label="Close"></button>
+    <form class="store-redeem-dialog bj21-panel" id="store-redeem-form">
+      <span class="bj21-panel-glow" aria-hidden="true"></span>
+      <h2 class="store-redeem-title" id="store-redeem-title">Redeem reward</h2>
+      <p class="store-redeem-copy" id="store-redeem-copy">Pick a slot from New Releases or Only on Stake.</p>
+      <label class="guess-label" for="store-redeem-slot-search">Slot</label>
+      <input
+        class="guess-input"
+        id="store-redeem-slot-search"
+        type="search"
+        maxlength="80"
+        autocomplete="off"
+        placeholder="Search New Releases or Only on Stake…"
+        enterkeyhint="search"
+      />
+      <p class="store-redeem-slot-empty is-hidden" id="store-redeem-slot-empty"></p>
+      <div class="hunt-add-slot-results is-hidden" id="store-redeem-slot-results" role="listbox" aria-label="Matching slots"></div>
+      <div class="store-redeem-slot-selected is-hidden" id="store-redeem-slot-selected">
+        <p class="store-redeem-slot-selected-label">Selected</p>
+        <div class="store-redeem-slot-selected-row">
+          <div>
+            <p class="store-redeem-slot-selected-name" id="store-redeem-slot-selected-name"></p>
+            <p class="store-redeem-slot-selected-meta" id="store-redeem-slot-selected-meta"></p>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline" id="store-redeem-slot-clear">Change</button>
+        </div>
+      </div>
+      <div class="store-redeem-type is-hidden" id="store-redeem-type">
+        <p class="guess-label" id="store-redeem-type-label">Bonus type</p>
+        <div class="store-redeem-type-options" role="radiogroup" aria-labelledby="store-redeem-type-label">
+          <label class="store-redeem-type-option">
+            <input type="radio" name="bonusType" value="regular" />
+            <span>Regular</span>
+          </label>
+          <label class="store-redeem-type-option">
+            <input type="radio" name="bonusType" value="super" />
+            <span>Super</span>
+          </label>
+          <label class="store-redeem-type-option">
+            <input type="radio" name="bonusType" value="epic" />
+            <span>Epic</span>
+          </label>
+        </div>
+      </div>
+      <p class="store-redeem-error is-hidden" id="store-redeem-error" role="alert"></p>
+      <div class="store-redeem-actions">
+        <button type="button" class="btn btn-sm btn-outline" id="store-redeem-cancel">Cancel</button>
+        <button type="submit" class="btn btn-sm btn-primary" id="store-redeem-submit">Redeem</button>
+      </div>
+    </form>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-text">vzqie</span>
+        <p>Gambling entertainment stream. 18+ only.</p>
+      </div>
+      <p class="disclaimer">
+        Gambling can be addictive. Please play responsibly. This channel is for entertainment purposes only.
+        If you or someone you know has a gambling problem, call <strong>1-800-GAMBLER</strong> or visit
+        <a href="https://www.begambleaware.org" target="_blank" rel="noopener noreferrer">BeGambleAware.org</a>.
+      </p>
+      <p class="copyright">&copy; <span id="year"></span> vzqie. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/main.js?v=avgx1"></script>
+  <script src="/js/auth.js?v=claim24h"></script>
+  <script src="/js/store.js?v=lbtabs1"></script>
+</body>
+</html>

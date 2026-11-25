@@ -1,0 +1,606 @@
+function getAuthMessage() {
+  const params = new URLSearchParams(window.location.search);
+  const auth = params.get("auth");
+  const message = params.get("message");
+
+  if (!auth) return null;
+
+  if (auth === "created") return "Account created with your Kick login.";
+  if (auth === "signed-in") return "Signed in with Kick.";
+  if (auth === "error") {
+    if (message === "Client authentication failed") {
+      return "Kick rejected the client secret. Regenerate it in Kick Developer Portal, paste it into .env, run npm run verify:kick until it says SUCCESS, then update Vercel and redeploy.";
+    }
+    return message || "Kick sign-in failed.";
+  }
+
+  return null;
+}
+
+function clearAuthQuery() {
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has("auth")) return;
+
+  url.searchParams.delete("auth");
+  url.searchParams.delete("message");
+  window.history.replaceState({}, "", url);
+}
+
+let currentAuthUser = null;
+
+function copyPlainTextNow(value) {
+  const area = document.createElement("textarea");
+  area.value = value;
+  area.setAttribute("readonly", "");
+  area.style.cssText = "position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;opacity:0;";
+  document.body.append(area);
+  area.focus();
+  area.select();
+  area.setSelectionRange(0, value.length);
+  let copied = false;
+  try {
+    copied = document.execCommand("copy");
+  } catch {
+    copied = false;
+  }
+  area.remove();
+  return copied;
+}
+
+async function copyPlainText(value) {
+  const copiedNow = copyPlainTextNow(value);
+  if (!navigator.clipboard?.writeText) return copiedNow;
+
+  try {
+    await navigator.clipboard.writeText(value);
+    return true;
+  } catch {
+    return copiedNow;
+  }
+}
+
+function flashStakeCopy(element, copied) {
+  element.classList.toggle("is-copied", copied);
+  element.classList.toggle("is-failed", !copied);
+  window.setTimeout(() => {
+    element.classList.remove("is-copied", "is-failed");
+  }, 1400);
+}
+
+function bindStakeCopy(element, username) {
+  const name = String(username || "").trim();
+  if (!element || !name) return element;
+
+  element.dataset.stakeCopy = name;
+  element.classList.add("is-stake-copy");
+  if (!element.title) element.title = "Copy Stake username";
+  if (!element.dataset.stakeCopyBound) {
+    element.dataset.stakeCopyBound = "1";
+    if (element.tagName !== "BUTTON" && element.tagName !== "A") {
+      element.setAttribute("role", "button");
+      element.tabIndex = 0;
+      element.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          element.click();
+        }
+      });
+    }
+    element.addEventListener("click", async (event) => {
+      const value = element.dataset.stakeCopy;
+      if (!value) return;
+      event.preventDefault();
+      event.stopPropagation();
+      flashStakeCopy(element, await copyPlainText(value));
+    });
+  }
+  return element;
+}
+
+window.bindStakeCopy = bindStakeCopy;
+
+window.createStakeCopyButton = function createStakeCopyButton(username, className = "") {
+  const name = String(username || "").trim();
+  if (!name) return null;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = `stake-copy${className ? ` ${className}` : ""}`;
+  button.textContent = name;
+  return bindStakeCopy(button, name);
+};
+
+function ensureStakeLinkModal() {
+  if (document.getElementById("stake-link-modal")) {
+    return;
+  }
+
+  const modal = document.createElement("div");
+  modal.id = "stake-link-modal";
+  modal.className = "stake-link-modal is-hidden";
+  modal.innerHTML = `
+    <div class="stake-link-backdrop" aria-hidden="true"></div>
+    <div class="stake-link-dialog" role="dialog" aria-modal="true" aria-labelledby="stake-link-title">
+      <p class="stake-link-eyebrow">Required</p>
+      <h2 class="stake-link-title" id="stake-link-title">Link your Stake account</h2>
+      <p class="stake-link-copy">
+        Enter your Stake username to finish signing in. We use it for leaderboards, giveaways, and stream games.
+        Use code <strong>vzqie</strong> when you sign up.
+      </p>
+      <form class="stake-link-form" id="stake-link-form">
+        <label class="guess-label" for="stake-link-input">Stake username</label>
+        <div class="guess-input-row">
+          <input
+            class="guess-input"
+            id="stake-link-input"
+            name="stakeUsername"
+            type="text"
+            maxlength="24"
+            autocomplete="username"
+            spellcheck="false"
+            placeholder="YourStakeName"
+            required
+          />
+        </div>
+        <p class="stake-link-error is-hidden" id="stake-link-error" role="alert"></p>
+        <div class="stake-link-actions">
+          <button type="submit" class="btn btn-sm btn-primary" id="stake-link-submit">
+            Link account
+          </button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const form = modal.querySelector("#stake-link-form");
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await submitStakeLink();
+  });
+}
+
+function setStakeLinkError(message) {
+  const error = document.getElementById("stake-link-error");
+  if (!error) return;
+
+  error.textContent = message;
+  error.classList.toggle("is-hidden", !message);
+}
+
+function hideStakeLinkModal() {
+  document.getElementById("stake-link-modal")?.classList.add("is-hidden");
+  setStakeLinkError("");
+}
+
+function showStakeLinkModal({ forceReset = false } = {}) {
+  ensureStakeLinkModal();
+  const modal = document.getElementById("stake-link-modal");
+  const input = document.getElementById("stake-link-input");
+  const alreadyOpen = Boolean(
+    modal && !modal.classList.contains("is-hidden")
+  );
+  modal?.classList.remove("is-hidden");
+  if (!alreadyOpen) {
+    setStakeLinkError("");
+  }
+  if (input) {
+    if (!alreadyOpen || forceReset) {
+      input.value = "";
+    }
+    // Defer focus so mobile keyboards and overlays settle first.
+    requestAnimationFrame(() => {
+      input.focus({ preventScroll: true });
+    });
+  }
+}
+
+function maybeShowStakeLinkPrompt(user) {
+  const params = new URLSearchParams(window.location.search);
+  const justAuthed =
+    params.get("auth") === "created" || params.get("auth") === "signed-in";
+
+  // Clear any legacy skip flag from older builds.
+  sessionStorage.removeItem("bj21-stake-prompt-dismissed");
+
+  if (!user?.kickUserId || user.stakeUsername) {
+    hideStakeLinkModal();
+    return;
+  }
+
+  const modal = document.getElementById("stake-link-modal");
+  if (modal && !modal.classList.contains("is-hidden")) {
+    return;
+  }
+
+  showStakeLinkModal({ forceReset: justAuthed });
+}
+
+async function submitStakeLink() {
+  const input = document.getElementById("stake-link-input");
+  const submitBtn = document.getElementById("stake-link-submit");
+  const stakeUsername = input?.value.trim();
+
+  if (!stakeUsername) {
+    setStakeLinkError("Enter your Stake username.");
+    return;
+  }
+
+  if (submitBtn) submitBtn.disabled = true;
+  setStakeLinkError("");
+
+  try {
+    const response = await fetch("/api/users/link-stake", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ stakeUsername }),
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      setStakeLinkError(data.error || "Could not link Stake account.");
+      return;
+    }
+
+    currentAuthUser = data.user;
+    renderAuthState(data.user);
+    hideStakeLinkModal();
+
+    const toast = document.getElementById("auth-toast");
+    if (toast) {
+      toast.textContent =
+        data.user.stakeCodeVerified || data.user.affGranted
+          ? `Stake account linked and verified on code vzqie.`
+          : `Stake account linked. We could not find that username on the vzqie leaderboard yet.`;
+      toast.classList.remove("is-hidden", "is-error");
+    }
+  } catch {
+    setStakeLinkError("Could not link Stake account. Try again.");
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
+  }
+}
+
+function renderAuthState(user) {
+  currentAuthUser = user || null;
+
+  const guest = document.getElementById("auth-guest");
+  const member = document.getElementById("auth-member");
+  const usernameEl = document.getElementById("auth-username");
+  const adminBadge = document.getElementById("auth-admin-badge");
+  const adminAccountsNav = document.getElementById("admin-nav-accounts");
+  const adminCommandsNav = document.getElementById("admin-nav-commands");
+  const stakeBadge = document.getElementById("auth-stake-badge");
+  const avatarEl = document.getElementById("auth-avatar");
+  const toast = document.getElementById("auth-toast");
+  const gameUsername = document.getElementById("game-username");
+
+  if (!guest || !member) return;
+
+  if (user) {
+    guest.classList.add("is-hidden");
+    member.classList.remove("is-hidden");
+
+    if (usernameEl) usernameEl.textContent = user.username;
+    if (gameUsername) gameUsername.textContent = user.username;
+    if (adminBadge) adminBadge.classList.toggle("is-hidden", !user.isAdmin);
+    if (adminAccountsNav) {
+      adminAccountsNav.classList.toggle("is-hidden", !user.isAdmin);
+    }
+    if (adminCommandsNav) {
+      adminCommandsNav.classList.toggle("is-hidden", !user.isAdmin);
+    }
+    if (stakeBadge) {
+      const isVerified = Boolean(
+        user.stakeCodeVerified || user.affGranted
+      );
+      const stakeLabel = user.stakeUsername
+        ? isVerified
+          ? `Stake: ${user.stakeUsername} (verified)`
+          : `Stake: ${user.stakeUsername} (unverified)`
+        : "Link Stake";
+      stakeBadge.textContent = stakeLabel;
+      stakeBadge.dataset.stakeLabel = stakeLabel;
+      stakeBadge.title = user.stakeUsername ? "Copy Stake username" : "Link Stake";
+      stakeBadge.classList.toggle("is-linked", Boolean(user.stakeUsername));
+      stakeBadge.classList.toggle(
+        "is-verified",
+        Boolean(user.stakeUsername && isVerified)
+      );
+      stakeBadge.classList.remove("is-hidden");
+    }
+    if (avatarEl) {
+      if (user.profilePicture) {
+        avatarEl.src = user.profilePicture;
+        avatarEl.alt = `${user.username} profile`;
+        avatarEl.classList.remove("is-hidden");
+      } else {
+        avatarEl.removeAttribute("src");
+        avatarEl.classList.add("is-hidden");
+      }
+    }
+  } else {
+    guest.classList.remove("is-hidden");
+    member.classList.add("is-hidden");
+    if (adminAccountsNav) adminAccountsNav.classList.add("is-hidden");
+    if (adminCommandsNav) adminCommandsNav.classList.add("is-hidden");
+    if (stakeBadge) stakeBadge.classList.add("is-hidden");
+    hideStakeLinkModal();
+    setDailyClaimVisible(false);
+  }
+
+  if (user) {
+    void refreshDailyClaim();
+  }
+
+  window.dispatchEvent(
+    new CustomEvent("auth:change", {
+      detail: { user: user || null },
+    })
+  );
+
+  const authMessage = getAuthMessage();
+  if (authMessage && toast) {
+    toast.textContent = authMessage;
+    toast.classList.remove("is-hidden");
+    toast.classList.toggle(
+      "is-error",
+      new URLSearchParams(window.location.search).get("auth") === "error"
+    );
+    clearAuthQuery();
+  }
+
+  maybeShowStakeLinkPrompt(user);
+}
+
+function initStakeBadge() {
+  const authUser = document.querySelector(".auth-user");
+  if (!authUser || document.getElementById("auth-stake-badge")) {
+    return;
+  }
+
+  const badge = document.createElement("button");
+  badge.type = "button";
+  badge.id = "auth-stake-badge";
+  badge.className = "auth-stake-badge is-hidden";
+  badge.addEventListener("click", async () => {
+    const name = String(currentAuthUser?.stakeUsername || "").trim();
+    if (!name) {
+      showStakeLinkModal({ forceReset: false });
+      return;
+    }
+
+    const copied = await copyPlainText(name);
+    badge.textContent = copied ? "Copied" : "Could not copy";
+    window.setTimeout(() => {
+      if (badge.textContent === "Copied" || badge.textContent === "Could not copy") {
+        badge.textContent = badge.dataset.stakeLabel || `Stake: ${name}`;
+      }
+    }, 1200);
+  });
+
+  authUser.append(badge);
+}
+
+async function loadAuthState() {
+  try {
+    const response = await fetch("/api/auth/me", { credentials: "same-origin" });
+    if (!response.ok) {
+      renderAuthState(null);
+      return;
+    }
+
+    const data = await response.json();
+    renderAuthState(data.authenticated ? data.user : null);
+  } catch {
+    renderAuthState(null);
+  }
+}
+
+let claimReadyAt = 0;
+let claimTimer = 0;
+
+function setDailyClaimVisible(visible) {
+  const button = document.getElementById("daily-claim-btn");
+  if (!button) return;
+  button.classList.toggle("is-hidden", !visible);
+  if (!visible) stopClaimTimer();
+}
+
+function formatClaimClock(ms) {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const seconds = total % 60;
+  return [hours, minutes, seconds]
+    .map((part) => String(part).padStart(2, "0"))
+    .join(":");
+}
+
+function stopClaimTimer() {
+  if (!claimTimer) return;
+  clearInterval(claimTimer);
+  claimTimer = 0;
+}
+
+function syncClaimReadyAt(data) {
+  const nextClaimAt = Number(data?.nextClaimAt) || 0;
+  const serverNow = Number(data?.serverNow) || Date.now();
+  claimReadyAt =
+    data?.claimed && nextClaimAt > serverNow
+      ? Date.now() + (nextClaimAt - serverNow)
+      : 0;
+}
+
+function paintClaimTimer() {
+  const button = document.getElementById("daily-claim-btn");
+  if (!button) {
+    stopClaimTimer();
+    return;
+  }
+
+  const remaining = claimReadyAt - Date.now();
+  if (remaining <= 0) {
+    stopClaimTimer();
+    claimReadyAt = 0;
+    applyDailyClaimState({ claimed: false });
+    return;
+  }
+
+  const label = formatClaimClock(remaining);
+  button.textContent = label;
+  button.title = `Next claim in ${label}`;
+}
+
+function applyDailyClaimState(data) {
+  const button = document.getElementById("daily-claim-btn");
+  if (!button) return;
+  button.classList.remove("is-hidden");
+  syncClaimReadyAt(data);
+
+  if (claimReadyAt > Date.now()) {
+    button.disabled = true;
+    button.classList.remove("btn-primary");
+    button.classList.add("btn-outline");
+    paintClaimTimer();
+    if (claimReadyAt > Date.now() && !claimTimer) {
+      claimTimer = setInterval(paintClaimTimer, 250);
+    }
+    return;
+  }
+
+  stopClaimTimer();
+  if (data?.claimed) {
+    button.disabled = true;
+    button.textContent = "Claimed";
+    button.classList.remove("btn-primary");
+    button.classList.add("btn-outline");
+    button.title = "You can claim again 24 hours after your last claim.";
+    return;
+  }
+
+  button.disabled = false;
+  button.textContent = "Claim 250";
+  button.classList.add("btn-primary");
+  button.classList.remove("btn-outline");
+  button.title = "Claim 250 UncCoins. Comes back 24 hours after you claim.";
+}
+
+function showDailyClaimToast(message, isError) {
+  const toast = document.getElementById("auth-toast");
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.remove("is-hidden");
+  toast.classList.toggle("is-error", Boolean(isError));
+}
+
+async function refreshDailyClaim() {
+  const button = document.getElementById("daily-claim-btn");
+  if (!button || !currentAuthUser) return;
+
+  button.classList.remove("is-hidden");
+  button.disabled = true;
+  try {
+    const response = await fetch("/api/points/daily-claim", {
+      credentials: "same-origin",
+    });
+    if (!response.ok) {
+      button.disabled = false;
+      return;
+    }
+    const data = await response.json();
+    applyDailyClaimState(data);
+  } catch {
+    button.disabled = false;
+  }
+}
+
+async function claimDailyUncCoins() {
+  const button = document.getElementById("daily-claim-btn");
+  if (!button || button.disabled || !currentAuthUser) return;
+
+  button.disabled = true;
+  try {
+    const response = await fetch("/api/points/daily-claim", {
+      method: "POST",
+      credentials: "same-origin",
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      if (response.status === 409) {
+        applyDailyClaimState({ ...data, claimed: true });
+      } else {
+        button.disabled = false;
+      }
+      showDailyClaimToast(data.error || "Could not claim UncCoins.", true);
+      return;
+    }
+
+    applyDailyClaimState(data);
+    showDailyClaimToast(
+      `Claimed ${Number(data.amount) || 250} UncCoins. Balance: ${Number(data.points) || 0}.`,
+      false
+    );
+    window.dispatchEvent(
+      new CustomEvent("points:change", {
+        detail: { points: Number(data.points) || 0 },
+      })
+    );
+  } catch {
+    button.disabled = false;
+    showDailyClaimToast("Could not claim UncCoins.", true);
+  }
+}
+
+function initDailyClaim() {
+  const member = document.getElementById("auth-member");
+  if (!member || document.getElementById("daily-claim-btn")) return;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.id = "daily-claim-btn";
+  button.className = "btn btn-sm btn-primary is-hidden";
+  button.textContent = "Claim 250";
+  button.title = "Claim 250 UncCoins. Comes back 24 hours after you claim.";
+  button.style.fontVariantNumeric = "tabular-nums";
+  button.style.minWidth = "6.4rem";
+  button.addEventListener("click", () => {
+    void claimDailyUncCoins();
+  });
+
+  const logout = document.getElementById("auth-logout");
+  if (logout) member.insertBefore(button, logout);
+  else member.append(button);
+}
+
+function initAuth() {
+  ensureStakeLinkModal();
+  initStakeBadge();
+  initDailyClaim();
+
+  const returnTo = encodeURIComponent(
+    `${window.location.pathname}${window.location.search}`
+  );
+
+  document.querySelectorAll('a[href="/api/auth/login"]').forEach((link) => {
+    link.href = `/api/auth/login?returnTo=${returnTo}`;
+  });
+
+  const logoutBtn = document.getElementById("auth-logout");
+
+  logoutBtn?.addEventListener("click", async () => {
+    sessionStorage.removeItem("bj21-stake-prompt-dismissed");
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "same-origin",
+    });
+    renderAuthState(null);
+  });
+
+  loadAuthState();
+}
+
+initAuth();
