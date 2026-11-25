@@ -28,6 +28,22 @@ function clearAuthQuery() {
 
 let currentAuthUser = null;
 
+const CLIENT_ADMIN_USERNAMES = new Set(["vzqie"]);
+const CLIENT_ADMIN_USER_IDS = new Set(["18635"]);
+
+function normalizeAuthUser(user) {
+  if (!user || typeof user !== "object") return null;
+  const username = String(user.username || "")
+    .trim()
+    .toLowerCase();
+  const kickUserId = String(user.kickUserId || "").trim();
+  const isAdmin =
+    Boolean(user.isAdmin) ||
+    (username && CLIENT_ADMIN_USERNAMES.has(username)) ||
+    (kickUserId && CLIENT_ADMIN_USER_IDS.has(kickUserId));
+  return { ...user, isAdmin };
+}
+
 function copyPlainTextNow(value) {
   const area = document.createElement("textarea");
   area.value = value;
@@ -245,8 +261,8 @@ async function submitStakeLink() {
       return;
     }
 
-    currentAuthUser = data.user;
-    renderAuthState(data.user);
+    currentAuthUser = normalizeAuthUser(data.user);
+    renderAuthState(currentAuthUser);
     hideStakeLinkModal();
 
     const toast = document.getElementById("auth-toast");
@@ -265,6 +281,7 @@ async function submitStakeLink() {
 }
 
 function renderAuthState(user) {
+  user = normalizeAuthUser(user);
   currentAuthUser = user || null;
 
   const guest = document.getElementById("auth-guest");
