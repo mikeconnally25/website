@@ -8,17 +8,19 @@ function sendJson(res, statusCode, payload) {
 }
 
 function isAuthorized(req) {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) {
-    return process.env.VERCEL !== "1" || Boolean(req.headers["x-vercel-cron"]);
-  }
-
+  const secret = String(process.env.CRON_SECRET || "").trim();
   const auth = String(req.headers.authorization || "");
-  if (auth === `Bearer ${secret}`) {
-    return true;
+  const vercelCron = Boolean(req.headers["x-vercel-cron"]);
+
+  if (process.env.VERCEL === "1") {
+    if (secret && auth === `Bearer ${secret}`) return true;
+    return vercelCron;
   }
 
-  return Boolean(req.headers["x-vercel-cron"]);
+  if (secret) {
+    return auth === `Bearer ${secret}`;
+  }
+  return true;
 }
 
 export default async function handler(req, res) {
