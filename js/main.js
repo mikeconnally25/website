@@ -345,7 +345,7 @@ function ensureFooterContact() {
   contact.id = "footer-contact";
   contact.className = "footer-contact";
   contact.innerHTML =
-    'Contact: email <a href="mailto:vzqiekick@gmail.com">vzqiekick@gmail.com</a>' +
+    'Contact: email <a href="mailto:vzqie@yahoo.com">vzqie@yahoo.com</a>' +
     ' · <a href="/privacy/">Privacy Policy</a>';
 
   const brand = footerInner.querySelector(".footer-brand");
