@@ -184,7 +184,7 @@
           const amount = Number(winner.amount || 0).toLocaleString();
           li.innerHTML = `<span class="house-loss-prev-name">${escapeHtml(
             name
-          )}</span><span class="house-loss-prev-amount">+${amount} UncCoins</span>`;
+          )}</span><span class="house-loss-prev-amount">+${amount} FunCoins</span>`;
           prevList.append(li);
         });
         const when = winners[0]?.revealedAt
@@ -713,7 +713,7 @@
   $("house-loss-draw-btn")?.addEventListener("click", async () => {
     if (
       !window.confirm(
-        "Force-draw the house games UncCoins pot now and start a new week?"
+        "Force-draw the house games FunCoins pot now and start a new week?"
       )
     ) {
       return;
@@ -734,7 +734,7 @@
       const count = Array.isArray(data.lastWinners) ? data.lastWinners.length : 0;
       setAdminStatus(
         count
-          ? `House pot drawn for ${count} winners. UncCoins credited.`
+          ? `House pot drawn for ${count} winners. FunCoins credited.`
           : "House pot draw complete.",
         "success"
       );

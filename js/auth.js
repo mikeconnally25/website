@@ -488,7 +488,7 @@ function applyDailyClaimState(data) {
   button.textContent = "Claim 250";
   button.classList.add("btn-primary");
   button.classList.remove("btn-outline");
-  button.title = "Claim 250 UncCoins. Comes back 24 hours after you claim.";
+  button.title = "Claim 250 FunCoins. Comes back 24 hours after you claim.";
 }
 
 function showDailyClaimToast(message, isError) {
@@ -520,7 +520,7 @@ async function refreshDailyClaim() {
   }
 }
 
-async function claimDailyUncCoins() {
+async function claimDailyFunCoins() {
   const button = document.getElementById("daily-claim-btn");
   if (!button || button.disabled || !currentAuthUser) return;
 
@@ -537,13 +537,13 @@ async function claimDailyUncCoins() {
       } else {
         button.disabled = false;
       }
-      showDailyClaimToast(data.error || "Could not claim UncCoins.", true);
+      showDailyClaimToast(data.error || "Could not claim FunCoins.", true);
       return;
     }
 
     applyDailyClaimState(data);
     showDailyClaimToast(
-      `Claimed ${Number(data.amount) || 250} UncCoins. Balance: ${Number(data.points) || 0}.`,
+      `Claimed ${Number(data.amount) || 250} FunCoins. Balance: ${Number(data.points) || 0}.`,
       false
     );
     window.dispatchEvent(
@@ -553,7 +553,7 @@ async function claimDailyUncCoins() {
     );
   } catch {
     button.disabled = false;
-    showDailyClaimToast("Could not claim UncCoins.", true);
+    showDailyClaimToast("Could not claim FunCoins.", true);
   }
 }
 
@@ -566,11 +566,11 @@ function initDailyClaim() {
   button.id = "daily-claim-btn";
   button.className = "btn btn-sm btn-primary is-hidden";
   button.textContent = "Claim 250";
-  button.title = "Claim 250 UncCoins. Comes back 24 hours after you claim.";
+  button.title = "Claim 250 FunCoins. Comes back 24 hours after you claim.";
   button.style.fontVariantNumeric = "tabular-nums";
   button.style.minWidth = "6.4rem";
   button.addEventListener("click", () => {
-    void claimDailyUncCoins();
+    void claimDailyFunCoins();
   });
 
   const logout = document.getElementById("auth-logout");

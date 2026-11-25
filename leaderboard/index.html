@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Leaderboard — Stake wagering and UncCoins standings on vzqie." />
+  <meta name="description" content="Leaderboard — Stake wagering and FunCoins standings on vzqie." />
   <title>Leaderboard | vzqie</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -70,7 +70,7 @@
             <h1 class="lb-title">Leaderboard</h1>
             <div class="lb-tabs" role="tablist" aria-label="Leaderboard type">
               <button type="button" class="lb-tab is-active" role="tab" id="lb-tab-stake" data-lb-tab="stake" aria-selected="true" aria-controls="lb-panel-stake">Stake wagered</button>
-              <button type="button" class="lb-tab" role="tab" id="lb-tab-unc" data-lb-tab="unc" aria-selected="false" aria-controls="lb-panel-unc">UncCoins</button>
+              <button type="button" class="lb-tab" role="tab" id="lb-tab-unc" data-lb-tab="unc" aria-selected="false" aria-controls="lb-panel-unc">FunCoins</button>
             </div>
             <p class="lb-lede" id="lb-lede">Top 10 wagered on code <strong>vzqie</strong>.</p>
             <button type="button" class="btn btn-sm btn-outline lb-rules-toggle" id="leaderboard-rules-toggle" aria-expanded="false" aria-controls="leaderboard-rules">
@@ -174,7 +174,7 @@
 
         <div class="lb-panel is-hidden" id="lb-panel-unc" data-lb-panel="unc" role="tabpanel" aria-labelledby="lb-tab-unc" hidden>
           <div class="lb-podium is-hidden" id="unc-podium-panel">
-            <div class="lb-podium-stage" id="unc-podium-stage" aria-label="Top 3 UncCoin holders"></div>
+            <div class="lb-podium-stage" id="unc-podium-stage" aria-label="Top 3 FunCoin holders"></div>
           </div>
 
           <section class="lb-board bj21-panel" aria-labelledby="unc-standings-title">
@@ -189,11 +189,11 @@
             <div class="lb-cols is-hidden" id="unc-table-head">
               <span>Rank</span>
               <span>Player</span>
-              <span>UncCoins</span>
+              <span>FunCoins</span>
               <span>Prize</span>
             </div>
 
-            <p class="lb-empty" id="unc-empty">No UncCoins yet.</p>
+            <p class="lb-empty" id="unc-empty">No FunCoins yet.</p>
             <p class="lb-empty is-hidden" id="unc-filter-empty">No player matches that search.</p>
 
             <ol class="lb-list is-hidden" id="unc-list"></ol>

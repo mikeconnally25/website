@@ -56,7 +56,7 @@ function setStoreStatus(message, tone = "") {
 }
 
 function formatPoints(value) {
-  return `${Number(value) || 0} UncCoins`;
+  return `${Number(value) || 0} FunCoins`;
 }
 
 function renderBalance() {
@@ -131,7 +131,7 @@ function renderBuyForm() {
     if (buyPackages.length > 1) {
       copy.textContent = `Choose a package · ${methodLabel}`;
     } else if (pkg) {
-      copy.textContent = `${Number(pkg.points).toLocaleString()} UncCoins for ${formatUsd(pkg.usd)} · ${methodLabel}`;
+      copy.textContent = `${Number(pkg.points).toLocaleString()} FunCoins for ${formatUsd(pkg.usd)} · ${methodLabel}`;
     } else {
       copy.textContent = `Choose a package · ${methodLabel}`;
     }
@@ -147,12 +147,12 @@ function renderBuyForm() {
     return;
   }
   if (buyConfig.enabled === false) {
-    note.textContent = "Buying UncCoins is paused right now. Check back later.";
+    note.textContent = "Buying FunCoins is paused right now. Check back later.";
     renderBuyMethods();
     return;
   }
   if (!currentUser) {
-    note.textContent = "Sign in with Kick to buy UncCoins.";
+    note.textContent = "Sign in with Kick to buy FunCoins.";
     renderBuyMethods();
     return;
   }
@@ -177,7 +177,7 @@ function renderBuyPackages() {
 
     const pts = document.createElement("span");
     pts.className = "store-buy-package-pts";
-    pts.textContent = `${Number(pkg.points).toLocaleString()} UncCoins`;
+    pts.textContent = `${Number(pkg.points).toLocaleString()} FunCoins`;
 
     const sep = document.createElement("span");
     sep.className = "store-buy-package-sep";
@@ -198,8 +198,8 @@ function renderBuyPackages() {
           !isBuyPointsOpen() && buyConfig.enabled !== false
             ? "Purchases are not configured yet."
             : buyConfig.enabled === false
-              ? "Buying UncCoins is paused right now."
-              : "Sign in with Kick to buy UncCoins.",
+              ? "Buying FunCoins is paused right now."
+              : "Sign in with Kick to buy FunCoins.",
           "error"
         );
         return;
@@ -356,7 +356,7 @@ function renderCatalog() {
 
     const cost = document.createElement("p");
     cost.className = "store-reward-card-cost";
-    cost.innerHTML = `<strong>${Number(item.cost) || 0}</strong> <span>UncCoins</span>`;
+    cost.innerHTML = `<strong>${Number(item.cost) || 0}</strong> <span>FunCoins</span>`;
 
     body.append(title, cost);
 
@@ -380,7 +380,7 @@ function renderCatalog() {
       redeem.title = "Redemptions disabled for this account";
       row.classList.add("is-locked");
     } else if (pointsBalance < item.cost) {
-      redeem.title = "Not enough UncCoins";
+      redeem.title = "Not enough FunCoins";
       row.classList.add("is-locked");
     }
     redeem.addEventListener("click", () => {
@@ -664,8 +664,8 @@ function renderBuyToggle() {
   toggle.checked = buyConfig.enabled !== false;
   status.textContent =
     buyConfig.enabled !== false
-      ? "Buy UncCoins is open"
-      : "Buy UncCoins is paused";
+      ? "Buy FunCoins is open"
+      : "Buy FunCoins is paused";
 }
 
 function renderAll() {
@@ -702,7 +702,7 @@ async function loadMe() {
     cache: "no-store",
   });
   if (!response.ok) {
-    throw new Error("Could not load UncCoins balance.");
+    throw new Error("Could not load FunCoins balance.");
   }
   const data = await response.json();
   pointsBalance = Number(data.balance?.points) || 0;
@@ -1158,7 +1158,7 @@ async function cancelRedemption(id, button) {
     pendingQueue = Array.isArray(data.redemptions) ? data.redemptions : [];
     await loadMe();
     renderAll();
-    setStoreStatus("Redemption cancelled and UncCoins refunded.", "success");
+    setStoreStatus("Redemption cancelled and FunCoins refunded.", "success");
     document
       .getElementById("store-history-panel")
       ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -1326,12 +1326,12 @@ function handlePurchaseReturnQuery() {
   if (purchase === "success") {
     setStoreStatus(
       provider === "stripe"
-        ? "Payment received. UncCoins credit shortly — refresh if your balance has not updated yet."
-        : "Payment received. UncCoins credit after the crypto payment confirms — refresh in a moment if your balance has not updated yet.",
+        ? "Payment received. FunCoins credit shortly — refresh if your balance has not updated yet."
+        : "Payment received. FunCoins credit after the crypto payment confirms — refresh in a moment if your balance has not updated yet.",
       "success"
     );
   } else if (purchase === "cancel") {
-    setStoreStatus("Purchase cancelled. No UncCoins were charged.", "error");
+    setStoreStatus("Purchase cancelled. No FunCoins were charged.", "error");
   }
 
   params.delete("purchase");
@@ -1371,7 +1371,7 @@ function initAwardChatForm() {
       await loadMe();
       renderAll();
       setAwardChatStatus(
-        `Awarded ${data.amount > 0 ? "+" : ""}${data.amount} UncCoins to ${data.awarded} chatters (last ${data.withinMinutes}m).`,
+        `Awarded ${data.amount > 0 ? "+" : ""}${data.amount} FunCoins to ${data.awarded} chatters (last ${data.withinMinutes}m).`,
         "success"
       );
     } catch (error) {
@@ -1404,7 +1404,7 @@ function initBuyToggle() {
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(data.error || "Could not update buy UncCoins.");
+        throw new Error(data.error || "Could not update buy FunCoins.");
       }
       buyConfig.enabled = data.enabled !== false;
       renderBuyToggle();
@@ -1412,15 +1412,15 @@ function initBuyToggle() {
       renderBuyPackages();
       setStoreStatus(
         buyConfig.enabled
-          ? "Buy UncCoins resumed."
-          : "Buy UncCoins paused.",
+          ? "Buy FunCoins resumed."
+          : "Buy FunCoins paused.",
         "success"
       );
     } catch (error) {
       buyConfig.enabled = previous;
       toggle.checked = previous;
       renderBuyToggle();
-      setStoreStatus(error.message || "Could not update buy UncCoins.", "error");
+      setStoreStatus(error.message || "Could not update buy FunCoins.", "error");
     } finally {
       toggle.disabled = false;
     }

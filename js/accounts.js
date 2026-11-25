@@ -482,7 +482,7 @@ function renderAccounts(users) {
 
     const pointsLabel = document.createElement("span");
     pointsLabel.className = "accounts-kick-id";
-    pointsLabel.textContent = `UncCoins: ${Number(user.points) || 0}`;
+    pointsLabel.textContent = `FunCoins: ${Number(user.points) || 0}`;
 
     const pointsInput = document.createElement("input");
     pointsInput.type = "number";
@@ -494,7 +494,7 @@ function renderAccounts(users) {
     pointsBtn.type = "button";
     pointsBtn.className = "btn btn-sm btn-primary accounts-points-award";
     pointsBtn.textContent = "Award";
-    pointsBtn.title = "Award (or subtract with a negative amount) UncCoins";
+    pointsBtn.title = "Award (or subtract with a negative amount) FunCoins";
     pointsBtn.addEventListener("click", () => {
       void awardAccountPoints(user.kickUserId, pointsInput.value, pointsBtn);
     });
@@ -829,12 +829,12 @@ async function setAccountStakeUsername(kickUserId, stakeUsername, saveButton, ca
 async function awardAccountPoints(kickUserId, amountValue, button) {
   const amount = Number(amountValue);
   if (!Number.isFinite(amount) || amount === 0) {
-    setAccountsStatus("Enter a non-zero UncCoins amount.", "error");
+    setAccountsStatus("Enter a non-zero FunCoins amount.", "error");
     return;
   }
 
   if (button) button.disabled = true;
-  setAccountsStatus(amount > 0 ? "Awarding UncCoins..." : "Adjusting UncCoins...");
+  setAccountsStatus(amount > 0 ? "Awarding FunCoins..." : "Adjusting FunCoins...");
 
   try {
     const response = await fetch("/api/points/award", {
@@ -850,27 +850,27 @@ async function awardAccountPoints(kickUserId, amountValue, button) {
     } catch {
       setAccountsStatus(
         response.ok
-          ? "Could not update UncCoins."
-          : `Could not update UncCoins (${response.status}).`,
+          ? "Could not update FunCoins."
+          : `Could not update FunCoins (${response.status}).`,
         "error"
       );
       return;
     }
 
     if (!response.ok) {
-      setAccountsStatus(data.error || "Could not update UncCoins.", "error");
+      setAccountsStatus(data.error || "Could not update FunCoins.", "error");
       return;
     }
 
     allUsers = data.users || [];
     altClusters = data.altClusters || [];
     setAccountsStatus(
-      `UncCoins updated. Balance: ${data.balance?.points ?? 0}.`,
+      `FunCoins updated. Balance: ${data.balance?.points ?? 0}.`,
       "success"
     );
     renderFilteredAccounts();
   } catch {
-    setAccountsStatus("Could not update UncCoins.", "error");
+    setAccountsStatus("Could not update FunCoins.", "error");
   } finally {
     if (button) button.disabled = false;
   }

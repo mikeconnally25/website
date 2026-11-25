@@ -136,14 +136,14 @@ function renderBoard() {
         ? ""
         : yours.refund
           ? " Refunded."
-          : ` Paid ${yours.payout} UncCoins.`;
+          : ` Paid ${yours.payout} FunCoins.`;
     yoursEl.textContent = `Your bet: ${yours.amount} on ${rangeLabel(yours.rangeId)}.${payout}`;
   } else if (state?.status === "settled") {
     yoursEl.textContent = `Final average ${formatX(state.averageX)} · ${rangeLabel(state.winningRangeId)}.`;
   } else {
     yoursEl.textContent =
       state?.status === "open"
-        ? `You have ${state.balance ?? 0} UncCoins.`
+        ? `You have ${state.balance ?? 0} FunCoins.`
         : state?.status === "locked"
           ? "Bets are closed. Totals are going in."
           : "";
@@ -359,7 +359,7 @@ function renderHead() {
     yours.textContent = "Sign in with Kick to bet.";
   } else if (mine) {
     const name = mine.side === "left" ? match.left?.slot?.name : match.right?.slot?.name;
-    const paid = mine.payout == null ? "" : mine.refund ? " Refunded." : ` Paid ${mine.payout} UncCoins.`;
+    const paid = mine.payout == null ? "" : mine.refund ? " Refunded." : ` Paid ${mine.payout} FunCoins.`;
     yours.textContent = `Your bet: ${mine.amount} on ${name || mine.side}.${paid}`;
   } else if (match?.final) {
     yours.textContent = match.winner === "tie"
@@ -512,7 +512,7 @@ function renderSpins() {
   if (game.status === "open" && state?.balance == null) {
     yours.textContent = "Sign in with Kick to bet.";
   } else if (mine) {
-    const paid = mine.payout == null ? "" : mine.refund ? " Refunded." : ` Paid ${mine.payout} UncCoins.`;
+    const paid = mine.payout == null ? "" : mine.refund ? " Refunded." : ` Paid ${mine.payout} FunCoins.`;
     yours.textContent = `Your bet: ${mine.amount} on ${spinLabel(mine.rangeId)} bonuses.${paid}`;
   } else if (game.final) {
     yours.textContent = `${game.count} bonuses · ${spinLabel(game.winningRangeId)}.`;

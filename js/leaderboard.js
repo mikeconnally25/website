@@ -685,7 +685,7 @@ function uncSignature(data) {
 
 async function loadUncLeaderboard({ quiet = false } = {}) {
   if (!quiet && activeTab === "unc") {
-    setLeaderboardStatus("Loading UncCoins leaderboard...");
+    setLeaderboardStatus("Loading FunCoins leaderboard...");
   }
 
   try {
@@ -695,7 +695,7 @@ async function loadUncLeaderboard({ quiet = false } = {}) {
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      throw new Error(data.error || "Could not load the UncCoins leaderboard.");
+      throw new Error(data.error || "Could not load the FunCoins leaderboard.");
     }
 
     const signature = uncSignature(data);
@@ -724,7 +724,7 @@ async function loadUncLeaderboard({ quiet = false } = {}) {
     }
     if (activeTab === "unc" && (!quiet || !uncLoadedOnce)) {
       setLeaderboardStatus(
-        error.message || "Could not load the UncCoins leaderboard.",
+        error.message || "Could not load the FunCoins leaderboard.",
         "error"
       );
     }
@@ -769,7 +769,7 @@ function switchTab(tab) {
 
   try {
     const url = new URL(window.location.href);
-    if (next === "unc") url.hash = "unccoins";
+    if (next === "unc") url.hash = "funcoins";
     else url.hash = "";
     history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
   } catch {
@@ -842,7 +842,7 @@ window.setInterval(() => {
 const initialHash = String(window.location.hash || "")
   .replace(/^#/, "")
   .toLowerCase();
-if (initialHash === "unccoins" || initialHash === "unc") {
+if (initialHash === "funcoins" || initialHash === "unccoins" || initialHash === "unc") {
   switchTab("unc");
 } else {
   switchTab("stake");

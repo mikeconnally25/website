@@ -60,7 +60,7 @@ function slotInitials(name) {
 
 function formatPrize(total) {
   const pot = Math.max(0, Math.floor(Number(total) || 0));
-  return `Pot · ${pot.toLocaleString("en-US")} UncCoins`;
+  return `Pot · ${pot.toLocaleString("en-US")} FunCoins`;
 }
 
 function formatAverage(value) {

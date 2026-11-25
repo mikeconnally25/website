@@ -1,7 +1,7 @@
 let oneVOneIsAdmin = false;
 
 function formatCoins(amount) {
-  return `${Number(amount) || 0} UncCoin${Number(amount) === 1 ? "" : "s"}`;
+  return `${Number(amount) || 0} FunCoin${Number(amount) === 1 ? "" : "s"}`;
 }
 
 function renderBet(element, { number, occupied, pool, myBet, winner, signedIn, betsOpen }, keepValue) {
@@ -40,7 +40,7 @@ function renderBet(element, { number, occupied, pool, myBet, winner, signedIn, b
       input.step = "1";
       input.inputMode = "numeric";
       input.placeholder = "Amount";
-      input.setAttribute("aria-label", `UncCoins to bet on side ${number}`);
+      input.setAttribute("aria-label", `FunCoins to bet on side ${number}`);
       if (keepValue) input.value = keepValue;
 
       const button = document.createElement("button");
@@ -303,7 +303,7 @@ function renderOneVOne(data, startedAt = 0, authoritative = false) {
   const balanceEl = document.getElementById("one-v-one-balance");
   if (balanceEl) {
     balanceEl.classList.toggle("is-hidden", !showBalance);
-    if (showBalance) balanceEl.textContent = `You have ${balanceText} UncCoins`;
+    if (showBalance) balanceEl.textContent = `You have ${balanceText} FunCoins`;
   }
   const you = document.getElementById("one-v-one-you");
   const youTotal = document.getElementById("one-v-one-you-total");
@@ -355,7 +355,7 @@ function renderOneVOne(data, startedAt = 0, authoritative = false) {
   if (newOpponent) newOpponent.disabled = !settled;
   if (openBets) openBets.disabled = settled || !bothSeated;
   paintBetsTimer();
-  // Only confirmed UncCoin bets — never merge Kick !bet chat (failed bets still appear in chat).
+  // Only confirmed FunCoin bets — never merge Kick !bet chat (failed bets still appear in chat).
   renderBetList(Array.isArray(data?.bets) ? data.bets : []);
   renderKickChat(data?.chat, data?.matchup);
 }
