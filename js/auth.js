@@ -73,7 +73,7 @@ function bindStakeCopy(element, username) {
 
   element.dataset.stakeCopy = name;
   element.classList.add("is-stake-copy");
-  if (!element.title) element.title = "Copy Stake username";
+  if (!element.title) element.title = "Copy Roobet username";
   if (!element.dataset.stakeCopyBound) {
     element.dataset.stakeCopyBound = "1";
     if (element.tagName !== "BUTTON" && element.tagName !== "A") {
@@ -122,13 +122,13 @@ function ensureStakeLinkModal() {
     <div class="stake-link-backdrop" aria-hidden="true"></div>
     <div class="stake-link-dialog" role="dialog" aria-modal="true" aria-labelledby="stake-link-title">
       <p class="stake-link-eyebrow">Required</p>
-      <h2 class="stake-link-title" id="stake-link-title">Link your Stake account</h2>
+      <h2 class="stake-link-title" id="stake-link-title">Link your Roobet username</h2>
       <p class="stake-link-copy">
-        Enter your Stake username to finish signing in. We use it for leaderboards, giveaways, and stream games.
-        Use code <strong>vzqie</strong> when you sign up.
+        Enter your Roobet username to finish signing in. We use it for leaderboards, giveaways, and stream games.
+        Play on code <strong>vzqie</strong> for exclusive rewards.
       </p>
       <form class="stake-link-form" id="stake-link-form">
-        <label class="guess-label" for="stake-link-input">Stake username</label>
+        <label class="guess-label" for="stake-link-input">Roobet username</label>
         <div class="guess-input-row">
           <input
             class="guess-input"
@@ -138,7 +138,7 @@ function ensureStakeLinkModal() {
             maxlength="24"
             autocomplete="username"
             spellcheck="false"
-            placeholder="YourStakeName"
+            placeholder="YourRoobetName"
             required
           />
         </div>
@@ -224,7 +224,7 @@ async function submitStakeLink() {
   const stakeUsername = input?.value.trim();
 
   if (!stakeUsername) {
-    setStakeLinkError("Enter your Stake username.");
+    setStakeLinkError("Enter your Roobet username.");
     return;
   }
 
@@ -241,7 +241,7 @@ async function submitStakeLink() {
     const data = await response.json();
 
     if (!response.ok) {
-      setStakeLinkError(data.error || "Could not link Stake account.");
+      setStakeLinkError(data.error || "Could not link Roobet username.");
       return;
     }
 
@@ -253,12 +253,12 @@ async function submitStakeLink() {
     if (toast) {
       toast.textContent =
         data.user.stakeCodeVerified || data.user.affGranted
-          ? `Stake account linked and verified on code vzqie.`
-          : `Stake account linked. We could not find that username on the vzqie leaderboard yet.`;
+          ? `Roobet username linked and verified on code vzqie.`
+          : `Roobet username linked. Play on code vzqie for exclusive rewards.`;
       toast.classList.remove("is-hidden", "is-error");
     }
   } catch {
-    setStakeLinkError("Could not link Stake account. Try again.");
+    setStakeLinkError("Could not link Roobet username. Try again.");
   } finally {
     if (submitBtn) submitBtn.disabled = false;
   }
@@ -299,12 +299,14 @@ function renderAuthState(user) {
       );
       const stakeLabel = user.stakeUsername
         ? isVerified
-          ? `Stake: ${user.stakeUsername} (verified)`
-          : `Stake: ${user.stakeUsername} (unverified)`
-        : "Link Stake";
+          ? `Roobet: ${user.stakeUsername} (verified)`
+          : `Roobet: ${user.stakeUsername}`
+        : "Link Roobet";
       stakeBadge.textContent = stakeLabel;
       stakeBadge.dataset.stakeLabel = stakeLabel;
-      stakeBadge.title = user.stakeUsername ? "Copy Stake username" : "Link Stake";
+      stakeBadge.title = user.stakeUsername
+        ? "Copy Roobet username"
+        : "Link Roobet username";
       stakeBadge.classList.toggle("is-linked", Boolean(user.stakeUsername));
       stakeBadge.classList.toggle(
         "is-verified",
@@ -377,7 +379,7 @@ function initStakeBadge() {
     badge.textContent = copied ? "Copied" : "Could not copy";
     window.setTimeout(() => {
       if (badge.textContent === "Copied" || badge.textContent === "Could not copy") {
-        badge.textContent = badge.dataset.stakeLabel || `Stake: ${name}`;
+        badge.textContent = badge.dataset.stakeLabel || `Roobet: ${name}`;
       }
     }, 1200);
   });
