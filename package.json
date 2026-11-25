@@ -10,7 +10,7 @@
     "diagnose:kick": "node scripts/diagnose-kick-chat.mjs"
   },
   "engines": {
-    "node": ">=20"
+    "node": "20.x"
   },
   "dependencies": {
     "@vercel/speed-insights": "^2.0.0",
