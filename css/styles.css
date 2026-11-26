@@ -19,8 +19,8 @@
   --radius-sm: 6px;
   --shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
   --shadow-card: 0 10px 28px rgba(0, 0, 0, 0.32);
-  --font-display: "Syne", sans-serif;
-  --font-body: "Outfit", sans-serif;
+  --font-display: "Sora", sans-serif;
+  --font-body: "Manrope", sans-serif;
   --container: 1120px;
   --header-height: 72px;
   --kick: #53fc18;
@@ -39,10 +39,16 @@ html {
 body {
   margin: 0;
   font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 1rem;
   background: var(--bg);
   color: var(--text);
-  line-height: 1.6;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 img,
@@ -128,9 +134,9 @@ ul {
 
 .logo-text {
   font-family: var(--font-display);
-  font-size: 1.55rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   line-height: 1;
   color: var(--text);
 }
@@ -742,11 +748,11 @@ body.site-drawer-open {
 .watch-header h1 {
   margin: 0 0 0.35rem;
   font-family: var(--font-display);
-  font-size: clamp(2.4rem, 5vw, 3.4rem);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 0.95;
-  text-transform: uppercase;
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  text-transform: none;
   background: var(--heading-gradient);
   -webkit-background-clip: text;
   background-clip: text;
@@ -819,24 +825,24 @@ body.site-drawer-open {
 }
 
 .section-eyebrow {
-  margin: 0 0 0.4rem;
-  font-family: var(--font-display);
-  font-size: 1.1rem;
+  margin: 0 0 0.45rem;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--accent-bright);
 }
 
 .section-header h2,
 .theme-heading {
   margin: 0 0 0.75rem;
   font-family: var(--font-display);
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 0.92;
-  text-transform: uppercase;
+  font-size: clamp(1.85rem, 4vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  text-transform: none;
   background: var(--heading-gradient);
   -webkit-background-clip: text;
   background-clip: text;
@@ -14232,7 +14238,7 @@ button.one-v-one-name:focus-visible {
   }
 }
 
-/* Rail is the site page language: titles, stat chips, and hairline rows. */
+/* Page titles: clean weight, no all-caps shout. */
 .page-section :is(
   h1,
   .theme-heading,
@@ -14246,9 +14252,11 @@ button.one-v-one-name:focus-visible {
 ),
 .home-page .section-header h2,
 #watch-title {
-  font-size: clamp(2.8rem, 6vw, 4.4rem);
-  line-height: 0.88;
-  letter-spacing: 0.04em;
+  font-size: clamp(1.85rem, 3.8vw, 2.55rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  text-transform: none;
   background: var(--heading-gradient);
   -webkit-background-clip: text;
   background-clip: text;
@@ -15387,23 +15395,23 @@ button.one-v-one-name:focus-visible {
 }
 
 .brand-hero-kicker {
-  margin: 0 0 0.85rem;
-  font-family: var(--font-display);
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
+  margin: 0 0 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--accent-bright);
 }
 
 .brand-hero-title {
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.75rem;
   font-family: var(--font-display);
-  font-size: clamp(3.4rem, 11vw, 6.4rem);
-  font-weight: 800;
-  letter-spacing: -0.045em;
-  line-height: 0.88;
-  text-transform: lowercase;
+  font-size: clamp(2.8rem, 8vw, 4.6rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  text-transform: none;
   background: linear-gradient(100deg, #fff8e7 8%, #f0d78c 40%, #d4af37 68%, #fff8e7 100%);
   background-size: 200% 100%;
   -webkit-background-clip: text;
@@ -15470,4 +15478,56 @@ button.one-v-one-name:focus-visible {
 
 @media (max-width: 720px) {
   .brand-hero-visual { opacity: 0.45; width: 70vw; }
+}
+
+
+/* type-cleanup */
+.level-up-heading,
+.store-heading,
+.accounts-heading,
+.guess-heading,
+.lb-heading,
+.commands-page h1,
+.page-section h1,
+.section-header h1 {
+  font-family: var(--font-display) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.025em !important;
+  text-transform: none !important;
+  line-height: 1.12 !important;
+  font-size: clamp(1.85rem, 4vw, 2.6rem) !important;
+}
+
+.site-drawer-title,
+.menu-label,
+.store-buy-title,
+.store-section-title,
+.guesses-heading,
+.guess-panel-title,
+.admin-panel-label,
+.lb-lede,
+.house-games-tab {
+  letter-spacing: 0.02em;
+}
+
+.menu-label,
+.admin-panel-label,
+.store-panel-label,
+.store-balance-label,
+.house-games-balance-label {
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.04em;
+  font-size: 0.8rem;
+}
+
+.btn,
+.btn-pill,
+.nav-links a:not(.btn) {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.btn-primary {
+  font-weight: 600;
 }
