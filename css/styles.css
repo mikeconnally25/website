@@ -13121,8 +13121,8 @@ button.one-v-one-name:focus-visible {
   overflow: visible;
 }
 
-.level-up-card[data-tier="bronze"] .level-up-icon {
-  filter: drop-shadow(0 0 12px rgba(201, 154, 90, 0.55));
+.level-up-card[data-tier="beginner"] .level-up-icon {
+  filter: drop-shadow(0 0 10px rgba(154, 163, 178, 0.4));
 }
 
 .level-up-card[data-tier="silver"] .level-up-icon {
@@ -13133,16 +13133,36 @@ button.one-v-one-name:focus-visible {
   filter: drop-shadow(0 0 14px rgba(240, 192, 32, 0.6));
 }
 
-.level-up-card[data-tier="platinum"] .level-up-icon {
-  filter: drop-shadow(0 0 16px rgba(90, 212, 232, 0.55));
+.level-up-card[data-tier="emerald"] .level-up-icon {
+  filter: drop-shadow(0 0 14px rgba(47, 212, 138, 0.55));
+}
+
+.level-up-card[data-tier="ruby"] .level-up-icon {
+  filter: drop-shadow(0 0 14px rgba(240, 69, 106, 0.55));
 }
 
 .level-up-card[data-tier="diamond"] .level-up-icon {
-  filter: drop-shadow(0 0 12px rgba(158, 204, 232, 0.45));
+  filter: drop-shadow(0 0 12px rgba(94, 200, 255, 0.5));
 }
 
-.level-up-card[data-tier="obsidian"] .level-up-icon {
-  filter: drop-shadow(0 0 14px rgba(139, 106, 212, 0.45));
+.level-up-card[data-tier="champion"] .level-up-icon {
+  filter: drop-shadow(0 0 14px rgba(255, 138, 42, 0.55));
+}
+
+.level-up-card[data-tier="legend"] .level-up-icon {
+  filter: drop-shadow(0 0 14px rgba(176, 108, 255, 0.55));
+}
+
+.level-up-card[data-tier="master"] .level-up-icon {
+  filter: drop-shadow(0 0 14px rgba(79, 124, 255, 0.55));
+}
+
+.level-up-card[data-tier="grandmaster"] .level-up-icon {
+  filter: drop-shadow(0 0 14px rgba(42, 212, 212, 0.55));
+}
+
+.level-up-card[data-tier="immortal"] .level-up-icon {
+  filter: drop-shadow(0 0 16px rgba(255, 233, 160, 0.65));
 }
 
 .level-up-badge {
@@ -13161,9 +13181,9 @@ button.one-v-one-name:focus-visible {
   border: none;
 }
 
-.level-up-card[data-tier="bronze"] .level-up-badge {
-  color: #1a1006;
-  background: linear-gradient(180deg, #e0b06a, #b07838);
+.level-up-card[data-tier="beginner"] .level-up-badge {
+  color: #121820;
+  background: linear-gradient(180deg, #c8d0dc, #7a8494);
 }
 
 .level-up-card[data-tier="silver"] .level-up-badge {
@@ -13176,20 +13196,45 @@ button.one-v-one-name:focus-visible {
   background: linear-gradient(180deg, #ffe066, #d4a018);
 }
 
-.level-up-card[data-tier="platinum"] .level-up-badge {
-  color: #041018;
-  background: linear-gradient(180deg, #7ed8f0, #3aa0c0);
+.level-up-card[data-tier="emerald"] .level-up-badge {
+  color: #041810;
+  background: linear-gradient(180deg, #7dffc0, #1aaa68);
+}
+
+.level-up-card[data-tier="ruby"] .level-up-badge {
+  color: #1a0610;
+  background: linear-gradient(180deg, #ff8aa4, #d02048);
 }
 
 .level-up-card[data-tier="diamond"] .level-up-badge {
   color: #041018;
-  background: linear-gradient(180deg, #9ad8ff, #3a88d0);
+  background: linear-gradient(180deg, #c5eeff, #2a88c8);
 }
 
-.level-up-card[data-tier="obsidian"] .level-up-badge {
-  color: #e8edf4;
-  background: linear-gradient(180deg, #3a4050, #12151c);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+.level-up-card[data-tier="champion"] .level-up-badge {
+  color: #1a0c04;
+  background: linear-gradient(180deg, #ffc078, #e06010);
+}
+
+.level-up-card[data-tier="legend"] .level-up-badge {
+  color: #12061a;
+  background: linear-gradient(180deg, #d8b0ff, #8030d0);
+}
+
+.level-up-card[data-tier="master"] .level-up-badge {
+  color: #060a1a;
+  background: linear-gradient(180deg, #9cbcff, #3050e0);
+}
+
+.level-up-card[data-tier="grandmaster"] .level-up-badge {
+  color: #041818;
+  background: linear-gradient(180deg, #9af0f0, #12a0a0);
+}
+
+.level-up-card[data-tier="immortal"] .level-up-badge {
+  color: #1a1404;
+  background: linear-gradient(180deg, #fff4c8, #d4a020);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .level-up-card-meta {
