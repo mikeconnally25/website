@@ -125,14 +125,36 @@ ul {
 
 .logo-image {
   display: block;
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
-  object-fit: cover;
-  border: 1px solid rgba(212, 175, 55, 0.45);
+  width: auto;
+  height: 52px;
+  border-radius: 0;
+  object-fit: contain;
+  border: none;
+  background: transparent;
 }
 
-.logo-text {
+/* Full lockup already includes VZQIE wordmark in the header */
+.logo .logo-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.footer-brand .logo-text,
+.footer .logo-text {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
   font-family: var(--font-display);
   font-size: 1.35rem;
   font-weight: 600;
@@ -15530,4 +15552,9 @@ button.one-v-one-name:focus-visible {
 
 .btn-primary {
   font-weight: 600;
+}
+
+/* logo-image height mobile */
+@media (max-width: 640px) {
+  .logo-image { height: 44px; }
 }
