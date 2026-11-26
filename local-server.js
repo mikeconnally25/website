@@ -67,6 +67,8 @@ import {
   handleUsersList,
   handleStakeLink,
   handleUserAffGrant,
+  handleAffiliateRosterGet,
+  handleAffiliateRosterSave,
   handleUserBan,
   handleUserRemove,
   handleUserSetStake,
@@ -272,6 +274,12 @@ app.get("/api/leaderboard", (req, res) => handleLeaderboardGet(req, res));
 app.get("/api/users", (req, res) => handleUsersList(req, res));
 app.post("/api/users/link-stake", (req, res) => handleStakeLink(req, res));
 app.post("/api/users/aff-grant", (req, res) => handleUserAffGrant(req, res));
+app.get("/api/users/affiliate-roster", (req, res) =>
+  handleAffiliateRosterGet(req, res)
+);
+app.post("/api/users/affiliate-roster", (req, res) =>
+  handleAffiliateRosterSave(req, res)
+);
 app.post("/api/users/ban", (req, res) => handleUserBan(req, res));
 app.post("/api/users/remove", (req, res) => handleUserRemove(req, res));
 app.post("/api/users/set-stake", (req, res) => handleUserSetStake(req, res));

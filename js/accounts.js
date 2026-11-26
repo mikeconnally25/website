@@ -876,6 +876,84 @@ async function awardAccountPoints(kickUserId, amountValue, button) {
   }
 }
 
+function paintAffiliateRoster(data) {
+  const text = document.getElementById("affiliate-roster-text");
+  const count = document.getElementById("affiliate-roster-count");
+  const meta = document.getElementById("affiliate-roster-meta");
+  const code = document.getElementById("affiliate-roster-code");
+  const entries = Array.isArray(data?.entries) ? data.entries : [];
+  const usernames = entries
+    .map((entry) => String(entry.username || "").trim())
+    .filter(Boolean);
+
+  if (code && data?.affiliateCode) {
+    code.textContent = data.affiliateCode;
+  }
+  if (text && document.activeElement !== text) {
+    text.value = usernames.join("\n");
+  }
+  if (count) {
+    count.textContent = `${usernames.length} username${
+      usernames.length === 1 ? "" : "s"
+    }`;
+  }
+  if (meta) {
+    const source = data?.source ? ` · ${data.source}` : "";
+    const updated = data?.updatedAt ? ` · updated ${formatDateTime(data.updatedAt)}` : "";
+    meta.textContent = `${data?.affiliateSite || "roobet"} / ${
+      data?.affiliateCode || "vzqie"
+    }${source}${updated}`;
+  }
+}
+
+async function loadAffiliateRoster() {
+  if (!currentUser?.isAdmin) return;
+  try {
+    const response = await fetch("/api/users/affiliate-roster", {
+      credentials: "same-origin",
+      cache: "no-store",
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || "Could not load AFF roster.");
+    }
+    paintAffiliateRoster(data);
+  } catch (error) {
+    const meta = document.getElementById("affiliate-roster-meta");
+    if (meta) meta.textContent = error.message || "Could not load AFF roster.";
+  }
+}
+
+async function saveAffiliateRoster() {
+  const text = document.getElementById("affiliate-roster-text");
+  const button = document.getElementById("affiliate-roster-save");
+  if (!text) return;
+  if (button) button.disabled = true;
+  try {
+    const response = await fetch("/api/users/affiliate-roster", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ text: text.value }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || "Could not save AFF roster.");
+    }
+    paintAffiliateRoster(data);
+    setAccountsStatus(
+      `Saved ${data.count || 0} Roobet AFF usernames for code ${
+        data.affiliateCode || "vzqie"
+      }.`,
+      "success"
+    );
+  } catch (error) {
+    setAccountsStatus(error.message || "Could not save AFF roster.", "error");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
 async function loadAccounts() {
   if (!currentUser?.isAdmin) {
     renderAccessState();
@@ -901,6 +979,7 @@ async function loadAccounts() {
     setAccountsStatus("");
     renderFilteredAccounts();
     updateSearchControls();
+    await loadAffiliateRoster();
   } catch {
     setAccountsStatus("Could not load accounts.", "error");
   }
@@ -941,6 +1020,17 @@ function initSearch() {
     subToggle.setAttribute("aria-pressed", filterSubOnly ? "true" : "false");
     renderFilteredAccounts();
   });
+
+  document
+    .getElementById("affiliate-roster-save")
+    ?.addEventListener("click", () => {
+      void saveAffiliateRoster();
+    });
+  document
+    .getElementById("affiliate-roster-refresh")
+    ?.addEventListener("click", () => {
+      void loadAffiliateRoster();
+    });
 }
 
 window.addEventListener("auth:change", async (event) => {
