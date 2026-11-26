@@ -4,47 +4,9 @@ let myRedemptions = [];
 let pendingQueue = [];
 let pointsBalance = 0;
 let canRedeem = true;
-let buyPackages = [];
-let buyConfig = {
-  configured: false,
-  stripeConfigured: false,
-  cryptoConfigured: false,
-  enabled: true,
-  rate: 100,
-  minUsd: 1,
-  maxUsd: 100,
-  minPoints: 100,
-  maxPoints: 10000,
-  stepPoints: 100,
-};
-let selectedBuyPackageId = null;
 let redeemSlotCatalog = [];
 let redeemSlotCatalogLoadedAt = 0;
 let selectedRedeemSlot = null;
-
-function isBuyPointsOpen() {
-  return (
-    (Boolean(buyConfig.stripeConfigured) ||
-      Boolean(buyConfig.cryptoConfigured) ||
-      Boolean(buyConfig.configured)) &&
-    buyConfig.enabled !== false
-  );
-}
-
-function buyPayMethods() {
-  const methods = [];
-  if (buyConfig.stripeConfigured) methods.push("stripe");
-  if (buyConfig.cryptoConfigured) methods.push("crypto");
-  return methods;
-}
-
-function buyMethodLabel() {
-  const methods = buyPayMethods();
-  if (methods.length === 2) return "card or crypto";
-  if (methods[0] === "stripe") return "card";
-  if (methods[0] === "crypto") return "crypto";
-  return "card or crypto";
-}
 
 function setStoreStatus(message, tone = "") {
   const status = document.getElementById("store-status");
@@ -76,185 +38,6 @@ function renderBalance() {
     copy.textContent = `Signed in as ${currentUser.username}. Store redemptions are disabled for uncapped accounts.`;
   } else {
     copy.textContent = `Signed in as ${currentUser.username}.`;
-  }
-}
-
-function formatUsd(value) {
-  const n = Number(value);
-  if (!Number.isFinite(n)) return "$0";
-  return `$${n % 1 === 0 ? String(n) : n.toFixed(2)}`;
-}
-
-function renderBuyMethods() {
-  const methodsEl = document.getElementById("store-buy-methods");
-  const cardBtn = document.getElementById("store-buy-pay-card");
-  const cryptoBtn = document.getElementById("store-buy-pay-crypto");
-  if (!methodsEl) return;
-
-  const canBuy = Boolean(currentUser) && isBuyPointsOpen();
-  const showChooser = canBuy && Boolean(selectedBuyPackageId);
-
-  methodsEl.classList.toggle("is-hidden", !showChooser);
-
-  // Always offer both options; disable any method that is not configured yet.
-  if (cardBtn) {
-    cardBtn.classList.remove("is-hidden");
-    cardBtn.disabled = !showChooser || !buyConfig.stripeConfigured;
-    cardBtn.title = buyConfig.stripeConfigured
-      ? "Pay with card via Stripe"
-      : "Card checkout needs STRIPE_SECRET_KEY on the server";
-    cardBtn.textContent = buyConfig.stripeConfigured
-      ? "Pay with card"
-      : "Pay with card (unavailable)";
-  }
-  if (cryptoBtn) {
-    cryptoBtn.classList.remove("is-hidden");
-    cryptoBtn.disabled = !showChooser || !buyConfig.cryptoConfigured;
-    cryptoBtn.title = buyConfig.cryptoConfigured
-      ? "Pay with crypto via NOWPayments"
-      : "Crypto checkout is not configured";
-    cryptoBtn.textContent = buyConfig.cryptoConfigured
-      ? "Pay with crypto"
-      : "Pay with crypto (unavailable)";
-  }
-}
-
-function renderBuyForm() {
-  const packagesEl = document.getElementById("store-buy-packages");
-  const note = document.getElementById("store-buy-note");
-  const copy = document.getElementById("store-buy-copy");
-  if (!note) return;
-
-  const methodLabel = buyMethodLabel();
-  const pkg = buyPackages[0];
-  if (copy) {
-    if (buyPackages.length > 1) {
-      copy.textContent = `Choose a package · ${methodLabel}`;
-    } else if (pkg) {
-      copy.textContent = `${Number(pkg.points).toLocaleString()} FunCoins for ${formatUsd(pkg.usd)} · ${methodLabel}`;
-    } else {
-      copy.textContent = `Choose a package · ${methodLabel}`;
-    }
-  }
-
-  const canBuy = Boolean(currentUser) && isBuyPointsOpen();
-  packagesEl?.classList.toggle("is-disabled", !canBuy);
-
-  if (!isBuyPointsOpen() && buyConfig.enabled !== false) {
-    note.textContent =
-      "Purchases are not configured yet. Add STRIPE_SECRET_KEY (card) and/or NOWPAYMENTS_API_KEY + NOWPAYMENTS_IPN_SECRET (crypto) on Vercel, then redeploy.";
-    renderBuyMethods();
-    return;
-  }
-  if (buyConfig.enabled === false) {
-    note.textContent = "Buying FunCoins is paused right now. Check back later.";
-    renderBuyMethods();
-    return;
-  }
-  if (!currentUser) {
-    note.textContent = "Sign in with Kick to buy FunCoins.";
-    renderBuyMethods();
-    return;
-  }
-  if (selectedBuyPackageId) {
-    note.textContent = "Choose Pay with card or Pay with crypto.";
-  } else {
-    note.textContent = "Tap a package, then choose card or crypto.";
-  }
-  renderBuyMethods();
-}
-
-function renderBuyPackages() {
-  const packagesEl = document.getElementById("store-buy-packages");
-  if (!packagesEl) return;
-
-  packagesEl.replaceChildren();
-  buyPackages.forEach((pkg) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "store-buy-package-btn";
-    btn.dataset.packageId = pkg.id;
-
-    const pts = document.createElement("span");
-    pts.className = "store-buy-package-pts";
-    pts.textContent = `${Number(pkg.points).toLocaleString()} FunCoins`;
-
-    const sep = document.createElement("span");
-    sep.className = "store-buy-package-sep";
-    sep.setAttribute("aria-hidden", "true");
-
-    const usd = document.createElement("span");
-    usd.className = "store-buy-package-usd";
-    usd.textContent = formatUsd(pkg.usd);
-
-    btn.append(pts, sep, usd);
-
-    if (selectedBuyPackageId === pkg.id) {
-      btn.classList.add("is-selected");
-    }
-    btn.addEventListener("click", () => {
-      if (!currentUser || !isBuyPointsOpen()) {
-        setStoreStatus(
-          !isBuyPointsOpen() && buyConfig.enabled !== false
-            ? "Purchases are not configured yet."
-            : buyConfig.enabled === false
-              ? "Buying FunCoins is paused right now."
-              : "Sign in with Kick to buy FunCoins.",
-          "error"
-        );
-        return;
-      }
-      selectedBuyPackageId = pkg.id;
-      document
-        .querySelectorAll(".store-buy-package-btn")
-        .forEach((el) =>
-          el.classList.toggle("is-selected", el.dataset.packageId === pkg.id)
-        );
-      // Always show card vs crypto — never auto-start a single method.
-      renderBuyForm();
-    });
-    packagesEl.append(btn);
-  });
-  renderBuyMethods();
-}
-
-async function startBuyPurchase(payload) {
-  const packageButtons = document.querySelectorAll(".store-buy-package-btn");
-  const methodButtons = document.querySelectorAll(".store-buy-method-btn");
-  packageButtons.forEach((btn) => {
-    btn.disabled = true;
-  });
-  methodButtons.forEach((btn) => {
-    btn.disabled = true;
-  });
-  const method = payload.method || "stripe";
-  setStoreStatus(
-    method === "crypto"
-      ? "Opening crypto checkout..."
-      : "Opening card checkout..."
-  );
-  try {
-    const response = await fetch("/api/points/buy", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      throw new Error(data.error || "Could not start purchase.");
-    }
-    const checkoutUrl = data.checkoutUrl || data.invoiceUrl;
-    if (!checkoutUrl) {
-      throw new Error("Checkout URL missing.");
-    }
-    window.location.href = checkoutUrl;
-  } catch (error) {
-    setStoreStatus(error.message || "Could not start purchase.", "error");
-    renderBuyForm();
-    packageButtons.forEach((btn) => {
-      btn.disabled = false;
-    });
   }
 }
 
@@ -653,25 +436,10 @@ function renderAdmin() {
   renderAdminCatalog();
   renderQueue();
   renderHistory();
-  renderBuyToggle();
-}
-
-function renderBuyToggle() {
-  const toggle = document.getElementById("store-buy-toggle");
-  const status = document.getElementById("store-buy-toggle-status");
-  if (!toggle || !status) return;
-
-  toggle.checked = buyConfig.enabled !== false;
-  status.textContent =
-    buyConfig.enabled !== false
-      ? "Buy FunCoins is open"
-      : "Buy FunCoins is paused";
 }
 
 function renderAll() {
   renderBalance();
-  renderBuyPackages();
-  renderBuyForm();
   renderCatalog();
   renderMyRedemptions();
   renderAdmin();
@@ -727,45 +495,9 @@ async function loadQueue() {
   pendingQueue = Array.isArray(data.redemptions) ? data.redemptions : [];
 }
 
-async function loadBuyPackages() {
-  const response = await fetch("/api/points/buy/packages", {
-    credentials: "same-origin",
-    cache: "no-store",
-  });
-  if (!response.ok) {
-    buyPackages = [];
-    buyConfig.configured = false;
-    buyConfig.stripeConfigured = false;
-    buyConfig.cryptoConfigured = false;
-    buyConfig.enabled = true;
-    return;
-  }
-  const data = await response.json().catch(() => ({}));
-  buyPackages = Array.isArray(data.packages) ? data.packages : [];
-  const stripeConfigured = Boolean(data.stripeConfigured);
-  const cryptoConfigured = Boolean(data.cryptoConfigured);
-  buyConfig = {
-    configured: Boolean(data.configured) || stripeConfigured || cryptoConfigured,
-    stripeConfigured,
-    cryptoConfigured,
-    enabled: data.enabled !== false,
-    rate: Number(data.rate) || 100,
-    minUsd: Number(data.minUsd) || 1,
-    maxUsd: Number(data.maxUsd) || 100,
-    minPoints: Number(data.minPoints) || 100,
-    maxPoints: Number(data.maxPoints) || 10000,
-    stepPoints: Number(data.stepPoints) || 100,
-  };
-}
-
 async function refreshStore() {
   try {
-    await Promise.all([
-      loadCatalog(),
-      loadMe(),
-      loadQueue(),
-      loadBuyPackages(),
-    ]);
+    await Promise.all([loadCatalog(), loadMe(), loadQueue()]);
     renderAll();
   } catch (error) {
     setStoreStatus(error.message || "Could not load store.", "error");
@@ -1297,50 +1029,6 @@ function setAwardChatStatus(message, tone = "") {
   }
 }
 
-function initBuyForm() {
-  const form = document.getElementById("store-buy-form");
-  if (form) {
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-    });
-  }
-
-  const cardBtn = document.getElementById("store-buy-pay-card");
-  const cryptoBtn = document.getElementById("store-buy-pay-crypto");
-  cardBtn?.addEventListener("click", () => {
-    if (!selectedBuyPackageId) return;
-    startBuyPurchase({ packageId: selectedBuyPackageId, method: "stripe" });
-  });
-  cryptoBtn?.addEventListener("click", () => {
-    if (!selectedBuyPackageId) return;
-    startBuyPurchase({ packageId: selectedBuyPackageId, method: "crypto" });
-  });
-}
-
-function handlePurchaseReturnQuery() {
-  const params = new URLSearchParams(window.location.search);
-  const purchase = params.get("purchase");
-  if (!purchase) return;
-
-  const provider = String(params.get("provider") || "").toLowerCase();
-  if (purchase === "success") {
-    setStoreStatus(
-      provider === "stripe"
-        ? "Payment received. FunCoins credit shortly — refresh if your balance has not updated yet."
-        : "Payment received. FunCoins credit after the crypto payment confirms — refresh in a moment if your balance has not updated yet.",
-      "success"
-    );
-  } else if (purchase === "cancel") {
-    setStoreStatus("Purchase cancelled. No FunCoins were charged.", "error");
-  }
-
-  params.delete("purchase");
-  params.delete("provider");
-  const next = params.toString();
-  const url = `${window.location.pathname}${next ? `?${next}` : ""}${window.location.hash || ""}`;
-  window.history.replaceState({}, "", url);
-}
-
 function initAwardChatForm() {
   const form = document.getElementById("store-award-chat-form");
   if (!form) return;
@@ -1382,51 +1070,6 @@ function initAwardChatForm() {
   });
 }
 
-function initBuyToggle() {
-  const toggle = document.getElementById("store-buy-toggle");
-  if (!toggle) return;
-
-  toggle.addEventListener("change", async () => {
-    if (!currentUser?.isAdmin) {
-      toggle.checked = buyConfig.enabled !== false;
-      return;
-    }
-
-    const nextEnabled = Boolean(toggle.checked);
-    const previous = buyConfig.enabled !== false;
-    toggle.disabled = true;
-    try {
-      const response = await fetch("/api/points/buy/settings", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ enabled: nextEnabled }),
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(data.error || "Could not update buy FunCoins.");
-      }
-      buyConfig.enabled = data.enabled !== false;
-      renderBuyToggle();
-      renderBuyForm();
-      renderBuyPackages();
-      setStoreStatus(
-        buyConfig.enabled
-          ? "Buy FunCoins resumed."
-          : "Buy FunCoins paused.",
-        "success"
-      );
-    } catch (error) {
-      buyConfig.enabled = previous;
-      toggle.checked = previous;
-      renderBuyToggle();
-      setStoreStatus(error.message || "Could not update buy FunCoins.", "error");
-    } finally {
-      toggle.disabled = false;
-    }
-  });
-}
-
 window.addEventListener("auth:change", async (event) => {
   currentUser = event.detail?.user || null;
   await refreshStore();
@@ -1442,9 +1085,6 @@ window.addEventListener("points:change", (event) => {
 });
 
 initCatalogForm();
-initBuyForm();
-initBuyToggle();
 initAwardChatForm();
 initRedeemModal();
-handlePurchaseReturnQuery();
 refreshStore();
