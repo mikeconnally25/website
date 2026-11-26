@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Leaderboard — Stake wagering and FunCoins standings on vzqie." />
+  <meta name="description" content="Leaderboard — FunCoins standings and competition info on vzqie." />
   <title>Leaderboard | vzqie</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -69,10 +69,10 @@
             <p class="section-eyebrow">vzqie</p>
             <h1 class="lb-title">Leaderboard</h1>
             <div class="lb-tabs" role="tablist" aria-label="Leaderboard type">
-              <button type="button" class="lb-tab is-active" role="tab" id="lb-tab-stake" data-lb-tab="stake" aria-selected="true" aria-controls="lb-panel-stake">Stake wagered</button>
+              <button type="button" class="lb-tab is-active" role="tab" id="lb-tab-stake" data-lb-tab="stake" aria-selected="true" aria-controls="lb-panel-stake">Wagered</button>
               <button type="button" class="lb-tab" role="tab" id="lb-tab-unc" data-lb-tab="unc" aria-selected="false" aria-controls="lb-panel-unc">FunCoins</button>
             </div>
-            <p class="lb-lede" id="lb-lede">Top 10 wagered on code <strong>vzqie</strong>.</p>
+            <p class="lb-lede" id="lb-lede">Wager standings are cleared for now. FunCoins rankings still update.</p>
             <button type="button" class="btn btn-sm btn-outline lb-rules-toggle" id="leaderboard-rules-toggle" aria-expanded="false" aria-controls="leaderboard-rules">
               Competition rules
             </button>
@@ -115,7 +115,7 @@
               </span>
               <h2>How to Participate</h2>
             </div>
-            <p>Play on <a href="https://stake.com" target="_blank" rel="noopener noreferrer">Stake.com</a> using the affiliate code <strong>vzqie</strong>. All wagers automatically count towards your leaderboard position.</p>
+            <p>Play on <a href="https://roobet.com" target="_blank" rel="noopener noreferrer">Roobet</a> using the affiliate code <strong>vzqie</strong>. When wager standings return, play on that code will count toward your position.</p>
           </article>
           <article class="lb-rule">
             <div class="lb-rule-head">
@@ -124,7 +124,7 @@
               </span>
               <h2>Eligible Games</h2>
             </div>
-            <p>All game types count: Casino slots, Live games, Sports betting, and Stake Originals.</p>
+            <p>Slots, live games, game shows, and other playable titles on Roobet.</p>
           </article>
           <article class="lb-rule">
             <div class="lb-rule-head">
@@ -165,7 +165,7 @@
               <span>Prize</span>
             </div>
 
-            <p class="lb-empty" id="leaderboard-empty">No leaderboard entries yet.</p>
+            <p class="lb-empty" id="leaderboard-empty">Wager standings data has been cleared. Check back when the next competition opens.</p>
             <p class="lb-empty is-hidden" id="leaderboard-filter-empty">No player matches that search.</p>
 
             <ol class="lb-list is-hidden" id="leaderboard-list"></ol>
@@ -220,6 +220,6 @@
 
   <script src="/js/main.js?v=avgx1"></script>
   <script src="/js/auth.js?v=claim24h"></script>
-  <script src="/js/leaderboard.js?v=lbtabs1"></script>
+  <script src="/js/leaderboard.js?v=lbclear1"></script>
 </body>
 </html>
