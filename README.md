@@ -59,17 +59,17 @@ Update the Kick app Redirect URL to that same production callback (Kick usually 
 
 Without real Client ID/Secret, public pages still load; sign-in stays broken.
 
-## Affiliate roster (Roobet / code `CaptainBonk`)
+## Affiliate roster (LIQD / code `CaptainBonk`)
 
-AFF badges and auto-verify no longer use the old Stake Google Sheet. They look up Roobet usernames for affiliate code **CaptainBonk**.
+AFF badges and auto-verify no longer use the old Stake Google Sheet. They look up casino usernames for affiliate code **CaptainBonk**.
 
 Configure one of:
 
-1. **Admin paste** — Accounts page → Roobet AFF roster (saved in Redis).
+1. **Admin paste** — Accounts page → Affiliate roster (saved in Redis).
 2. **Remote URL** — set `AFFILIATE_ROSTER_URL` to a public Google Sheet gviz URL or a JSON username list.
 3. **Sheet id** — `AFFILIATE_SHEET_ID` + optional `AFFILIATE_SHEET_GID`.
 
-Optional overrides: `AFFILIATE_SITE=roobet`, `AFFILIATE_CODE=CaptainBonk`. Weekly raffle wager sheets use `AFFILIATE_RAFFLE_ROSTER_URL` / `AFFILIATE_RAFFLE_SHEET_GID` (no hardcoded Stake sheet).
+Optional overrides: `AFFILIATE_SITE=liqd`, `AFFILIATE_CODE=CaptainBonk`. Weekly raffle wager sheets use `AFFILIATE_RAFFLE_ROSTER_URL` / `AFFILIATE_RAFFLE_SHEET_GID` (no hardcoded Stake sheet).
 
 ## What’s included
 

@@ -149,7 +149,7 @@ async function loadSlotStats() {
     document.getElementById("slot-stats-results")?.classList.add("is-hidden");
     document.getElementById("slot-stats-results")?.replaceChildren();
     if (empty) {
-      empty.textContent = "Type a game name from the Roobet catalog.";
+      empty.textContent = "Type a game name from the game catalog.";
       empty.classList.remove("is-hidden");
     }
     renderSlotStatsDetail(null);
@@ -172,7 +172,7 @@ async function loadSlotStats() {
     }
     if (empty) {
       empty.textContent = data.catalogEmpty
-        ? "No games loaded yet. Sync from Roobet on Bonus Hunt."
+        ? "No games loaded yet. Sync catalog on Bonus Hunt."
         : "No matching slots.";
     }
     renderSlotStatsMatches();

@@ -1782,7 +1782,7 @@ function setPickerOpen(nextOpen) {
   if (label) {
     label.textContent = pickerOpen
       ? "Hide slot list"
-      : "Choose a Roobet game…";
+      : "Choose a LIQD game…";
   }
   if (pickerOpen) {
     renderSlotPickerOptions();
@@ -1867,12 +1867,12 @@ function renderSlotPickerOptions() {
 
   if (empty) {
     if (!slotCatalog.length) {
-      empty.textContent = "Loading Roobet slots…";
+      empty.textContent = "Loading Slots…";
       empty.classList.remove("is-hidden");
     } else if (!visibleCount) {
       empty.textContent = query
         ? "No matching slots."
-        : "No Roobet games found.";
+        : "No LIQD games found.";
       empty.classList.remove("is-hidden");
     } else {
       empty.classList.add("is-hidden");
@@ -1888,7 +1888,7 @@ function renderSlotPickerOptions() {
         (total, group) => total + catalogSlotsForGroup(group).length,
         0
       );
-      meta.textContent = `${sectionCount} Roobet games`;
+      meta.textContent = `${sectionCount} LIQD games`;
     }
   }
 }
@@ -2032,7 +2032,7 @@ async function loadSlotCatalog({ force = false } = {}) {
   catalogLoadPromise = (async () => {
     const meta = document.getElementById("st-assign-catalog-meta");
     if (meta && !slotCatalog.length) {
-      meta.textContent = "Loading Roobet slots…";
+      meta.textContent = "Loading Slots…";
     }
 
     try {
@@ -2061,16 +2061,16 @@ async function loadSlotCatalog({ force = false } = {}) {
       return slotCatalog;
     } catch (error) {
       if (meta) {
-        meta.textContent = error.message || "Could not load Roobet slot catalog.";
+        meta.textContent = error.message || "Could not load Slot catalog.";
       }
       const empty = document.getElementById("st-assign-slot-empty");
       if (empty && pickerOpen) {
-        empty.textContent = error.message || "Could not load Roobet slots.";
+        empty.textContent = error.message || "Could not load Slots.";
         empty.classList.remove("is-hidden");
       }
       const claimEmpty = document.getElementById("st-claim-slot-empty");
       if (claimEmpty && claimPickerOpen) {
-        claimEmpty.textContent = error.message || "Could not load Roobet slots.";
+        claimEmpty.textContent = error.message || "Could not load Slots.";
         claimEmpty.classList.remove("is-hidden");
       }
       throw error;
@@ -2519,7 +2519,7 @@ function setClaimPickerOpen(open, { entryId = null, username = "" } = {}) {
         if (claimPickerOpen) renderClaimSlotPickerOptions();
       })
       .catch((error) => {
-        setClaimStatus(error.message || "Could not load Roobet slots.", "error");
+        setClaimStatus(error.message || "Could not load Slots.", "error");
         renderClaimSlotPickerOptions();
       });
     window.setTimeout(() => {
@@ -2596,12 +2596,12 @@ function renderClaimSlotPickerOptions() {
 
   if (empty) {
     if (!slotCatalog.length) {
-      empty.textContent = "Loading Roobet slots…";
+      empty.textContent = "Loading Slots…";
       empty.classList.remove("is-hidden");
     } else if (!visibleCount) {
       empty.textContent = query
         ? "No matching slots."
-        : "No Roobet games found.";
+        : "No LIQD games found.";
       empty.classList.remove("is-hidden");
     } else {
       empty.classList.add("is-hidden");

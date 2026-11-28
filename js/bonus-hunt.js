@@ -1043,8 +1043,8 @@ function formatCatalogCountSummary() {
   let summary = parts.length
     ? `${parts.join(" · ")} (${unique} unique)`
     : unique === 1
-      ? "1 unique Roobet game"
-      : `${unique} unique Roobet games`;
+      ? "1 unique LIQD game"
+      : `${unique} unique LIQD games`;
 
   const updatedLabel = formatCatalogUpdatedAt(slotCatalogUpdatedAt);
   if (updatedLabel) {
@@ -1058,7 +1058,7 @@ function updateSlotCatalogNote() {
   const note = document.getElementById("slot-catalog-note");
   const summary = slotCatalog.length
     ? formatCatalogCountSummary()
-    : "No slots loaded yet. Use Sync from Roobet above.";
+    : "No slots loaded yet. Use Sync catalog above.";
 
   if (note && isHuntAdmin()) {
     note.textContent = summary;
@@ -4545,29 +4545,29 @@ function initAdminForm() {
     );
   }
 
-  document.getElementById("slot-sync-roobet")?.addEventListener("click", async (event) => {
+  document.getElementById("slot-sync-liqd")?.addEventListener("click", async (event) => {
     const button = event.currentTarget;
     button.disabled = true;
-    setCatalogSyncStatus("Syncing all playable Roobet games…", "pending");
+    setCatalogSyncStatus("Syncing all playable games…", "pending");
     try {
-      const response = await fetch("/api/bonus-hunt/slots/sync-roobet", {
+      const response = await fetch("/api/bonus-hunt/slots/sync-liqd", {
         method: "POST",
         credentials: "include",
         headers: { Accept: "application/json" },
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(data.error || "Could not sync from Roobet.");
+        throw new Error(data.error || "Could not sync catalog.");
       }
       await loadSlotCatalog();
       const logoNote =
         data.withThumbnails > 0 ? ` · ${data.withThumbnails} with logos` : "";
       setCatalogSyncStatus(
-        `Roobet synced. ${formatCatalogCountSummary()}${logoNote}`,
+        `LIQD synced. ${formatCatalogCountSummary()}${logoNote}`,
         "success"
       );
     } catch (error) {
-      setCatalogSyncStatus(error.message || "Could not sync from Roobet.", "error");
+      setCatalogSyncStatus(error.message || "Could not sync catalog.", "error");
     } finally {
       button.disabled = false;
     }
