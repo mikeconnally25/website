@@ -13,30 +13,47 @@ body {
 }
 
 body {
-  font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif;
-  color: #eef6fb;
+  font-family: "Manrope", system-ui, -apple-system, Segoe UI, sans-serif;
+  color: #fff8e8;
   -webkit-font-smoothing: antialiased;
 }
 
 .bh-overlay {
-  --accent: #58c9f3;
-  --accent-bright: #7ed8ff;
-  --text: #eef6fb;
-  --text-muted: #8ba4b6;
-  --heading-gradient: linear-gradient(115deg, #eef6fb 10%, #7ed8ff 55%, #58c9f3 100%);
-  --font-display: "Teko", sans-serif;
+  --accent: #f0b000;
+  --accent-bright: #ffe228;
+  --accent-deep: #c07000;
+  --text: #fff8e8;
+  --text-muted: #b8a888;
+  --heading-gradient: linear-gradient(
+    180deg,
+    #fff6c8 0%,
+    #ffe228 28%,
+    #f0b000 62%,
+    #c07000 100%
+  );
+  --font-display: "Sora", sans-serif;
+  --font-body: "Manrope", sans-serif;
+  --border: rgba(240, 176, 0, 0.2);
+  --border-soft: rgba(240, 176, 0, 0.12);
+  --panel: linear-gradient(155deg, #141414, #000000);
+  --panel-inset: linear-gradient(
+    155deg,
+    rgba(20, 20, 20, 0.94),
+    rgba(0, 0, 0, 0.9)
+  );
 
   position: relative;
   isolation: isolate;
   overflow: hidden;
   width: 26rem;
   padding: 1.05rem 1.15rem 1.15rem 1.25rem;
-  border-radius: 1rem;
-  border: 1px solid rgba(88, 201, 243, 0.18);
-  background: linear-gradient(155deg, #121f2b, #060c12);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--panel);
   box-shadow:
-    0 16px 44px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    0 16px 44px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 246, 200, 0.06);
+  font-family: var(--font-body);
 }
 
 .bh-overlay::before {
@@ -46,8 +63,8 @@ body {
   top: 0;
   bottom: 0;
   width: 3px;
-  background: linear-gradient(180deg, #7ed8ff, rgba(88, 201, 243, 0.15));
-  opacity: 0.85;
+  background: linear-gradient(180deg, #ffe44d, rgba(240, 176, 0, 0.15));
+  opacity: 0.9;
   pointer-events: none;
   z-index: 1;
 }
@@ -60,7 +77,7 @@ body {
   width: 12rem;
   height: 12rem;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(88, 201, 243, 0.18), transparent 68%);
+  background: radial-gradient(circle, rgba(240, 176, 0, 0.16), transparent 68%);
   pointer-events: none;
   z-index: 0;
 }
@@ -85,9 +102,9 @@ body {
 .bh-overlay-eyebrow {
   margin: 0 0 0.15rem;
   font-family: var(--font-display);
-  font-size: 0.95rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -95,10 +112,10 @@ body {
 .bh-overlay-title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 2rem;
+  font-size: 1.85rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 0.92;
+  letter-spacing: 0.02em;
+  line-height: 0.98;
   text-transform: uppercase;
   background: var(--heading-gradient);
   -webkit-background-clip: text;
@@ -111,10 +128,10 @@ body {
   margin-top: 0.35rem;
   padding: 0.22rem 0.55rem;
   border-radius: 999px;
-  border: 1px solid rgba(88, 201, 243, 0.28);
-  background: rgba(88, 201, 243, 0.1);
+  border: 1px solid rgba(255, 220, 40, 0.4);
+  background: rgba(240, 176, 0, 0.14);
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   color: var(--accent-bright);
@@ -125,7 +142,7 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 0.45rem;
   padding-bottom: 0.85rem;
-  border-bottom: 1px solid rgba(88, 201, 243, 0.12);
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .bh-overlay-stat-col {
@@ -139,10 +156,9 @@ body {
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.4rem 0.5rem;
-  border-radius: 0.55rem;
-  border: 1px solid rgba(88, 201, 243, 0.12);
-  background:
-    linear-gradient(155deg, rgba(14, 24, 34, 0.9), rgba(6, 12, 18, 0.86));
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-soft);
+  background: var(--panel-inset);
 }
 
 .bh-overlay-stat-label {
@@ -179,10 +195,9 @@ body {
   align-items: center;
   min-height: 3.5rem;
   padding: 0.55rem 0.6rem 0.55rem 0.7rem;
-  border-radius: 0.7rem;
-  background:
-    linear-gradient(155deg, rgba(18, 31, 43, 0.92), rgba(6, 12, 18, 0.88));
-  border: 1px solid rgba(88, 201, 243, 0.14);
+  border-radius: 0.6rem;
+  background: var(--panel-inset);
+  border: 1px solid var(--border-soft);
   overflow: hidden;
 }
 
@@ -197,8 +212,8 @@ body {
   top: 0;
   bottom: 0;
   width: 2px;
-  background: linear-gradient(180deg, #7ed8ff, rgba(88, 201, 243, 0.15));
-  opacity: 0.75;
+  background: linear-gradient(180deg, #ffe44d, rgba(240, 176, 0, 0.15));
+  opacity: 0.85;
 }
 
 .bh-overlay-star {
@@ -206,7 +221,7 @@ body {
   top: 0.35rem;
   left: 0.45rem;
   font-size: 0.62rem;
-  color: #f0c98e;
+  color: #ffe228;
   line-height: 1;
   z-index: 1;
 }
@@ -218,8 +233,8 @@ body {
   overflow: hidden;
   display: grid;
   place-items: center;
-  background: rgba(88, 201, 243, 0.1);
-  border: 1px solid rgba(88, 201, 243, 0.16);
+  background: rgba(240, 176, 0, 0.12);
+  border: 1px solid rgba(240, 176, 0, 0.22);
   color: var(--accent-bright);
   font-size: 0.62rem;
   font-weight: 700;
@@ -269,10 +284,9 @@ body {
   --bh-visible-rows: 2;
   overflow: hidden;
   padding: 0.55rem 0.55rem 0.45rem;
-  border-radius: 0.7rem;
-  border: 1px solid rgba(88, 201, 243, 0.12);
-  background:
-    linear-gradient(155deg, rgba(14, 24, 34, 0.88), rgba(6, 12, 18, 0.84));
+  border-radius: 0.6rem;
+  border: 1px solid var(--border-soft);
+  background: var(--panel-inset);
 }
 
 .bh-overlay-table {
@@ -293,7 +307,7 @@ body {
   text-transform: uppercase;
   color: var(--text-muted);
   text-align: left;
-  border-bottom: 1px solid rgba(88, 201, 243, 0.12);
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .bh-overlay-table thead th:nth-child(1),
@@ -343,14 +357,14 @@ body {
   height: var(--bh-row-height);
   padding: 0.3rem 0.35rem;
   font-size: 0.8rem;
-  border-bottom: 1px solid rgba(88, 201, 243, 0.08);
+  border-bottom: 1px solid rgba(240, 176, 0, 0.08);
   vertical-align: middle;
 }
 
 .bh-overlay-table tbody td:nth-child(1) {
-  color: rgba(126, 216, 255, 0.65);
+  color: rgba(255, 226, 40, 0.7);
   font-family: var(--font-display);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
   letter-spacing: 0.04em;
 }
@@ -381,8 +395,8 @@ body {
   overflow: hidden;
   display: grid;
   place-items: center;
-  background: rgba(88, 201, 243, 0.1);
-  border: 1px solid rgba(88, 201, 243, 0.14);
+  background: rgba(240, 176, 0, 0.12);
+  border: 1px solid rgba(240, 176, 0, 0.2);
   color: var(--accent-bright);
   font-size: 0.52rem;
   font-weight: 700;
@@ -415,7 +429,7 @@ body {
   letter-spacing: 0.08em;
   line-height: 1;
   color: #1a1204;
-  background: linear-gradient(135deg, #ffd27d, #f0a020);
+  background: linear-gradient(135deg, #ffe228, #f0b000);
 }
 
 .bh-overlay-epic-badge {
@@ -428,20 +442,24 @@ body {
   font-weight: 800;
   letter-spacing: 0.08em;
   line-height: 1;
-  color: #120818;
-  background: linear-gradient(135deg, #e0b8ff, #a85cff);
+  color: #1a1204;
+  background: linear-gradient(135deg, #fff6c8, #c07000);
 }
 
 .bh-overlay-table tbody tr.is-super td {
-  background: rgba(240, 160, 32, 0.08);
+  background: rgba(240, 176, 0, 0.1);
 }
 
 .bh-overlay-table tbody tr.is-epic td {
-  background: rgba(168, 92, 255, 0.1);
+  background: rgba(255, 226, 40, 0.08);
 }
 
 .bh-overlay-table tbody tr.is-super.is-epic td {
-  background: linear-gradient(90deg, rgba(240, 160, 32, 0.08), rgba(168, 92, 255, 0.1));
+  background: linear-gradient(
+    90deg,
+    rgba(240, 176, 0, 0.12),
+    rgba(255, 226, 40, 0.08)
+  );
 }
 
 .bh-overlay-game-requester {
