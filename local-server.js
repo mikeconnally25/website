@@ -221,7 +221,7 @@ app.post("/api/bonus-hunt/history/remove", (req, res) =>
   handleBonusHuntHistoryRemove(req, res)
 );
 app.get("/api/bonus-hunt/slots", (req, res) => handleBonusHuntSlots(req, res));
-app.post("/api/bonus-hunt/slots/sync-liqd", (req, res) =>
+app.post("/api/bonus-hunt/slots/sync-roobet", (req, res) =>
   handleBonusHuntSlotsSyncRoobet(req, res)
 );
 app.post("/api/bonus-hunt/slots/import", (req, res) =>

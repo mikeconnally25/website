@@ -619,7 +619,7 @@ function renderRedeemSlotResults() {
     results.classList.add("is-hidden");
     empty.classList.remove("is-hidden");
     empty.textContent =
-      "No synced slots yet. Sync catalog on Bonus Hunt first.";
+      "No synced slots yet. Sync from Roobet on Bonus Hunt first.";
     return;
   }
 
@@ -627,7 +627,7 @@ function renderRedeemSlotResults() {
   if (!matches.length) {
     results.classList.add("is-hidden");
     empty.classList.remove("is-hidden");
-    empty.textContent = "No matching LIQD games.";
+    empty.textContent = "No matching Roobet games.";
     return;
   }
 
@@ -696,7 +696,7 @@ async function openRedeemModal(item) {
   if (copy) {
     copy.textContent = itemNeedsBonusType(item)
       ? `Redeeming ${item.title}. Pick a synced slot, then Regular, Super, or Epic.`
-      : `Redeeming ${item.title}. Pick a synced LIQD game.`;
+      : `Redeeming ${item.title}. Pick a synced Roobet game.`;
   }
   typeWrap?.classList.toggle("is-hidden", !itemNeedsBonusType(item));
   modal.classList.remove("is-hidden");
@@ -795,7 +795,7 @@ function initRedeemModal() {
     const submit = document.getElementById("store-redeem-submit");
 
     if (!selectedRedeemSlot?.name || !selectedRedeemSlot?.slug) {
-      setRedeemModalError("Pick a game from the synced game catalog.");
+      setRedeemModalError("Pick a game from the synced Roobet catalog.");
       search?.focus();
       return;
     }

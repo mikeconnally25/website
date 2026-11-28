@@ -900,7 +900,7 @@ function paintAffiliateRoster(data) {
   if (meta) {
     const source = data?.source ? ` · ${data.source}` : "";
     const updated = data?.updatedAt ? ` · updated ${formatDateTime(data.updatedAt)}` : "";
-    meta.textContent = `${data?.affiliateSite || "liqd"} / ${
+    meta.textContent = `${data?.affiliateSite || "roobet"} / ${
       data?.affiliateCode || "CaptainBonk"
     }${source}${updated}`;
   }
@@ -942,7 +942,7 @@ async function saveAffiliateRoster() {
     }
     paintAffiliateRoster(data);
     setAccountsStatus(
-      `Saved ${data.count || 0} affiliate usernames for code ${
+      `Saved ${data.count || 0} Roobet AFF usernames for code ${
         data.affiliateCode || "CaptainBonk"
       }.`,
       "success"

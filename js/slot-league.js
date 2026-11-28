@@ -198,10 +198,10 @@ function renderJoin() {
     copy.textContent = "Signups are closed.";
     btn.disabled = true;
   } else if (!slotCatalog.length) {
-    copy.textContent = `Pick a Slot after syncing the Allowed list on Bonus Hunt.`;
+    copy.textContent = `Pick a Roobet slot after syncing the Allowed list on Bonus Hunt.`;
     btn.disabled = true;
   } else {
-    copy.textContent = `Pick a Slot and claim one of the 16 spots.${catalogNote}`;
+    copy.textContent = `Pick a Roobet slot and claim one of the 16 spots.${catalogNote}`;
     btn.disabled = false;
   }
 }
