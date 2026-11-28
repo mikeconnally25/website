@@ -34,7 +34,7 @@ let huntAddSearchQuery = "";
 
 function isHuntAdmin() {
   if (currentUser?.isAdmin) return true;
-  return String(currentUser?.username || "").trim().toLowerCase() === "vzqie";
+  return String(currentUser?.username || "").trim().toLowerCase() === "CaptainBonk";
 }
 
 const REQUEST_STATUS_LABELS = {
@@ -1560,10 +1560,10 @@ function accessModeLabel() {
 
 function accessModeNoteText() {
   if (affiliatesOnly && subscribersOnly) {
-    return "AFF/SUB only — verified vzqie affiliates and active Kick subscribers can request.";
+    return "AFF/SUB only — verified CaptainBonk affiliates and active Kick subscribers can request.";
   }
   if (affiliatesOnly) {
-    return "AFF only — verified vzqie affiliates can request.";
+    return "AFF only — verified CaptainBonk affiliates can request.";
   }
   if (subscribersOnly) {
     return "SUB only — active Kick subscribers can request.";
@@ -4376,7 +4376,7 @@ function initAdminForm() {
   function resolveSyncApiBase() {
     const origin = window.location.origin;
     if (/vercel\.app$/i.test(window.location.hostname)) {
-      return "https://www.vzqie.com";
+      return "https://www.CaptainBonk.com";
     }
     return origin;
   }

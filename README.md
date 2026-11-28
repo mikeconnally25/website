@@ -1,10 +1,10 @@
-# vzqie Website
+# CaptainBonk Website
 
-Streamer site for **vzqie**, based on the structure of [blakjac21-website](https://github.com/mikeconnally25/blakjac21-website) with your branding and links.
+Streamer site for **CaptainBonk**, based on the structure of [blakjac21-website](https://github.com/mikeconnally25/blakjac21-website) with your branding and links.
 
 ## Links
 
-- Kick: https://kick.com/vzqie
+- Kick: https://kick.com/captainbonk
 - Discord: https://discord.gg/akt6jhgCu
 
 ## Run locally
@@ -26,12 +26,12 @@ House games, chat, and admin tools need Kick OAuth credentials in `.env`.
 
 ### Create a Kick developer app
 
-1. Log into Kick as **vzqie** and enable **2FA** (required for the developer portal).
+1. Log into Kick as **CaptainBonk** and enable **2FA** (required for the developer portal).
 2. Open [kick.com/settings/developer](https://kick.com/settings/developer).
-3. Create an app (name can be `vzqie website`).
+3. Create an app (name can be `CaptainBonk website`).
 4. Set the **Redirect URL** to exactly one of:
    - Local: `http://localhost:3848/api/auth/callback`
-   - Live (example): `https://website-vzqie.vercel.app/api/auth/callback`
+   - Live (example): `https://website-captainbonk.vercel.app/api/auth/callback`
 5. Copy the **Client ID** and **Client Secret**.
 
 ### Fill `.env` (local)
@@ -41,7 +41,7 @@ KICK_CLIENT_ID=paste_client_id_here
 KICK_CLIENT_SECRET=paste_client_secret_here
 KICK_REDIRECT_URI=http://localhost:3848/api/auth/callback
 SESSION_SECRET=any-long-random-string
-ADMIN_KICK_USERNAMES=vzqie
+ADMIN_KICK_USERNAMES=captainbonk,vzqie
 ```
 
 Restart `npm run dev`, then open http://localhost:3848 and click **Sign in with Kick**.
@@ -51,17 +51,17 @@ Restart `npm run dev`, then open http://localhost:3848 and click **Sign in with 
 Add the same vars in the Vercel project → Settings → Environment Variables, with:
 
 ```env
-SITE_URL=https://www.vzqie.com
-KICK_REDIRECT_URI=https://www.vzqie.com/api/auth/callback
+SITE_URL=https://www.captainbonk.com
+KICK_REDIRECT_URI=https://www.captainbonk.com/api/auth/callback
 ```
 
 Update the Kick app Redirect URL to that same production callback (Kick usually allows one redirect per app — switch it when you go live, or create a second Kick app for local).
 
 Without real Client ID/Secret, public pages still load; sign-in stays broken.
 
-## Affiliate roster (Roobet / code `vzqie`)
+## Affiliate roster (Roobet / code `CaptainBonk`)
 
-AFF badges and auto-verify no longer use the old Stake Google Sheet. They look up Roobet usernames for affiliate code **vzqie**.
+AFF badges and auto-verify no longer use the old Stake Google Sheet. They look up Roobet usernames for affiliate code **CaptainBonk**.
 
 Configure one of:
 
@@ -69,7 +69,7 @@ Configure one of:
 2. **Remote URL** — set `AFFILIATE_ROSTER_URL` to a public Google Sheet gviz URL or a JSON username list.
 3. **Sheet id** — `AFFILIATE_SHEET_ID` + optional `AFFILIATE_SHEET_GID`.
 
-Optional overrides: `AFFILIATE_SITE=roobet`, `AFFILIATE_CODE=vzqie`. Weekly raffle wager sheets use `AFFILIATE_RAFFLE_ROSTER_URL` / `AFFILIATE_RAFFLE_SHEET_GID` (no hardcoded Stake sheet).
+Optional overrides: `AFFILIATE_SITE=roobet`, `AFFILIATE_CODE=CaptainBonk`. Weekly raffle wager sheets use `AFFILIATE_RAFFLE_ROSTER_URL` / `AFFILIATE_RAFFLE_SHEET_GID` (no hardcoded Stake sheet).
 
 ## What’s included
 

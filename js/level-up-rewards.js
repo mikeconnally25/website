@@ -1,4 +1,4 @@
-/** Roobet rewards ranks + vzqie streamer bonuses (mapped from prior Stake tiers). */
+/** Roobet rewards ranks + CaptainBonk streamer bonuses (mapped from prior Stake tiers). */
 const ROOBET_LEVELS = [
   { id: "beginner", tier: "beginner", name: "Beginner", wager: 0 },
   { id: "silver-1", tier: "silver", name: "Silver I", wager: 1000, roman: "I" },
@@ -11,7 +11,7 @@ const ROOBET_LEVELS = [
     wager: 10000,
     roman: "IV",
     roobetBonus: 15,
-    vzqieBonus: 15,
+    CaptainBonkBonus: 15,
   },
   { id: "gold-1", tier: "gold", name: "Gold I", wager: 18500, roman: "I" },
   { id: "gold-2", tier: "gold", name: "Gold II", wager: 32000, roman: "II" },
@@ -22,7 +22,7 @@ const ROOBET_LEVELS = [
     wager: 56000,
     roman: "III",
     roobetBonus: 50,
-    vzqieBonus: 50,
+    CaptainBonkBonus: 50,
   },
   {
     id: "gold-4",
@@ -31,7 +31,7 @@ const ROOBET_LEVELS = [
     wager: 95000,
     roman: "IV",
     roobetBonus: 100,
-    vzqieBonus: 75,
+    CaptainBonkBonus: 75,
   },
   { id: "emerald-1", tier: "emerald", name: "Emerald I", wager: 160000, roman: "I" },
   {
@@ -41,7 +41,7 @@ const ROOBET_LEVELS = [
     wager: 275000,
     roman: "II",
     roobetBonus: 200,
-    vzqieBonus: 100,
+    CaptainBonkBonus: 100,
   },
   {
     id: "emerald-3",
@@ -50,7 +50,7 @@ const ROOBET_LEVELS = [
     wager: 460000,
     roman: "III",
     roobetBonus: 400,
-    vzqieBonus: 200,
+    CaptainBonkBonus: 200,
   },
   {
     id: "ruby-1",
@@ -59,7 +59,7 @@ const ROOBET_LEVELS = [
     wager: 785000,
     roman: "I",
     roobetBonus: 800,
-    vzqieBonus: 400,
+    CaptainBonkBonus: 400,
   },
   { id: "ruby-2", tier: "ruby", name: "Ruby II", wager: 1300000, roman: "II" },
   {
@@ -69,7 +69,7 @@ const ROOBET_LEVELS = [
     wager: 2250000,
     roman: "III",
     roobetBonus: 1600,
-    vzqieBonus: 800,
+    CaptainBonkBonus: 800,
     reload: true,
   },
   {
@@ -79,7 +79,7 @@ const ROOBET_LEVELS = [
     wager: 3800000,
     roman: "I",
     roobetBonus: 3200,
-    vzqieBonus: 1600,
+    CaptainBonkBonus: 1600,
     reload: true,
   },
   { id: "diamond-2", tier: "diamond", name: "Diamond II", wager: 6500000, roman: "II", reload: true },
@@ -90,7 +90,7 @@ const ROOBET_LEVELS = [
     wager: 10000000,
     roman: "III",
     roobetBonus: 6400,
-    vzqieBonus: 3200,
+    CaptainBonkBonus: 3200,
     reload: true,
   },
   { id: "champion-1", tier: "champion", name: "Champion I", wager: 18000000, roman: "I", reload: true },
@@ -101,7 +101,7 @@ const ROOBET_LEVELS = [
     wager: 30000000,
     roman: "II",
     roobetBonus: 12800,
-    vzqieBonus: 6400,
+    CaptainBonkBonus: 6400,
     reload: true,
   },
   {
@@ -111,7 +111,7 @@ const ROOBET_LEVELS = [
     wager: 50000000,
     roman: "III",
     roobetBonus: 25600,
-    vzqieBonus: 12800,
+    CaptainBonkBonus: 12800,
     reload: true,
   },
   {
@@ -121,7 +121,7 @@ const ROOBET_LEVELS = [
     wager: 88000000,
     roman: "I",
     roobetBonus: 51200,
-    vzqieBonus: 20000,
+    CaptainBonkBonus: 20000,
     reload: true,
   },
   {
@@ -131,7 +131,7 @@ const ROOBET_LEVELS = [
     wager: 150000000,
     roman: "II",
     roobetBonus: 102400,
-    vzqieBonus: 30000,
+    CaptainBonkBonus: 30000,
     reload: true,
   },
   {
@@ -141,7 +141,7 @@ const ROOBET_LEVELS = [
     wager: 250000000,
     roman: "III",
     roobetBonus: 204800,
-    vzqieBonus: 40000,
+    CaptainBonkBonus: 40000,
     reload: true,
   },
   {
@@ -151,7 +151,7 @@ const ROOBET_LEVELS = [
     wager: 425000000,
     roman: "I",
     roobetBonus: 409600,
-    vzqieBonus: 80000,
+    CaptainBonkBonus: 80000,
     reload: true,
   },
   { id: "master-2", tier: "master", name: "Master II", wager: 720000000, roman: "II", reload: true },
@@ -221,14 +221,14 @@ function rewardCopy(level) {
       : " + recent gameplay bonus";
     return `<strong>Roobet</strong> Gives <strong>${formatMoney(
       level.roobetBonus
-    )}</strong>${reload} &amp; <strong>vzqie</strong> gives <strong>${formatMoney(
+    )}</strong>${reload} &amp; <strong>CaptainBonk</strong> gives <strong>${formatMoney(
       level.vzqieBonus
     )}</strong> extra on top.`;
   }
   if (level.wager === 0) {
-    return "Starting rank on Roobet. Keep wagering under code <strong>vzqie</strong> to climb.";
+    return "Starting rank on Roobet. Keep wagering under code <strong>CaptainBonk</strong> to climb.";
   }
-  return "Roobet rank-up bonus varies by play. Open a Discord ticket when you hit this rank for the vzqie bonus.";
+  return "Roobet rank-up bonus varies by play. Open a Discord ticket when you hit this rank for the CaptainBonk bonus.";
 }
 
 function iconSvg(level) {

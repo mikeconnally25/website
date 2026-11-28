@@ -756,7 +756,7 @@ function switchTab(tab) {
     lede.innerHTML =
       next === "unc"
         ? 'When the monthly leaderboard ends, 1st gets a <strong>$100 tip</strong>, 2nd gets <strong>$50</strong>, and 3rd gets <strong>$25</strong>.'
-        : 'Top 10 wagered on code <strong>vzqie</strong>.';
+        : 'Top 10 wagered on code <strong>CaptainBonk</strong>.';
   }
 
   const rulesBtn = document.getElementById("leaderboard-rules-toggle");

@@ -113,10 +113,10 @@ function accessModeLabel() {
 
 function accessModeNoteText() {
   if (affiliatesOnly && subscribersOnly) {
-    return "AFF/SUB only — verified vzqie affiliates and active Kick subscribers can guess.";
+    return "AFF/SUB only — verified CaptainBonk affiliates and active Kick subscribers can guess.";
   }
   if (affiliatesOnly) {
-    return "AFF only — verified vzqie affiliates can guess.";
+    return "AFF only — verified CaptainBonk affiliates can guess.";
   }
   if (subscribersOnly) {
     return "SUB only — active Kick subscribers can guess.";

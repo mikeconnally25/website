@@ -1,4 +1,4 @@
-const KICK_USERNAME = "vzqie";
+const KICK_USERNAME = "captainbonk";
 
 let hlsInstance = null;
 

@@ -489,7 +489,7 @@ app.post("/api/one-v-one/settle", (req, res) => handleOneVOneSettle(req, res));
 app.post("/api/one-v-one/clear", (req, res) => handleOneVOneClear(req, res));
 
 app.listen(PORT, () => {
-  console.log(`vzqie site running at http://localhost:${PORT}`);
+  console.log(`CaptainBonk site running at http://localhost:${PORT}`);
   console.log(`Kick redirect URI: ${process.env.KICK_REDIRECT_URI || `http://localhost:${PORT}/api/auth/callback`}`);
   startLocalChatPromoScheduler();
   console.log("Kick chat promo: combined message every 10m");

@@ -137,8 +137,8 @@
     if (label) label.textContent = "Live countdown";
     if (note) {
       note.textContent = week.endsAt
-        ? `Closes ${formatWhen(week.endsAt)} · keep wagering on vzqie`
-        : "Keep wagering on vzqie to stack tickets";
+        ? `Closes ${formatWhen(week.endsAt)} · keep wagering on CaptainBonk`
+        : "Keep wagering on CaptainBonk to stack tickets";
     }
     setDigits(remaining);
   }

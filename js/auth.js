@@ -28,7 +28,7 @@ function clearAuthQuery() {
 
 let currentAuthUser = null;
 
-const CLIENT_ADMIN_USERNAMES = new Set(["vzqie"]);
+const CLIENT_ADMIN_USERNAMES = new Set(["CaptainBonk"]);
 const CLIENT_ADMIN_USER_IDS = new Set(["18635"]);
 
 function normalizeAuthUser(user) {
@@ -141,7 +141,7 @@ function ensureStakeLinkModal() {
       <h2 class="stake-link-title" id="stake-link-title">Link your Roobet username</h2>
       <p class="stake-link-copy">
         Enter your Roobet username to finish signing in. We use it for leaderboards, giveaways, and stream games.
-        Play on code <strong>vzqie</strong> for exclusive rewards.
+        Play on code <strong>CaptainBonk</strong> for exclusive rewards.
       </p>
       <form class="stake-link-form" id="stake-link-form">
         <label class="guess-label" for="stake-link-input">Roobet username</label>
@@ -269,8 +269,8 @@ async function submitStakeLink() {
     if (toast) {
       toast.textContent =
         data.user.stakeCodeVerified || data.user.affGranted
-          ? `Roobet username linked and verified on code vzqie.`
-          : `Roobet username linked. Play on code vzqie for exclusive rewards.`;
+          ? `Roobet username linked and verified on code CaptainBonk.`
+          : `Roobet username linked. Play on code CaptainBonk for exclusive rewards.`;
       toast.classList.remove("is-hidden", "is-error");
     }
   } catch {

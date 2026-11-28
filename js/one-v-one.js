@@ -285,9 +285,9 @@ function renderOneVOne(data, startedAt = 0, authoritative = false) {
   if (accessNote) {
     const note =
       affiliatesOnly && subscribersOnly
-        ? "AFF/SUB only — verified vzqie affiliates or active Kick subscribers can enter."
+        ? "AFF/SUB only — verified CaptainBonk affiliates or active Kick subscribers can enter."
         : affiliatesOnly
-          ? "AFF only — verified vzqie affiliates can enter."
+          ? "AFF only — verified CaptainBonk affiliates can enter."
           : subscribersOnly
             ? "SUB only — active Kick subscribers can enter."
             : "";

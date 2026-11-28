@@ -12,11 +12,11 @@ Crypto checkout for FunCoins via hosted NOWPayments invoices.
 2. In Vercel → Project → **Environment Variables** (Production + Preview if needed):
    - `NOWPAYMENTS_API_KEY`
    - `NOWPAYMENTS_IPN_SECRET`
-   - `SITE_URL` = `https://website-vzqie.vercel.app`
+   - `SITE_URL` = `https://website-CaptainBonk.vercel.app`
    - Optional: `NOWPAYMENTS_SANDBOX` = `1` for sandbox testing
    - Optional: `POINTS_USD_RATE` (default `100`)
 3. Set NOWPayments IPN URL to:
-   `https://website-vzqie.vercel.app/api/points/buy/ipn`
+   `https://website-CaptainBonk.vercel.app/api/points/buy/ipn`
 4. **Redeploy** Vercel (env vars do not apply until redeploy).
 5. Confirm `GET /api/points/buy/packages` returns `"configured": true`.
 6. Admins can pause/resume purchases from the Store admin panel (`POST /api/points/buy/settings` with `{ "enabled": false }`).

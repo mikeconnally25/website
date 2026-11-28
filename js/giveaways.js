@@ -141,10 +141,10 @@ function accessModeLabel() {
 
 function accessModeNoteText() {
   if (giveawayAffiliatesOnly && giveawaySubscribersOnly) {
-    return "AFF/SUB only — verified vzqie affiliates and active Kick subscribers can enter.";
+    return "AFF/SUB only — verified CaptainBonk affiliates and active Kick subscribers can enter.";
   }
   if (giveawayAffiliatesOnly) {
-    return "AFF only — entrants must be verified on code vzqie.";
+    return "AFF only — entrants must be verified on code CaptainBonk.";
   }
   if (giveawaySubscribersOnly) {
     return "SUB only — entrants must be active Kick subscribers.";
@@ -158,7 +158,7 @@ function updateAffiliatesOnlyLabel() {
 
   if (label) {
     label.textContent = giveawayAffiliatesOnly
-      ? "Only AFF users (verified on code vzqie) can enter"
+      ? "Only AFF users (verified on code CaptainBonk) can enter"
       : "Affiliate restriction off";
   }
 
@@ -696,7 +696,7 @@ async function setAffiliatesOnly(affiliatesOnly) {
     giveawayAffiliatesOnly
       ? giveawaySubscribersOnly
         ? "AFF and SUB modes on. Affiliates or Kick subs can enter."
-        : "AFF-only mode on. Only verified vzqie affiliates can enter."
+        : "AFF-only mode on. Only verified CaptainBonk affiliates can enter."
       : giveawaySubscribersOnly
         ? "AFF-only off. SUB-only still active."
         : "AFF-only mode off. Anyone can enter with the keyword.",

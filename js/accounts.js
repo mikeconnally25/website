@@ -302,7 +302,7 @@ function renderAccounts(users) {
       affBadge.className = "accounts-aff-badge";
       affBadge.textContent = "AFF";
       affBadge.title = user.affOnRoster
-        ? "Verified on code vzqie"
+        ? "Verified on code CaptainBonk"
         : "Manually granted AFF";
       badges.append(affBadge);
     }
@@ -901,7 +901,7 @@ function paintAffiliateRoster(data) {
     const source = data?.source ? ` · ${data.source}` : "";
     const updated = data?.updatedAt ? ` · updated ${formatDateTime(data.updatedAt)}` : "";
     meta.textContent = `${data?.affiliateSite || "roobet"} / ${
-      data?.affiliateCode || "vzqie"
+      data?.affiliateCode || "CaptainBonk"
     }${source}${updated}`;
   }
 }
@@ -943,7 +943,7 @@ async function saveAffiliateRoster() {
     paintAffiliateRoster(data);
     setAccountsStatus(
       `Saved ${data.count || 0} Roobet AFF usernames for code ${
-        data.affiliateCode || "vzqie"
+        data.affiliateCode || "CaptainBonk"
       }.`,
       "success"
     );
