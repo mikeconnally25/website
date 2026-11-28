@@ -172,7 +172,7 @@ async function loadSlotStats() {
     }
     if (empty) {
       empty.textContent = data.catalogEmpty
-        ? "No games loaded yet. Sync from Roobet on Bonus Hunt."
+        ? "No games loaded yet. Sync LIQD on Bonus Hunt."
         : "No matching slots.";
     }
     renderSlotStatsMatches();

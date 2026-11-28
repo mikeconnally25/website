@@ -619,7 +619,7 @@ function renderRedeemSlotResults() {
     results.classList.add("is-hidden");
     empty.classList.remove("is-hidden");
     empty.textContent =
-      "No synced slots yet. Sync from Roobet on Bonus Hunt first.";
+      "No synced slots yet. Sync LIQD on Bonus Hunt first.";
     return;
   }
 

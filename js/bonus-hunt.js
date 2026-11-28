@@ -1058,7 +1058,7 @@ function updateSlotCatalogNote() {
   const note = document.getElementById("slot-catalog-note");
   const summary = slotCatalog.length
     ? formatCatalogCountSummary()
-    : "No slots loaded yet. Use Sync from Roobet above.";
+    : "No slots loaded yet. Use Sync LIQD above.";
 
   if (note && isHuntAdmin()) {
     note.textContent = summary;
@@ -4909,34 +4909,6 @@ function initAdminForm() {
         return;
       }
       setCatalogSyncStatus(error.message || "Could not sync from LIQD.", "error");
-    } finally {
-      button.disabled = false;
-    }
-  });
-
-  document.getElementById("slot-sync-roobet")?.addEventListener("click", async (event) => {
-    const button = event.currentTarget;
-    button.disabled = true;
-    setCatalogSyncStatus("Syncing all playable Roobet games…", "pending");
-    try {
-      const response = await fetch("/api/bonus-hunt/slots/sync-roobet", {
-        method: "POST",
-        credentials: "include",
-        headers: { Accept: "application/json" },
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(data.error || "Could not sync from Roobet.");
-      }
-      await loadSlotCatalog();
-      const logoNote =
-        data.withThumbnails > 0 ? ` · ${data.withThumbnails} with logos` : "";
-      setCatalogSyncStatus(
-        `Roobet synced. ${formatCatalogCountSummary()}${logoNote}`,
-        "success"
-      );
-    } catch (error) {
-      setCatalogSyncStatus(error.message || "Could not sync from Roobet.", "error");
     } finally {
       button.disabled = false;
     }
