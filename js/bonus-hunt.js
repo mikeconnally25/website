@@ -4252,11 +4252,256 @@ function initAdminForm() {
         host === "stake.ac" ||
         host.endsWith(".stake.ac") ||
         host === "stake.games" ||
-        host.endsWith(".stake.games")
+        host.endsWith(".stake.games") ||
+        host === "liqd.com" ||
+        host.endsWith(".liqd.com") ||
+        host === "liqd.gg" ||
+        host.endsWith(".liqd.gg") ||
+        host === "roobet.com" ||
+        host.endsWith(".roobet.com")
       );
     } catch {
       return false;
     }
+  }
+
+  function buildLiqdSyncScript({ token, apiBase, openerOrigins }) {
+    const importUrl = `${apiBase}/api/bonus-hunt/slots/import-sync`;
+    const allowedOpeners = Array.isArray(openerOrigins)
+      ? openerOrigins
+      : [openerOrigins].filter(Boolean);
+    return `(async () => {
+  const token = ${JSON.stringify(token)};
+  const importUrl = ${JSON.stringify(importUrl)};
+  const openerOrigins = ${JSON.stringify(allowedOpeners)};
+  const lockKey = "__bhLiqdSyncLock_" + token.slice(0, 12);
+  if (window[lockKey]) {
+    console.warn("LIQD sync already running for this token.");
+    return;
+  }
+  window[lockKey] = true;
+
+  const notify = (source, extra = {}) => {
+    for (const origin of openerOrigins) {
+      try {
+        window.opener?.postMessage({ source, token, ...extra }, origin);
+      } catch {}
+    }
+  };
+  const notifyProgress = (message) =>
+    notify("bh-slot-sync-progress", { message });
+  const notifyFailure = (error) =>
+    notify("bh-slot-sync-failed", {
+      message: error?.message || String(error) || "LIQD sync failed.",
+    });
+  const notifyDone = (payload) =>
+    notify("bh-slot-sync-complete", payload || {});
+
+  const collectionKeys = (game) => {
+    const collections = game?.collections;
+    if (Array.isArray(collections)) {
+      return collections.map((v) => String(v || "").toLowerCase());
+    }
+    if (collections && typeof collections === "object") {
+      return Object.keys(collections).map((k) => k.toLowerCase());
+    }
+    const tags = Array.isArray(game?.tags) ? game.tags : [];
+    return tags
+      .map((tag) => String(tag?.slug || tag?.name || tag || "").toLowerCase())
+      .filter(Boolean);
+  };
+
+  const groupSlugsFromKeys = (keys) => {
+    const set = new Set(keys);
+    const groups = new Set();
+    for (const key of set) {
+      if (key === "slots" || key === "slot" || (key.includes("slot") && !key.includes("live"))) {
+        groups.add("slots");
+      }
+      if (
+        key === "live" ||
+        key === "live-games" ||
+        key === "livecasino" ||
+        key === "live-casino" ||
+        key === "live_casino" ||
+        (key.includes("live") && !key.includes("show"))
+      ) {
+        groups.add("live-games");
+      }
+      if (
+        key === "game-shows" ||
+        key === "gameshows" ||
+        key === "game_shows" ||
+        (key.includes("game") && key.includes("show"))
+      ) {
+        groups.add("game-shows");
+      }
+    }
+    return [...groups];
+  };
+
+  const slugify = (game) =>
+    String(game?.slug || game?.identifier || game?.id || game?.name || game?.title || "")
+      .trim()
+      .toLowerCase()
+      .replace(/^\\/+/, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+  const mapGame = (game, forcedGroup) => {
+    const keys = collectionKeys(game);
+    const category = String(game?.category || game?.game_type || game?.type || "").toLowerCase();
+    if (category) keys.push(category);
+    let groups = forcedGroup ? [forcedGroup] : groupSlugsFromKeys(keys);
+    groups = groups.filter((g) => ["slots", "live-games", "game-shows"].includes(g));
+    if (!groups.length) return [];
+    const name = String(game?.title || game?.name || "").trim();
+    const slug = slugify(game);
+    if (!name || !slug) return [];
+    const thumbnailUrl =
+      game.squareImage || game.image || game.thumbnailUrl || game.thumbnail || game.url_thumb || null;
+    const provider = String(game.provider || game.provider_name || game.producer || "").trim();
+    return groups.map((groupSlug) => ({
+      name,
+      slug,
+      provider,
+      thumbnailUrl,
+      groupSlug,
+      groupSlugs: groups,
+    }));
+  };
+
+  const extractSoftswiss = (payload) => {
+    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload?.games)) return payload.games;
+    if (payload?.games && typeof payload.games === "object") return Object.values(payload.games);
+    if (payload && typeof payload === "object") {
+      const values = Object.values(payload);
+      if (values.length && values.every((v) => v && typeof v === "object" && (v.title || v.name))) {
+        return values;
+      }
+    }
+    return [];
+  };
+
+  let slots = [];
+  try {
+    notifyProgress("Fetching LIQD catalog…");
+    const soft = await fetch("/api/games/allowed_desktop", {
+      credentials: "include",
+      headers: { Accept: "application/json" },
+    });
+    if (soft.ok) {
+      const payload = await soft.json();
+      slots = extractSoftswiss(payload).flatMap((game) => mapGame(game));
+      notifyProgress("SoftSwiss catalog loaded (" + slots.length + " matched)…");
+    }
+  } catch (error) {
+    console.warn("SoftSwiss LIQD fetch failed", error);
+  }
+
+  if (!slots.length) {
+    const tabs = [
+      { tabId: "slots", groupSlug: "slots" },
+      { tabId: "slot", groupSlug: "slots" },
+      { tabId: "live-casino", groupSlug: "live-games" },
+      { tabId: "live", groupSlug: "live-games" },
+      { tabId: "live-games", groupSlug: "live-games" },
+      { tabId: "game-shows", groupSlug: "game-shows" },
+      { tabId: "gameshows", groupSlug: "game-shows" },
+      { tabId: "game_shows", groupSlug: "game-shows" },
+    ];
+    const seenTabs = new Set();
+    for (const tab of tabs) {
+      if (seenTabs.has(tab.tabId)) continue;
+      seenTabs.add(tab.tabId);
+      for (let page = 1; page <= 80; page += 1) {
+        const url =
+          "/api/games-v2?page=" +
+          page +
+          "&per_page=100&tab_id=" +
+          encodeURIComponent(tab.tabId);
+        const response = await fetch(url, {
+          credentials: "include",
+          headers: { Accept: "application/json" },
+        });
+        if (!response.ok) break;
+        const payload = await response.json().catch(() => ({}));
+        const rows = Array.isArray(payload?.data)
+          ? payload.data
+          : Array.isArray(payload?.games)
+            ? payload.games
+            : Array.isArray(payload)
+              ? payload
+              : [];
+        if (!rows.length) break;
+        for (const row of rows) {
+          slots.push(...mapGame(row, tab.groupSlug));
+        }
+        notifyProgress(
+          "LIQD " + tab.groupSlug + " page " + page + " (" + slots.length + " games)…"
+        );
+        const lastPage = Number(
+          payload?.meta?.last_page || payload?.last_page || payload?.pagination?.last_page || 0
+        );
+        if (lastPage && page >= lastPage) break;
+        if (rows.length < 100) break;
+      }
+    }
+  }
+
+  const bySlug = new Map();
+  for (const slot of slots) {
+    if (!slot?.slug) continue;
+    const existing = bySlug.get(slot.slug);
+    if (!existing) {
+      bySlug.set(slot.slug, slot);
+      continue;
+    }
+    existing.groupSlugs = [
+      ...new Set([...(existing.groupSlugs || []), ...(slot.groupSlugs || []), slot.groupSlug]),
+    ];
+  }
+  slots = [...bySlug.values()];
+
+  if (!slots.length) {
+    const err = new Error(
+      "No LIQD slots / live / game shows found on this page. Make sure you are on liqd.com in an allowed region."
+    );
+    notifyFailure(err);
+    window[lockKey] = false;
+    throw err;
+  }
+
+  notifyProgress("Uploading " + slots.length + " LIQD games…");
+  try {
+    const response = await fetch(importUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        token,
+        payload: {
+          source: "liqd",
+          slots,
+        },
+      }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || "Could not upload LIQD catalog.");
+    }
+    notifyDone({
+      count: data.unique || data.count || slots.length,
+      withThumbnails: data.withThumbnails || 0,
+    });
+    console.log("LIQD sync done:", slots.length, "games");
+  } catch (error) {
+    notifyFailure(error);
+    throw error;
+  } finally {
+    window[lockKey] = false;
+  }
+})();`;
   }
 
   function resolveOpenerOrigins() {
@@ -4308,6 +4553,14 @@ function initAdminForm() {
         const message = data.message || "Sync failed.";
         setCatalogSyncStatus(message, "error");
         resolveSyncCompletion(data.token, { error: message });
+        return;
+      }
+      if (data?.source === "bh-slot-sync-complete" && data.token) {
+        resolveSyncCompletion(data.token, {
+          complete: true,
+          count: data.count,
+          withThumbnails: data.withThumbnails || 0,
+        });
         return;
       }
       if (data?.source !== "bh-slot-sync" || !data.token || !Array.isArray(data.slots)) {
@@ -4544,6 +4797,122 @@ function initAdminForm() {
       "success"
     );
   }
+
+  async function startLiqdBrowserSync() {
+    const label = "LIQD";
+    ensureStakeSyncMessageListener();
+    hideSyncScriptFallback();
+    setCatalogSyncStatus("Preparing LIQD browser sync…", "pending");
+
+    const tokenResponse = await fetch("/api/bonus-hunt/slots/sync-token", {
+      method: "POST",
+      credentials: "same-origin",
+    });
+    const tokenData = await tokenResponse.json().catch(() => ({}));
+    if (!tokenResponse.ok || !tokenData.token) {
+      throw new Error(
+        tokenData.error || "Could not start sync. Sign in as admin and try again."
+      );
+    }
+
+    const script = buildLiqdSyncScript({
+      token: tokenData.token,
+      apiBase: resolveSyncApiBase(),
+      openerOrigins: resolveOpenerOrigins(),
+    });
+
+    const liqdWindow = window.open("https://liqd.com/casino/slots", "_blank");
+    if (!liqdWindow) {
+      showSyncScriptFallback(script, label);
+      throw new Error(
+        "Popup blocked. Allow popups, open liqd.com, then paste the script into the LIQD console."
+      );
+    }
+
+    let copied = false;
+    try {
+      await copyTextToClipboard(script);
+      copied = true;
+    } catch {
+      showSyncScriptFallback(script, label);
+    }
+
+    setCatalogSyncStatus(
+      copied
+        ? "LIQD script copied. Keep this tab open. On LIQD: wait for the page, then F12 → Console → paste → Enter."
+        : "LIQD: clipboard blocked — copy the script below, then paste in the LIQD console."
+    );
+
+    const timeoutMs = 25 * 60 * 1000;
+    const status = await Promise.race([
+      pollSyncToken(tokenData.token, { timeoutMs }),
+      waitForSyncCompletion(tokenData.token),
+    ]);
+    syncCompletionWaiters.delete(tokenData.token);
+    if (status?.error) {
+      throw new Error(status.error);
+    }
+
+    await loadSlotCatalog();
+    hideSyncScriptFallback();
+    const logoNote =
+      status.withThumbnails > 0 ? ` · ${status.withThumbnails} with logos` : "";
+    setCatalogSyncStatus(
+      `LIQD synced. ${formatCatalogCountSummary()}${logoNote}`,
+      "success"
+    );
+  }
+
+  document.getElementById("slot-sync-liqd")?.addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    setCatalogSyncStatus("Syncing LIQD slots, live games, and game shows…", "pending");
+    try {
+      const response = await fetch("/api/bonus-hunt/slots/sync-liqd", {
+        method: "POST",
+        credentials: "include",
+        headers: { Accept: "application/json" },
+      });
+      const data = await response.json().catch(() => ({}));
+      if (response.ok) {
+        await loadSlotCatalog();
+        const logoNote =
+          data.withThumbnails > 0 ? ` · ${data.withThumbnails} with logos` : "";
+        setCatalogSyncStatus(
+          `LIQD synced. ${formatCatalogCountSummary()}${logoNote}`,
+          "success"
+        );
+        return;
+      }
+
+      if (data.regionBlocked || /region|blocked|451|HTML instead of JSON/i.test(data.error || "")) {
+        setCatalogSyncStatus(
+          "Server cannot reach LIQD from this region — switching to browser sync…",
+          "pending"
+        );
+        await startLiqdBrowserSync();
+        return;
+      }
+
+      throw new Error(data.error || "Could not sync from LIQD.");
+    } catch (error) {
+      try {
+        if (/region|blocked|451|HTML instead of JSON|Failed to fetch/i.test(error.message || "")) {
+          await startLiqdBrowserSync();
+          return;
+        }
+      } catch (browserError) {
+        setCatalogSyncStatus(
+          browserError.message || error.message || "Could not sync from LIQD.",
+          "error"
+        );
+        return;
+      }
+      setCatalogSyncStatus(error.message || "Could not sync from LIQD.", "error");
+    } finally {
+      button.disabled = false;
+    }
+  });
 
   document.getElementById("slot-sync-roobet")?.addEventListener("click", async (event) => {
     const button = event.currentTarget;
